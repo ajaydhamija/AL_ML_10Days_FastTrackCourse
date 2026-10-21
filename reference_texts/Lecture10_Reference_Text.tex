@@ -1,0 +1,219 @@
+\documentclass[11pt]{article}
+\usepackage{notes}
+\definecolor{AccN}{HTML}{A8861A}
+\begin{document}
+\titlepg{10}{Project Presentations:\\A Practitioner's Guide}{How to frame, build, validate, report and defend a defence-AI project --- with the assessment rubric, a model project outline and the STARE method for hard questions}
+\tableofcontents
+\newpage
+
+\section{What the Panel Is Really Assessing}
+The project is not a test of algorithm recall but of judgement: did you identify the right problem, choose and justify a method, validate it honestly, and think through how it would be used and how it could fail? Panels include external defence-AI practitioners who ask how your system would perform in real operational conditions.
+
+\section{Framing the Problem}
+A good problem statement is specific, quantified and operational. Weak: ``We applied machine learning to air defence.'' Strong: ``IADS operators at a forward air base receive about 400 radar tracks per hour; manual classification takes 45 seconds per track; we need a classifier with at least 95\% accuracy and bomber recall above 95\% within 3 ms.'' Name the environment and threat, quantify the cost of not solving the problem, and identify the decision your system supports. Then map it to a paradigm using the three master questions (labels? interaction? multiple agents?).
+
+\section{Data: the First Thing the Panel Will Probe}
+Report $N$, features, class distribution and how the data were generated (real, exercise, simulation). Then address the Lecture~1 checklist explicitly: collection and survivorship bias; distribution shift between data source and deployment; label quality and noise; class imbalance and the operational base rate; confounders that could produce Simpson-type reversals; leakage (temporal, duplicate, label). A presentation that never mentions data quality is a red flag.
+
+\section{Experimental Design}
+\subsection{Baselines}
+Always compare against (1) a trivial baseline (majority class, random policy, mean predictor), (2) a simple model (logistic regression, linear regression, $k$-Means), and (3) the relevant course benchmark. An 87\% result means nothing without context.
+\subsection{Validation protocol}
+Fix the train/validation/test split (stratified, and split by mission or day for sequential data) before modelling; tune only on validation or cross-validation; evaluate the test set once. For RL, train with several random seeds (at least five) and evaluate on many episodes against several opponents.
+\subsection{Ablations}
+Remove one component at a time (a feature group, the curriculum, the target network) to show what actually drives performance.
+
+\section{Reporting Results Honestly}
+\subsection{Metrics that match the decision}
+Classification: confusion matrix, per-class precision and recall, and precision at the operational base rate; $F_\beta$ reflecting error costs. Regression: RMSE, MAE, signed bias and prediction intervals. Clustering: silhouette plus agreement between methods or with experts. Anomaly detection: TPR at a fixed false-alert budget per day. RL: mean and spread across seeds, win rate against several opponents.
+\subsection{Uncertainty}
+Report confidence intervals. For an accuracy $\hat a$ on $n$ test cases, $\hat a\pm1.96\sqrt{\hat a(1-\hat a)/n}$.
+\begin{example}{is the improvement real?}
+Your classifier scores 95.0\% on 400 test tracks; the course benchmark is 97.5\%. The 95\% interval for your result is $95.0\pm1.96\sqrt{0.95\times0.05/400}=95.0\pm2.1\%$, i.e.\ $(92.9,\,97.1)$. The benchmark lies just outside, suggesting your model is genuinely somewhat worse; with only 100 test tracks the interval would be $\pm4.3\%$ and the comparison inconclusive. For two models on the same test set, use McNemar's test; for RL, compare across seeds.
+\end{example}
+\subsection{Visualisation}
+One clear chart comparing your result with baselines, a confusion matrix or reliability diagram, and a figure of the system architecture are worth more than many tables.
+
+\section{Statistics for Your Results}
+\subsection{Bootstrap confidence intervals}
+When no formula is convenient (e.g.\ for $F_1$, AUC or average reward), resample the test set with replacement many times (say 1,000), recompute the metric on each resample, and take the 2.5th and 97.5th percentiles as a 95\% interval. For 93\% accuracy on 500 tracks a bootstrap typically gives about (90.8\%, 95.2\%), matching the normal approximation; for a rare-class recall based on 20 positives it will be much wider --- which is exactly what the panel needs to see.
+
+\subsection{Comparing RL methods across seeds}
+\begin{example}{Welch's t-test}
+Method A over five seeds: mean success 0.82, s.d.\ 0.04. Method B: mean 0.78, s.d.\ 0.05. $SE=\sqrt{0.04^2/5+0.05^2/5}=\sqrt{0.00082}=0.0286$; $t=0.04/0.0286=1.40$, with about 7.6 degrees of freedom (Welch--Satterthwaite), $p\approx0.20$. A four-point advantage over five seeds is not established; more seeds, or evaluation on more episodes per seed, are needed.
+\end{example}
+
+\subsection{Effect sizes}
+Report how big a difference is, not only whether it is significant: absolute and relative differences, and for continuous outcomes Cohen's $d=(\bar x_A-\bar x_B)/s_{\text{pooled}}$ (0.2 small, 0.5 medium, 0.8 large). In the seed example, $d=0.04/0.045\approx0.9$: potentially large but imprecisely estimated --- a reason to run more seeds, not to claim victory.
+
+\section{Failure Modes and Effects Analysis}
+Engineering design reviews list how a system can fail and rate each failure for severity (S), occurrence (O) and detectability (D) on 1--10 scales; the risk priority number $\text{RPN}=S\times O\times D$ ranks what to fix first.
+\begin{center}\small\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{Xcccc}\toprule Failure mode (anomaly-detection project) & S & O & D & RPN\\\midrule Novel attack mimics normal traffic and is missed & 9 & 4 & 7 & 252\\ Concept drift raises false alerts beyond analyst capacity & 6 & 7 & 3 & 126\\ Baseline poisoned by slow insider activity & 8 & 3 & 8 & 192\\ Automatic isolation cuts a critical service & 9 & 2 & 4 & 72\\\bottomrule\end{tabularx}\end{center}
+The table directs effort: mimicry and poisoning (RPN 252, 192) call for red-teaming and peer-group baselines; the high-severity isolation risk is controlled by keeping a human approval step.
+
+\section{Documentation: Data Cards and Model Cards}
+\textbf{Data card:} source and collection process; time period and locations; known gaps and biases (e.g.\ only detected incidents labelled); class distribution and base rate; labelling procedure and estimated noise; preprocessing; permitted uses and restrictions. \textbf{Model card:} intended use and users; out-of-scope uses; training and evaluation data; metrics with confidence intervals, per class and per operating condition; known failure modes; autonomy level and human oversight required; version and date. Panels respond well to projects that include both: they show you know where the system should not be used.
+
+\section{Reproducibility Checklist}
+\begin{itemize}
+\item Fixed random seeds, and results reported across several seeds.
+\item Exact data splits saved (by mission or day for sequential data).
+\item Code, configuration and library versions recorded.
+\item Preprocessing fitted on training data only (pipelines).
+\item Hyper-parameters chosen on validation data; the test set used once.
+\item Every number on a slide traceable to a logged run.
+\end{itemize}
+
+\section{Planning the Project}
+\begin{center}\begin{tikzpicture}[x=1.1cm,y=0.55cm]
+\foreach \w in {1,...,8}{\node[font=\scriptsize]at(\w+0.5,0.7){wk \w};}
+\foreach \y/\a/\b/\t/\c in {0/1/2/Problem framing \& data audit/NavyN,-1/2/4/Baselines \& first models/BluN,-2/3/6/Main method \& tuning/AccN,-3/5/7/Validation; CIs; ablations/GrnN,-4/6/8/Deployment plan; FMEA; cards/AmbN,-5/7/9/Slides \& two rehearsals/RedN}{\fill[\c!60](\a,\y-0.35)rectangle(\b,\y+0.35);\node[font=\scriptsize,anchor=east]at(0.9,\y){\t};}
+\end{tikzpicture}\\{\small\color{GreyN}Figure 1: an eight-week project plan. Overlaps are deliberate: start validation before tuning ends.}\end{center}
+
+\section{Slide-by-Slide Plan for Ten Minutes}
+\begin{enumerate}
+\item Title, team, one-sentence claim.
+\item Operational problem with numbers and the cost of inaction.
+\item Data: sources, size, class balance, base rate, pitfalls found and fixed.
+\item Method: chosen algorithm, two alternatives, why this one (cite course benchmarks).
+\item Results 1: headline metric vs baselines, with confidence intervals.
+\item Results 2: per-class or per-condition breakdown; confusion matrix or reliability diagram.
+\item Ablation or robustness test (shift, noise, adversarial).
+\item Deployment concept: architecture, latency, autonomy level, human interface.
+\item Risks: FMEA highlights, sim-to-real gap estimate, ethics.
+\item Limitations (two specific) and next steps.
+\end{enumerate}
+
+\section{A Worked Rubric Scoring}
+\begin{example}{scoring a sample presentation}
+A group presents a radar classifier: problem quantified (400 tracks/hour, 3 ms budget) but no cost of inaction stated --- \emph{problem 16/20}. Random forest chosen over SVM and logistic regression with course benchmarks cited --- \emph{algorithm 22/25}. Accuracy 96.1\% with per-class recall but no confidence intervals or baseline --- \emph{results 15/25}. Latency and Level-2 operation discussed, sim-to-real not addressed --- \emph{operational 14/20}. One generic limitation, no adversarial discussion --- \emph{ethics 5/10}. Total \textbf{72/100} (weighted by the rubric). The fastest improvements: add confidence intervals and a majority-class baseline (+6--8), quantify the deployment-domain gap (+3--4), and give two specific limitations including adversarial robustness (+3--4).
+\end{example}
+
+\section{Expanded Panel Question Bank}
+\textbf{Data:} How were labels obtained, and by whom? What is missing from your data? How does the test set differ from the deployment environment? \textbf{Method:} Why not a simpler model? What did the ablation show? \textbf{Results:} What is the confidence interval? How many seeds? What does the confusion matrix look like for the rarest class? \textbf{Operations:} What does the operator see? What happens when the system is wrong? How will you detect drift? \textbf{Adversary:} How would an opponent fool or exploit your system? \textbf{Ethics and law:} Who is accountable for a recommendation that leads to harm? Which autonomy level, and why not higher?
+
+\section{The Deployment Plan}
+Separate technically competent projects from operationally mature ones: state the autonomy level (and why), latency budget and hardware, the human--AI interface (what the operator sees, what they approve), ROE and IHL compliance mechanisms, the expected simulation-to-reality gap and how you would close and measure it (domain randomisation, field trials), monitoring for drift after deployment, and the failure modes with their consequences (a short failure-mode and effects table).
+
+\section{Limitations and Ethics}
+Give two specific limitations, not generic ones. Weak: ``future work would improve accuracy.'' Strong: ``trained only on L-band signatures; frequency-agile X-band radars would require retraining with domain data.'' Address adversarial robustness (can an opponent fool or exploit the system?), accountability and IHL where force is involved.
+
+\section{The Assessment Rubric Explained}
+\begin{center}\small\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{>{\bfseries}p{3cm}cX}\toprule Criterion & Weight & What distinction looks like\\\midrule
+Problem definition & 20\% & Quantified, operationally grounded, cost of inaction stated.\\
+Algorithm justification & 25\% & Compared with at least two alternatives, citing course metrics; choice explained by data properties.\\
+Results and validation & 25\% & Per-class metrics, confidence intervals, method, baselines, ablations.\\
+Operational applicability & 20\% & Autonomy level, latency, ROE, sim-to-real gap quantified, deployment and monitoring plan.\\
+Critical evaluation and ethics & 10\% & Specific limitations, IHL, adversarial robustness, failure modes.\\\bottomrule
+\end{tabularx}\end{center}
+Peer evaluation contributes 20\% of the project grade (clarity, technical depth, operational relevance, question handling), moderated by the instructor.
+
+\section{The Ten-Minute Presentation}
+Problem (60 s) $\to$ data and data quality (60 s) $\to$ algorithm and justification (90 s) $\to$ results and validation (120 s) $\to$ deployment plan (90 s) $\to$ limitations (30 s), leaving time for transitions. One idea per slide; numbers on every results slide; rehearse to time.
+
+\section{Handling Questions: STARE}
+\textbf{S}tate what you know (with numbers); \textbf{T}ie it to your slides; \textbf{A}cknowledge the gap honestly --- never bluff; \textbf{R}eason about what would happen; \textbf{E}nd with what you would do next.
+\begin{example}{a STARE answer}
+\emph{Q: Is your detector robust to adversarial traffic?} S: ``On 100,000 test packets it achieved 95\% TPR at 0.8\% FPR.'' T: ``Slide 6 shows the per-attack breakdown.'' A: ``We did not test adversarial perturbations.'' R: ``Autoencoders can be evaded by attacks that imitate normal patterns; R2L is already our weakest class.'' E: ``Next we would red-team with crafted traffic and add an Isolation Forest cross-check.''
+\end{example}
+
+\section{Common Pitfalls}
+Accuracy-only reporting; no baseline; ignoring data quality; claiming operational readiness from simulation; missing ethics; choosing deep learning by default when a simpler model suffices; misreading statistics (adding percentages, ignoring base rates, ``not significant = no effect''); and point results without uncertainty.
+
+\section{A Model Project Outline}
+\textbf{Title:} Tiered anomaly detection for a brigade network. \textbf{Problem:} 2 million events/day, analysts can triage 200 alerts; current signature IDS misses novel attacks. \textbf{Data:} 30 days of normal traffic plus labelled red-team attacks; checks for leakage by day, base rate 0.01\%. \textbf{Methods:} Isolation Forest screen, autoencoder confirmation, compared with z-score and one-class SVM baselines. \textbf{Results:} TPR at a fixed 150 false alerts/day, with bootstrap confidence intervals; per-attack recall; ablation without tier 1. \textbf{Deployment:} edge server, 3 s daily compute, Level-2 containment approvals, drift monitoring and monthly retraining. \textbf{Limitations:} mimicry attacks; baseline poisoning; red-team traffic may not represent real adversaries. \textbf{Ethics:} privacy of user monitoring, accountability for automated isolation.
+\clearpage
+\part*{Part C --- Research Methods for AI Projects}
+\addcontentsline{toc}{part}{Part C --- Research Methods for AI Projects}
+
+\section{Designing Experiments}
+\subsection{From question to hypothesis}
+A project question (``Can ML improve radar threat classification?'') must become a testable hypothesis with a measurable outcome (``A gradient-boosted classifier achieves higher bomber recall at 1\% false-positive rate than the current rule set, on held-out data from a later month''). Name the \textbf{independent variables} you will change (algorithm, features, sensor set), the \textbf{dependent variables} you will measure (recall, latency, false alarms per hour) and the \textbf{controls} you hold fixed (data split, preprocessing, compute budget).
+\subsection{Factorial designs for simulation studies}
+When several factors may matter, varying one at a time misses interactions and wastes runs. A \textbf{$2^k$ factorial design} runs every combination of $k$ factors at two levels.
+\begin{example}{a $2^2$ design}
+Factor A: sensor package (baseline $-$, upgraded $+$). Factor B: decision algorithm (rules $-$, learned $+$). Mean mission success over replicated simulations: $(-,-)=70\%$, $(+,-)=78\%$, $(-,+)=74\%$, $(+,+)=90\%$.\\
+Main effect of A $=\frac{78+90}{2}-\frac{70+74}{2}=12$ points. Main effect of B $=\frac{74+90}{2}-\frac{70+78}{2}=8$ points. Interaction AB $=\frac{(70+90)-(78+74)}{2}=4$ points: the learned algorithm gains more when the better sensors are present. A one-factor-at-a-time study starting from $(-,-)$ would have seen gains of 8 and 4 and missed the synergy.
+\end{example}
+\subsection{How many replications?}
+Simulation outcomes are random, so each configuration is replicated. To estimate a mean to within $\pm E$ with 95\% confidence when the run-to-run standard deviation is $s$, about $n=(1.96\,s/E)^2$ replications are needed. With mission times varying by $s=8$ minutes and a target precision of $\pm2$ minutes, $n=(1.96\times8/2)^2\approx62$ runs per configuration. \textbf{Common random numbers} --- running each configuration with the same random seeds --- make the comparison between configurations far more precise than the individual estimates, because shared luck cancels in the difference.
+
+\section{Tuning Without Fooling Yourself}
+Every hyper-parameter choice made by looking at results is a form of fitting. Three practices keep the final estimate honest:
+\begin{itemize}
+\item \textbf{Nested cross-validation:} an inner loop chooses hyper-parameters; an outer loop, which never sees those choices, estimates performance. The test set remains untouched until the end.
+\item \textbf{Equal tuning budgets:} a baseline tuned for an afternoon against a new method tuned for a month is not a fair comparison; give both the same number of trials.
+\item \textbf{Random search over grid search:} when only a few hyper-parameters matter, random sampling explores each important dimension more thoroughly than a grid with the same number of points.
+\end{itemize}
+Report the search space, the budget and the selection criterion, so that readers can judge how much optimism the tuning introduced.
+
+\section{Statistics for Results, Part II}
+\subsection{How many test cases do you need?}
+To estimate an accuracy near $p$ to within $\pm E$ at 95\% confidence needs about $n=1.96^2p(1-p)/E^2$ test cases. For $p=0.9$ and $E=0.02$: $n\approx864$. For a rare class, $n$ counts the cases \emph{of that class}: estimating bomber recall to $\pm2$ points needs about 864 bombers, not 864 tracks.
+\subsection{Small samples: the Wilson interval}
+\begin{example}{18 of 20 threats detected}
+Recall $=0.90$. The textbook (Wald) interval $0.90\pm1.96\sqrt{0.9\times0.1/20}$ gives $(0.77,\,1.03)$ --- an upper limit above 1, which is impossible. The \textbf{Wilson interval},
+\[\frac{\hat p+\frac{z^2}{2n}\pm z\sqrt{\frac{\hat p(1-\hat p)}{n}+\frac{z^2}{4n^2}}}{1+\frac{z^2}{n}},\]
+gives $(0.70,\,0.97)$: honest about how little twenty cases can establish. Use Wilson (or exact Clopper--Pearson) intervals whenever counts are small.
+\end{example}
+\subsection{Many comparisons}
+Comparing a new model with four alternatives at $\alpha=0.05$ each inflates the chance of a spurious ``win'' (Lecture~1). The \textbf{Bonferroni} correction tests each at $\alpha/m$. The \textbf{Holm} procedure is uniformly more powerful: sort the $p$-values, compare the smallest with $\alpha/m$, the next with $\alpha/(m-1)$, and so on, stopping at the first that fails.
+\begin{example}{Holm versus Bonferroni}
+Four comparisons with $p=0.004,\,0.014,\,0.030,\,0.20$. Bonferroni threshold $0.0125$: only the first is significant. Holm: $0.004\le0.0125$ (reject), $0.014\le0.0167$ (reject), $0.030>0.025$ (stop). Holm finds two genuine differences while controlling the same family-wise error rate.
+\end{example}
+
+\section{Ablation and Sensitivity Analysis}
+An \textbf{ablation} removes one component at a time to show what each contributes; a \textbf{sensitivity analysis} varies one assumption at a time to show how fragile the conclusion is.
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabular}{lcc}\toprule Configuration (illustrative) & Bomber recall & False alarms / hour\\\midrule
+Full system (fusion + boosted classifier + calibration) & 0.94 & 1.2\\
+\quad without ESM features & 0.86 & 1.9\\
+\quad without calibration (default threshold) & 0.94 & 3.4\\
+\quad logistic regression instead of boosting & 0.89 & 1.6\\
+\quad trained on 25\% of the data & 0.88 & 1.5\\\bottomrule\end{tabular}\end{center}
+A table like this tells the panel which parts of the design matter (here, ESM features for recall and calibration for false alarms) and where effort should go next. Present sensitivity analyses as tornado charts or small tables: ``if the base rate doubles, precision rises from 0.16 to 0.28; if ESM is jammed, recall falls to 0.86''.
+
+\section{From Notebook to Deployable System}
+\subsection{Machine-learning operations}
+A model that works in a notebook is a prototype. A deployable system also needs: \textbf{versioned data and models} (which data trained which model, reproducibly); \textbf{automated pipelines} for training, testing and packaging; \textbf{monitoring} of input distributions, prediction distributions and, when labels arrive, accuracy; \textbf{retraining triggers} and a rollback plan; and documentation (data cards and model cards, as in the main text).
+\subsection{Latency and the edge}
+Defence systems often run on constrained hardware at the tactical edge. Every millisecond is budgeted.
+\begin{example}{a latency budget}
+A requirement of 5 ms from track update to classification: model inference 3.1 ms, preprocessing 0.8 ms, data-link and queueing 1.5 ms --- 5.4 ms, over budget. Quantising the model to 8-bit integers roughly halves inference time to about 1.6 ms, giving 3.9 ms within budget, provided accuracy is re-validated after quantisation (it usually drops slightly). Pruning, distillation into a smaller model and hardware accelerators are the other levers.
+\end{example}
+
+\section{Threat-Modelling a Machine-Learning System}
+An adversary can attack an ML system at every stage. A project that will face an adversary should include a short threat model:
+\begin{center}\small\renewcommand{\arraystretch}{1.3}\begin{tabularx}{\textwidth}{>{\bfseries}l X X}\toprule Attack & What the adversary does & Mitigations\\\midrule
+Poisoning & corrupts training data or labels so the model learns a blind spot or backdoor & data provenance, outlier screening, robust training, holding back clean validation data\\
+Evasion & crafts inputs (camouflage, spoofed emissions, adversarial patches) that are misclassified & adversarial training, multi-sensor confirmation, input sanity checks\\
+Model extraction & queries the model to copy it or learn its decision boundary & rate limits, query monitoring, coarse outputs\\
+Inference attacks & recovers sensitive training data from the model's outputs & limit output detail, differential privacy, access control\\
+Supply chain & compromised libraries, pre-trained weights or hardware & signed artefacts, trusted sources, independent testing\\\bottomrule\end{tabularx}\end{center}
+
+\section{Writing the Technical Report}
+A good report follows the same arc as the talk: problem and operational context; data and its limitations; method and why it was chosen over alternatives; results with baselines, uncertainty and ablations; deployment considerations; limitations, risks and ethics; recommendations. Practical rules:
+\begin{itemize}
+\item State the main finding, with its uncertainty, in the first paragraph.
+\item Every figure has a caption that says what the reader should conclude.
+\item Every number has units, a sample size and, where meaningful, an interval.
+\item Distinguish clearly between what was measured, what was inferred and what is speculation.
+\item Include enough detail (data split, hyper-parameters, seeds, software versions) for someone else to reproduce the results.
+\end{itemize}
+
+\section{A Fully Worked Example Project}
+The numbers below are illustrative; the structure is the point.
+\subsection*{Title: Early warning of UAV propulsion faults from telemetry}
+\textbf{Problem.} A squadron of small UAVs loses about one airframe a quarter to in-flight motor failures. Maintenance is calendar-based. Goal: flag developing faults at least one sortie before failure, with no more than one false alert per 50 sorties.\\
+\textbf{Data.} 18 months of telemetry (motor current, vibration, temperature, battery voltage at 10 Hz) from 2,400 sorties, including 31 sorties preceding a confirmed motor failure. Split by airframe and by time: train on the first 12 months, validate on months 13--15, test on months 16--18.\\
+\textbf{Baselines.} (1) The current calendar schedule; (2) fixed vibration thresholds from the manufacturer.\\
+\textbf{Method.} Per-sortie features (spectral band energies of vibration, current--thrust residuals, temperature rise rate); an Isolation Forest trained on healthy sorties for screening; a CUSUM on each airframe's anomaly score to detect persistent drift (Lecture~5). Thresholds set on the validation months to meet the false-alert budget.\\
+\textbf{Results (test months).} Of 9 pre-failure sorties, 7 were flagged at least one sortie early (recall 0.78, Wilson 95\% interval 0.45--0.94); 11 false alerts in 600 healthy sorties (1 per 55). Fixed thresholds caught 3 of 9 with 9 false alerts.\\
+\textbf{Ablation.} Without the CUSUM layer, recall was the same but false alerts doubled; without vibration spectra, recall fell to 4 of 9.\\
+\textbf{Limitations.} Nine failures is a small sample, so the recall interval is wide; all data come from one airframe type and one climate; two missed faults were electrical, not mechanical, and need different sensors.\\
+\textbf{Deployment.} Alerts go to maintenance technicians as advisories with the contributing features displayed; no automatic grounding. Monitor alert rates monthly; retrain quarterly; re-validate after any change of motor supplier.\\
+\textbf{Ethics and risk.} Low direct risk; the main risks are over-trust (skipping inspections because no alert was raised) and alert fatigue. Both are addressed by keeping the calendar inspections during a six-month trial.
+\begin{keypoint}A strong project is honest about what it does not know: a recall of 0.78 with a wide interval, clearly explained, is more persuasive to an experienced panel than an unqualified 0.95.\end{keypoint}
+
+\end{document}
