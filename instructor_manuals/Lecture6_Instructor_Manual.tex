@@ -1,0 +1,339 @@
+\documentclass[11pt]{article}
+\usepackage{notes} % place notes.sty in the same folder
+\definecolor{AccN}{HTML}{2C3E80}
+\fancyhead[L]{\small\color{NavyN}\nouppercase{\leftmark}}\fancyhead[R]{\small\color{GreyN}Instructor Manual --- Lecture 6}
+\usepackage{longtable,multicol,needspace}
+\setlength{\emergencystretch}{2em}
+\newtcolorbox{instr}[1]{nb,colback=AccN!6,colframe=AccN,title={#1}}
+\newtcolorbox{prob}{nb,colback=BluN!5,colframe=BluN,title={Problem statement}}
+\newtcolorbox{soln}{nb,colback=GrnN!5,colframe=GrnN,title={Model solution and marking points}}
+\newtcolorbox{sayit}{nb,colback=white,colframe=NavyN,title={Read aloud to students}}
+\newtcolorbox{live}[1]{nb,colback=AccN!4,colframe=AccN,title={#1}}
+\begin{document}
+\begin{titlepage}\centering\vspace*{2.2cm}
+{\color{AccN}\large\bfseries LECTURE 6\par}\vspace{0.6cm}
+{\color{NavyN}\Huge\bfseries Reinforcement Learning Part 1:\\Q-Learning \& Deep Q-Networks\par}\vspace{0.6cm}
+{\color{AccN}\rule{0.7\textwidth}{1.5pt}}\par\vspace{0.6cm}
+{\LARGE Instructor Manual\par}\vspace{0.4cm}
+{\large\begin{minipage}{0.85\textwidth}\centering MDPs \textbullet\ Bellman equations \textbullet\ Q-learning \textbullet\ $\varepsilon$-greedy \textbullet\ DQN \textbullet\ replay buffer \textbullet\ reward shaping\\Case study: wargame tactical agent, 20$\times$20 JANUS grid, 100K episodes, 81\% win vs novice human\end{minipage}\par}\vspace{2cm}
+{\large AK DHAMIJA, Researcher \& Instructor, AI \& Machine Learning\par}\vspace{0.2cm}
+{\normalsize \href{mailto:dhamija.ak@gmail.com}{dhamija.ak@gmail.com} \quad\textbullet\quad 9811453163\par}\vspace{0.3cm}
+{Unit 4: Simulation Strategies in Warfare --- AI \& Machine Learning in Warfare\par}\vfill
+\begin{tcolorbox}[colback=NavyN!4,colframe=NavyN,boxrule=0.6pt,arc=2pt,width=0.9\textwidth]\small
+\textbf{This manual contains:} the 45-minute session plan with timings; a slide-by-slide teaching guide for all 19 slides; key messages, facilitation tips, anticipated questions with model answers, misconceptions and in-class activities; live demonstrations with the interactive studio; consistency notes on the source material; the complete quiz answer key with rationale and scoring rules; and the assignment with marking scheme and full model solutions.
+\end{tcolorbox}
+\end{titlepage}
+\tableofcontents\newpage
+
+
+\needspace{12\baselineskip}\section{Lecture at a Glance}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.3cm}>{\raggedright\arraybackslash}X@{}}\toprule
+
+\textcolor{NavyN}{Lecture}&6 --- Reinforcement Learning Part 1: Q-Learning \& Deep Q-Networks\\
+\textcolor{NavyN}{Duration}&45 minutes: 5 min opening Q\&A, 30 min teaching, 10 min auto-quiz\\
+\textcolor{NavyN}{Slides}&19 (Beamer PDF, 16:9), 9 sections\\
+\textcolor{NavyN}{Prerequisite}&Lecture~5; students should have attempted its quiz and assignment.\\
+\textcolor{NavyN}{Student materials}&\texttt{Lecture6\_Slides\_Beamer.pdf}; \texttt{Lecture6\_Reference\_Text.pdf}; \texttt{Lecture6\_Quiz.html}; \texttt{Lecture6\_Answers\_Assignment.html} (release after the quiz)\\
+\textcolor{NavyN}{Interactive studio}&\texttt{Lecture6\_Q\_Learning\_Gridworld.html} (live demonstrations in Section~\ref{sec:live})\\
+\textcolor{NavyN}{Assessment}&Auto-quiz: 15 MCQs, 40~s each, $+1/-0.25$. Assignment: 5 problems, 100 marks, plus a 20-mark bonus problem.\\\bottomrule\end{tabularx}\end{center}
+
+\subsection*{Overview}Lecture~6 opens the reinforcement-learning block (Lectures~6--8) on autonomous systems. It builds the formal machinery --- Markov decision processes, the Markov property and POMDPs, Bellman equations --- then derives tabular Q-learning and scales it to Deep Q-Networks with experience replay, target networks, Double and Dueling DQN. Reward shaping and curriculum learning address the sparse rewards typical of combat. The running case is a tactical agent on a $20\times20$ JANUS hex grid trained over 100K episodes: 93\% against a random opponent, 81\% against novice humans, and 54\% against a minimax AI. The lecture ends by framing such agents as \emph{advisors}, not commanders.
+
+\subsection*{Learning outcomes}By the end of the lecture students should be able to:\begin{enumerate}\item Formulate a tactical problem as an MDP $(S,A,P,R,\gamma)$ and recognise when it is a POMDP.\item State the Bellman optimality equations and interpret a $Q$-value.\item Perform Q-learning updates by hand and explain off-policy learning and $\varepsilon$-greedy exploration.\item Explain why DQN needs replay and a target network, and what Double and Dueling DQN fix.\item Design safe (potential-based) reward shaping and a curriculum.\end{enumerate}
+
+\subsection*{Syllabus mapping}\begin{itemize}\item Reinforcement learning for autonomous systems --- \textbf{Q-learning} (tabular and deep)\end{itemize}
+
+\needspace{12\baselineskip}\section{Session Plan (45 Minutes)}
+
+\begin{center}\begin{tikzpicture}[x=0.3444cm,y=1cm]
+\fill[AmbN!40](0,0)rectangle(5,1);\node[font=\scriptsize\bfseries,align=center]at(2.5,0.5){Q\&A\\recap};
+\fill[AccN!25](5.00,0)rectangle(6.50,1);\draw[white,thick](5.00,0)--(5.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(5.75,0.5){\parbox{0.9cm}{\centering \S1}};
+\fill[NavyN!18](6.50,0)rectangle(10.00,1);\draw[white,thick](6.50,0)--(6.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(8.25,0.5){\parbox{0.9cm}{\centering \S2}};
+\fill[AccN!25](10.00,0)rectangle(13.50,1);\draw[white,thick](10.00,0)--(10.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(11.75,0.5){\parbox{0.9cm}{\centering \S3}};
+\fill[NavyN!18](13.50,0)rectangle(18.00,1);\draw[white,thick](13.50,0)--(13.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(15.75,0.5){\parbox{0.9cm}{\centering \S4}};
+\fill[AccN!25](18.00,0)rectangle(23.00,1);\draw[white,thick](18.00,0)--(18.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(20.50,0.5){\parbox{0.9cm}{\centering \S5}};
+\fill[NavyN!18](23.00,0)rectangle(26.50,1);\draw[white,thick](23.00,0)--(23.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(24.75,0.5){\parbox{0.9cm}{\centering \S6}};
+\fill[AccN!25](26.50,0)rectangle(30.00,1);\draw[white,thick](26.50,0)--(26.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(28.25,0.5){\parbox{0.9cm}{\centering \S7}};
+\fill[NavyN!18](30.00,0)rectangle(31.50,1);\draw[white,thick](30.00,0)--(30.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(30.75,0.5){\parbox{0.9cm}{\centering \S8}};
+\fill[AccN!25](31.50,0)rectangle(35.00,1);\draw[white,thick](31.50,0)--(31.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(33.25,0.5){\parbox{0.9cm}{\centering \S9}};
+\fill[RedN!30](35,0)rectangle(45,1);\node[font=\scriptsize\bfseries,align=center]at(40,0.5){Auto-quiz\\15 Q $\times$ 40 s};
+\draw[NavyN](0,0)rectangle(45,1);
+\foreach \tt in {0,5,10,15,20,25,30,35,40,45}{\draw[NavyN](\tt,0)--(\tt,-0.12);\node[font=\tiny,below]at(\tt,-0.12){\tt};}
+\node[font=\scriptsize,below]at(22.5,-0.45){minutes};
+\end{tikzpicture}\end{center}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.2}\begin{tabularx}{\textwidth}{@{}l l X r@{}}\toprule\textbf{Clock} & \textbf{Slides} & \textbf{Segment} & \textbf{Min}\\\midrule
+
+0:00--5:00 & --- & \textbf{Opening Q\&A and recap} (see prompts below) & 5\\
+
+5:00--6:30 & 2 & 1. Why RL (1 slide) & 1.5\\
+
+6:30--10:00 & 3--4 & 2. MDPs (2 slides) & 3.5\\
+
+10:00--13:30 & 5--6 & 3. Bellman Equations (2 slides) & 3.5\\
+
+13:30--18:00 & 7--9 & 4. Q-Learning (3 slides) & 4.5\\
+
+18:00--23:00 & 10--12 & 5. Deep Q-Networks (3 slides) & 5\\
+
+23:00--26:30 & 13--14 & 6. Rewards \& Curriculum (2 slides) & 3.5\\
+
+26:30--30:00 & 15--16 & 7. Case Study Results (2 slides) & 3.5\\
+
+30:00--31:30 & 17 & 8. Across Disciplines (1 slide) & 1.5\\
+
+31:30--35:00 & 18--19 & 9. Summary (2 slides) & 3.5\\
+
+35:00--45:00 & --- & \textbf{Auto-quiz} (instructions 1 min, 15 questions $\times$ 40 s = 10 min of answering; collect scores) & 10\\\bottomrule\end{tabularx}\end{center}
+
+Slide 1 is the title slide and is shown while students settle. The teaching segment covers 18 content slides in 30 minutes, an average pace of 0.6 slides per minute. 
+
+Minute allocations are proportional to slide counts; shift time towards the sections students find hardest.
+
+\begin{instr}{Opening Q\&A prompts (first 5 minutes)}\begin{enumerate}\item From Lecture~5: why do false alarms dominate when attacks are rare?\item Which anomaly detector was used for real-time screening in the 3-tier design, and why?\item How does RL differ from supervised learning? (preview from Lecture~1)\end{enumerate}Take two or three answers per prompt; correct misconceptions briefly and note any topic that needs revisiting.\end{instr}
+
+\needspace{12\baselineskip}\section{Slide-by-Slide Teaching Guide}
+
+Each subsection gives the slide range, the suggested time, what to emphasise, and the slide titles in order. Numbers refer to pages of the Beamer PDF.
+
+\needspace{8\baselineskip}\subsection{1. Why RL \normalfont\small\color{GreyN}(slide 2, about 1.5 min)}
+
+\textbf{Teaching note.} The agent--environment loop; learning from reward rather than labels; delayed and sparse feedback; exploration.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}2 & The Third Paradigm --- Learning by Doing: No Labels, Just Rewards\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{2. MDPs \normalfont\small\color{GreyN}(slides 3--4, about 3.5 min)}
+
+\textbf{Teaching note.} The five MDP elements; return and discount (horizon $\approx1/(1-\gamma)$, about 20 steps at $\gamma=0.95$); the Markov property; fog of war makes warfare a POMDP.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}3 & Markov Decision Process --- Five Elements Define the Agent's World\\
+4 & The Markov Property --- and Why Real Warfare Is a POMDP\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{3. Bellman Equations \normalfont\small\color{GreyN}(slides 5--6, about 3.5 min)}
+
+\textbf{Teaching note.} Bellman expectation and optimality equations; in the worked example, a value of 18.7 for $Q(s,\text{attack})$ means the expected discounted return from attacking now and acting optimally afterwards.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}5 & Bellman Equations --- Recursive Characterisation of the Optimal Policy\\
+6 & Wargame Worked Example --- Reading Q-Values\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{4. Q-Learning \normalfont\small\color{GreyN}(slides 7--9, about 4.5 min)}
+
+\textbf{Teaching note.} The TD update $Q\leftarrow Q+\alpha[r+\gamma\max Q'-Q]$ (worked: $8\to9.5$); off-policy learning; $\varepsilon$-greedy schedules; convergence conditions and the tabular wall.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}7 & Q-Learning (Watkins, 1989) --- Model-Free, Off-Policy TD Control\\
+8 & $\varepsilon$-Greedy Exploration --- the Exploration--Exploitation Dilemma\\
+9 & Q-Learning Convergence --- the Theory and the Tabular Wall\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{5. Deep Q-Networks \normalfont\small\color{GreyN}(slides 10--12, about 5 min)}
+
+\textbf{Teaching note.} Function approximation; experience replay and the target network; over-estimation from the max of noisy estimates; Double DQN separates selection from evaluation; Dueling separates $V$ and $A$.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}10 & Deep Q-Network --- Replace the Q-Table with a Neural Network\\
+11 & DQN's Two Key Innovations --- Experience Replay and the Target Network\\
+12 & Double DQN and Dueling DQN --- Better Value Estimates\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{6. Rewards \& Curriculum \normalfont\small\color{GreyN}(slides 13--14, about 3.5 min)}
+
+\textbf{Teaching note.} Sparse $\pm100$ rewards; potential-based shaping $F=\gamma\Phi(s')-\Phi(s)$ preserves the optimal policy; curriculum raised the final win rate from 51\% to 91\%.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}13 & Reward Shaping --- When +100 Win / $-$100 Lose Is Too Sparse to Learn From\\
+14 & Curriculum Learning --- Start Simple, Add Complexity\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{7. Case Study Results \normalfont\small\color{GreyN}(slides 15--16, about 3.5 min)}
+
+\textbf{Teaching note.} Results by algorithm and opponent; the sim-to-real gap; present the top three actions with $Q$-values to a commander.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}15 & Wargame Case Study --- DQN Agent on the 20$\times$20 JANUS Hex Grid\\
+16 & Sim-to-Real Gap and the Advisory Role of Wargame AI\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{8. Across Disciplines \normalfont\small\color{GreyN}(slide 17, about 1.5 min)}
+
+\textbf{Teaching note.} RL in psychology (operant conditioning, dopamine prediction error), control engineering, biology (foraging) and aeronautics (flight control).
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}17 & Reinforcement Learning Across the Disciplines\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{9. Summary \normalfont\small\color{GreyN}(slides 18--19, about 3.5 min)}
+
+\textbf{Teaching note.} Summary and look-ahead to policy-gradient methods.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}18 & Lecture 6 Summary --- From MDP Formalism to Wargame Tactical Agents\\
+19 & Looking Ahead --- Lecture 7: Policy Gradient Methods\\\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{Key Messages}Students should leave the room able to state these in their own words:\begin{keypoint}\begin{enumerate}\item RL learns behaviour from consequences; the reward \emph{is} the specification.\item Bellman equations make long-horizon value recursive and learnable.\item Q-learning is model-free and off-policy; exploration must never stop during training.\item Replay and target networks stabilise deep Q-learning; Double DQN fixes optimistic bias.\item Results depend heavily on the opponent; simulation success is not field success.\end{enumerate}\end{keypoint}
+
+\needspace{12\baselineskip}\section{Facilitation Tips}\begin{itemize}\item Do one Q-update on the board with all numbers before showing any network.\item Use the corridor example from the reference text (four cells, reward at the end) to show value propagating backwards over episodes.\item Ask: ``What would this agent do if we rewarded only kills?'' to motivate the reward-design discussion.\end{itemize}
+
+\needspace{12\baselineskip}\section{Anticipated Questions and Model Answers}
+
+\begin{question}{anticipated question}\textbf{Q:} Why use $\gamma<1$ at all?\par\smallskip\textbf{A:} It keeps returns finite in long tasks, expresses preference for sooner rewards and reduces variance; it also sets an effective planning horizon.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} Can Q-learning handle hidden enemy units?\par\smallskip\textbf{A:} Not directly; it assumes Markov states. Use memory (recurrent DQN), belief states or frame stacking for POMDPs.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} Is 81\% against novices impressive?\par\smallskip\textbf{A:} It is a single evaluation against one opponent type. Against a minimax AI it fell to 54\%. Report repeated runs with confidence intervals and adaptive opponents.\end{question}
+
+\needspace{12\baselineskip}\section{Common Misconceptions}\begin{center}\small\renewcommand{\arraystretch}{1.35}\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}\toprule\textbf{Misconception} & \textbf{Correction}\\\midrule``A higher reward always means a better policy.'' & Only for the specified reward; mis-specified rewards produce reward hacking.\\
+``$\varepsilon$ should decay to zero.'' & Keep a floor during training; exploit fully only at evaluation.\\
+``Reward shaping is always harmless.'' & Only potential-based shaping preserves the optimum; ad-hoc bonuses can be gamed.\\\bottomrule\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{In-Class Activities and Discussion Prompts}\label{sec:act}\begin{itemize}\item \textbf{Reward design workshop:} teams write a reward for ``hold the bridge for 30 turns with minimal losses'' and swap with another team to find exploits.\item \textbf{Q-update relay:} three consecutive updates on a 2-state MDP, each pair passes the table on.\end{itemize}
+
+\needspace{12\baselineskip}\section{Run It Live: Studio Demonstrations}\label{sec:live}
+
+Project \texttt{Lecture6\_Q\_Learning\_Gridworld.html} (it is a single HTML file and runs offline in any browser; every result updates as an input changes). Each demonstration below follows the same rhythm: \textbf{set} the inputs, \textbf{ask} the class to commit to a prediction (a show of hands or a one-word answer), then \textbf{reveal} the result and \textbf{land} the point. The numbers are exactly what the page shows for the settings given; simulations use fixed random seeds, so they repeat every time. The 45-minute plan has little slack: choose the one demonstration marked \emph{first choice} for class, and use the others in a tutorial, a second session, or as homework with the drill cards at the bottom of the page.
+
+\begin{live}{Demo 1: Value iteration, one sweep at a time (about 2 min, with \S3 Bellman Equations)}\textbf{Set.} Patrol grid 2$\times$3, $\gamma=0.9$, no slip. In Demo~2 press \textsf{One sweep} repeatedly.\par\smallskip\textbf{Ask.} Before each press: ``Which cells change next, and to what?''\par\smallskip\textbf{Reveal.} Values spread one cell per sweep and converge after \textbf{4 sweeps} to the lecture values: $V^*(S1)=8$, $V^*(S2)=10$, $V^*(S4)=6.2$, $V^*(S5)=8$. S4 shows two arrows: Up and Right are equally good.\par\smallskip\textbf{Land the point.} The Bellman update needs a model; Q-learning (Demo~1) estimates the same quantities from experience.\end{live}
+
+\begin{live}{Demo 2: Q-learning versus SARSA beside a minefield (about 4 min, with \S4 Q-Learning) --- \emph{first choice}}\textbf{Set.} Demo~1: map \textsf{Minefield edge 4$\times$8}, $\alpha=0.5$, $\gamma=0.9$, $\varepsilon=0.1$. Choose Q-learning, \textsf{Reset Q to zero}, press \textsf{100 episodes} five times; repeat for SARSA.\par\smallskip\textbf{Ask.} ``Which algorithm learns the better policy?''\par\smallskip\textbf{Reveal.} Q-learning: mean return over the last 50 episodes \textbf{$-8.12$}; greedy route 9 moves along the minefield edge (return $+2$). SARSA: \textbf{$-4.74$}; greedy route 13 moves, keeping clear (return $-2$).\par\smallskip\textbf{Land the point.} Q-learning learns the optimal greedy policy but trains worse, because exploration near the edge is fatal. SARSA learns the value of what it actually does. Choose by whether exploration, or execution noise, will persist in deployment.\end{live}
+
+\begin{live}{Demo 3: How far ahead does the agent look? (about 2 min, with \S2 MDPs)}\textbf{Set.} Demo~3 defaults: $\gamma=0.9$, reward 2 now or 10 in 20 steps.\par\smallskip\textbf{Ask.} ``Which does the agent take?''\par\smallskip\textbf{Reveal.} Horizon 10 steps; the later reward is worth 1.22 now, so it \textbf{takes the reward now}; it would wait only if $\gamma>0.923$. At $\gamma=0.95$: horizon 20 steps, present value 3.58, \textbf{wait}.\par\smallskip\textbf{Land the point.} $\gamma$ is a design choice about patience, and too small a value makes a patrol agent ignore distant objectives.\end{live}
+
+\begin{live}{Demo 4: Why DQN overestimates (about 2 min, with \S5 Deep Q-Networks)}\textbf{Set.} Demo~4 defaults: 6 actions, all truly worth 0, estimation noise $\sigma=1$.\par\smallskip\textbf{Ask.} ``On average, what will $\max_a \hat Q(s',a)$ report?''\par\smallskip\textbf{Reveal.} \textbf{$+1.267$} (Double DQN's estimate: $-0.004$); compounded over 10 bootstrapped steps, about $+8.25$. With 20 actions: $+1.868$.\par\smallskip\textbf{Land the point.} The max of noisy estimates is biased upward and the bias feeds into every target. Double DQN separates choosing from evaluating.\end{live}
+
+\needspace{12\baselineskip}\section{Consistency Notes on the Source Material}These notes record where the original PowerPoint deck contained an inconsistency and how the current slides, reference text, quiz and assignment handle it. Students who have seen the old deck may raise them.\begin{itemize}\item The source deck reports 87\% for Double DQN against novice humans, while its results table gives 81\% for the stronger Dueling + Double agent; Lecture~1's source slides quote 67/85/91\% learning-curve values where Lecture~6 gives 38/76/91\%. The new materials follow the Lecture~6 results table and flag single-run figures as indicative.\end{itemize}
+
+\needspace{12\baselineskip}\section{Quiz Administration and Answer Key}
+
+\begin{sayit}``You will now take a 15-question quiz. Each question has four options and exactly one correct answer. You have 40 seconds per question; the quiz advances automatically when time runs out. A correct answer scores $+1$, a wrong answer $-0.25$, and an unanswered question 0. The maximum is 15 and the minimum is $-3.75$. Because of the negative marking, guessing blindly among four options gains nothing on average --- answer when you can eliminate options. Your score and a full review appear at the end.''\end{sayit}
+
+\textbf{Delivery.} Open \texttt{Lecture6\_Quiz.html} on each student device (or project it and collect answers on paper). The page enforces the timer and computes the score with negative marking. Release \texttt{Lecture6\_Answers\_Assignment.html} only after all students have finished.
+
+\subsection*{Answer key}\begin{center}\small\renewcommand{\arraystretch}{1.3}\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}\hline \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{11} & \textbf{12} & \textbf{13} & \textbf{14} & \textbf{15}\\\hline A & A & C & C & A & B & C & D & B & B & B & C & D & D & A\\\hline\end{tabular}\end{center}
+
+\textbf{Interpreting scores.} 12 or more: secure command of the lecture. 9--11.75: good, review missed items. Below 9: revisit the reference text before the assignment. If more than half the class misses a question, revisit that point in the next lecture's opening Q\&A.
+
+\subsection*{Questions, options and rationale}
+
+{\small
+
+\noindent\textbf{Q1.} Reinforcement learning differs from supervised learning mainly because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{The agent learns from rewards generated by its own interaction, with delayed and sparse feedback, not labelled answers}~{\color{GrnN}$\checkmark$}\item[B.] It uses neural networks\item[C.] It needs no data\item[D.] It is unsupervised clustering\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} No one labels the correct move; the agent discovers it from consequences.\par\medskip
+
+\noindent\textbf{Q2.} An MDP is defined by:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{(S, A, P, R, gamma)}~{\color{GrnN}$\checkmark$}\item[B.] (X, Y, loss)\item[C.] (k, epsilon, MinPts)\item[D.] (Q, K, V)\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} States, actions, transition probabilities, rewards, discount factor.\par\medskip
+
+\noindent\textbf{Q3.} With gamma = 0.95 the effective planning horizon is roughly:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] 5 steps\item[B.] 95 steps\item[\textbf{C.}] \textbf{20 steps}~{\color{GrnN}$\checkmark$}\item[D.] Infinite\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $1/(1-\gamma)=20$.\par\medskip
+
+\noindent\textbf{Q4.} If OPFOR positions are hidden by fog of war, the problem is best modelled as:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] A bandit\item[B.] A supervised task\item[\textbf{C.}] \textbf{A POMDP: the agent must act on beliefs or memory}~{\color{GrnN}$\checkmark$}\item[D.] A deterministic MDP\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} The Markov property fails for observations; real warfare is partially observable.\par\medskip
+
+\noindent\textbf{Q5.} The Bellman optimality equation for Q* states that Q*(s,a) equals:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Expected immediate reward plus discounted value of the best next action}~{\color{GrnN}$\checkmark$}\item[B.] The immediate reward only\item[C.] The average of all Q values\item[D.] The probability of winning\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $Q^*=\sum_{s'}P[R+\gamma\max_{a'}Q^*(s',a')]$.\par\medskip
+
+\noindent\textbf{Q6.} Q(s, attack) = 18.7 means:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] An 18.7\% chance of winning\item[\textbf{B.}] \textbf{Expected discounted cumulative reward of attacking now and acting optimally afterwards}~{\color{GrnN}$\checkmark$}\item[C.] 18.7 enemy units destroyed\item[D.] The learning rate\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Q-values are in reward units, not probabilities.\par\medskip
+
+\noindent\textbf{Q7.} Q = 8, r = 2, max Q(s') = 10, gamma = 0.9, alpha = 0.5. The updated Q is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] 9.0\item[B.] 11.0\item[\textbf{C.}] \textbf{9.5}~{\color{GrnN}$\checkmark$}\item[D.] 10.0\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Target 11, TD error 3, new Q = 8 + 0.5 x 3 = 9.5.\par\medskip
+
+\noindent\textbf{Q8.} Q-learning is called off-policy because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] It needs a model\item[B.] It uses a target network\item[C.] It never explores\item[\textbf{D.}] \textbf{Its target uses the greedy max action, not necessarily the action the exploring agent takes next}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} SARSA, by contrast, uses the action actually taken (on-policy).\par\medskip
+
+\noindent\textbf{Q9.} Why must epsilon never reach zero during training?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] It slows computation\item[\textbf{B.}] \textbf{Untried actions would never have their values corrected}~{\color{GrnN}$\checkmark$}\item[C.] It causes overestimation\item[D.] The buffer would overflow\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Convergence requires visiting all state-action pairs; keep some exploration (e.g. 0.05).\par\medskip
+
+\noindent\textbf{Q10.} Experience replay helps DQN by:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Only saving memory\item[\textbf{B.}] \textbf{Breaking temporal correlation between consecutive samples and reusing data}~{\color{GrnN}$\checkmark$}\item[C.] Removing the need for rewards\item[D.] Making Q-values probabilities\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Both stability and sample efficiency.\par\medskip
+
+\noindent\textbf{Q11.} The target network's role is to:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Explore\item[\textbf{B.}] \textbf{Provide stable targets by freezing a copy of the weights for C steps}~{\color{GrnN}$\checkmark$}\item[C.] Pick actions\item[D.] Shape rewards\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Without it the target moves with every update.\par\medskip
+
+\noindent\textbf{Q12.} Standard DQN over-estimates values because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Rewards are biased\item[B.] Gamma is too small\item[\textbf{C.}] \textbf{The max over noisy estimates preferentially picks positive noise}~{\color{GrnN}$\checkmark$}\item[D.] Replay is random\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Double DQN decouples selection (online) from evaluation (target): 18.4 to 4.2 units.\par\medskip
+
+\noindent\textbf{Q13.} The dueling architecture decomposes Q into:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Mean and variance\item[B.] Actor and critic\item[C.] Reward and penalty\item[\textbf{D.}] \textbf{State value V(s) and advantage A(s,a), minus the mean advantage}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $Q=V+A-\bar A$; helps when many actions are equally good.\par\medskip
+
+\noindent\textbf{Q14.} Potential-based reward shaping $F=\gamma\Phi(s')-\Phi(s)$ is safe because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] It is always positive\item[B.] It only affects terminal states\item[C.] It removes the discount\item[\textbf{D.}] \textbf{Shaping terms telescope to a constant, so the optimal policy is unchanged}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Ng, Harada \& Russell (1999).\par\medskip
+
+\noindent\textbf{Q15.} Curriculum learning raised the final win rate from 51\% (direct) to 91\% because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Easier early tasks give dense learning signal whose knowledge transfers to harder tasks}~{\color{GrnN}$\checkmark$}\item[B.] It used a bigger network\item[C.] It changed the reward\item[D.] It removed exploration\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Drills before full exercises.\par\medskip
+
+}
+
+\needspace{12\baselineskip}\section{Assignment: Marking Scheme and Model Solutions}
+
+\textbf{Instructions.} Five problems, 100 marks, plus a 20-mark bonus problem (Problem 6). Reference: Lecture 6 reference text.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{0.85\textwidth}{@{}l X r@{}}\toprule\textbf{\#} & \textbf{Problem} & \textbf{Marks}\\\midrule1 & Discounting and tactical preference & 15\\
+2 & Solving a small MDP & 20\\
+3 & Tracing Q-learning & 20\\
+4 & Over-estimation and DQN design & 20\\
+5 & Reward shaping and reward hacking & 25\\
+6 & Problem 6 (bonus): The tempting shortcut & 20\\\midrule & \textbf{Total} & \textbf{100} + 20 bonus\\\bottomrule\end{tabularx}\end{center}
+
+\begin{instr}{General marking guidance}\begin{itemize}
+\item Marks for each part are shown in square brackets in the problem statement.
+\item Award method marks for correct working even when an arithmetic slip carries through; deduct once for the slip, not again for its consequences.
+\item For interpretive parts, full marks need (i) the correct conclusion, (ii) the reason, and (iii) an operational implication or caveat.
+\item Answers that state a number without uncertainty, baseline or caveat where one is required lose a mark per part.
+\item Suggested deadline: one week after the lecture; return marked work before the next quiz on the same topic.
+\end{itemize}\end{instr}
+
+\needspace{8\baselineskip}\subsection{Problem 1: Discounting and tactical preference \normalfont\small\color{GreyN}(15 marks)}
+
+\begin{prob}Policy A earns +10 one step from now; policy B earns +25 ten steps from now (rewards counted at step $k$ are weighted $\gamma^{k-1}$).
+
+(a) Which is preferred with $\gamma=0.9$ and with $\gamma=0.95$? [8]\newline (b) Find the $\gamma$ at which the agent is indifferent, and interpret. [7]\end{prob}
+
+\begin{soln}\textbf{(a)} $\gamma=0.9$: A $=10$; B $=0.9^9\times25=0.387\times25=9.69$: A preferred. $\gamma=0.95$: B $=0.630\times25=15.8$: B preferred.
+
+\textbf{(b)} $\gamma^9=0.4\Rightarrow\gamma=0.4^{1/9}=\mathbf{0.903}$. The discount factor encodes how far ahead the agent plans; a small change flips a quick limited gain into a patient larger one. $\gamma$ is a command decision about time preference, not a mere tuning knob.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 2: Solving a small MDP \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}From \textit{Safe} the agent can \textit{advance} to \textit{Contact} (reward 0) or \textit{hold} (stay, reward 0). From Contact, \textit{attack} succeeds with probability 0.6 (reward +10, episode ends) or fails with 0.4 (reward $-4$, back to Safe); \textit{withdraw} returns to Safe with reward 0. $\gamma=0.9$.
+
+(a) Write the Bellman optimality equations. [6]\newline (b) Solve for $V^*(\text{Safe})$ and $V^*(\text{Contact})$, assuming advance and attack are optimal, and verify that assumption. [10]\newline (c) How would the optimal policy change if failure cost $-30$? [4]\end{prob}
+
+\begin{soln}\textbf{(a)} $V(S)=\max\{0.9V(C),\,0.9V(S)\}$; $V(C)=\max\{0.6(10)+0.4(-4+0.9V(S)),\;0.9V(S)\}$.
+
+\textbf{(b)} With advance and attack: $V(S)=0.9V(C)$ and $V(C)=6-1.6+0.36V(S)=4.4+0.324V(C)$, so $V(C)=4.4/0.676=\mathbf{6.51}$ and $V(S)=\mathbf{5.86}$. Check: withdraw gives $0.9\times5.86=5.27<6.51$; hold gives $0.9\times5.86<0.9\times6.51$. Assumption confirmed.
+
+\textbf{(c)} Attack value $=6+0.4(-30+0.9V(S))=-6+0.36V(S)$. If attacking, $V(C)=-6+0.324V(C)$ gives $V(C)<0$, worse than withdrawing (value $\ge0$). The optimal policy becomes never to attack (holding or withdrawing, value 0): a high enough failure cost makes the objective not worth the risk.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 3: Tracing Q-learning \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Corridor cells 1--2--3; entering cell 3 gives +10 and ends the episode; every other move gives $-1$. $\gamma=0.9$, $\alpha=0.5$, all $Q=0$. The agent moves right every time.
+
+(a) Compute $Q(1,R)$ and $Q(2,R)$ after episodes 1, 2 and 3. [12]\newline (b) What are the true values $Q^*$? Why does learning propagate backward one cell per episode? [8]\end{prob}
+
+\begin{soln}\textbf{(a)} Ep 1: $Q(1,R)=0.5(-1+0)=-0.5$; $Q(2,R)=0.5(10)=5$. Ep 2: $Q(1,R)=-0.5+0.5(-1+4.5+0.5)=\mathbf{1.5}$; $Q(2,R)=5+0.5(5)=\mathbf{7.5}$. Ep 3: $Q(1,R)=1.5+0.5(-1+6.75-1.5)=\mathbf{3.625}$; $Q(2,R)=\mathbf{8.75}$.
+
+\textbf{(b)} $Q^*(2,R)=10$; $Q^*(1,R)=-1+0.9\times10=8$. Each update looks only one step ahead, so information about the goal reaches cell 1 only after cell 2's estimate has grown. With sparse rewards over 40 turns this is very slow: multi-step targets, reward shaping and curricula speed propagation.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 4: Over-estimation and DQN design \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}(a) Seven actions all have true value 5; each estimate has independent noise uniform on $[-1,1]$. Using $E[\max]=(n-1)/(n+1)$ for $n$ such variables, compute the expected over-estimation of $\max_a\hat Q$. Repeat for 3 actions. [6]\newline (b) Explain how Double DQN removes most of this bias. [6]\newline (c) Specify a DQN for the wargame: input encoding, architecture, loss, replay, target updates, exploration, and evaluation protocol. [8]\end{prob}
+
+\begin{soln}\textbf{(a)} $n=7$: $6/8=\mathbf{0.75}$ units of upward bias; $n=3$: $\mathbf{0.5}$. Bias grows with the number of actions, and bootstrapping compounds it through the targets.
+
+\textbf{(b)} The online network chooses $a^*=\arg\max Q(s',\cdot;\theta)$, and the target network, whose errors are largely independent, evaluates $Q(s',a^*;\theta^-)$. Selection noise no longer inflates the evaluated value. In the case study the bias fell from 18.4 to 4.2.
+
+\textbf{(c)} A model answer: encode hex contents and unit attributes (410 inputs, or a CNN on the grid); two 512-unit ReLU layers; dueling head with 7 outputs; Huber loss; Adam at $10^{-4}$; 100K replay with batch 32 (optionally prioritised); target copy every 1,000 steps; Double-DQN targets; $\varepsilon$ decayed from 1.0 to 0.05; curriculum from small maps. Evaluate against random, scripted, minimax and human opponents over many seeds, reporting means with confidence intervals; test for exploitability with an adaptive opponent.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 5: Reward shaping and reward hacking \normalfont\small\color{GreyN}(25 marks)}
+
+\begin{prob}Potential $\Phi(s)=-d(s)$, where $d$ is the distance in hexes to the objective (0 at the objective); $\gamma=0.9$; base reward 0 for moves.
+
+(a) Compute the shaping reward $F=\gamma\Phi(s')-\Phi(s)$ for a move from $d=5$ to $d=4$, from $d=4$ to $d=5$, and for staying at $d=4$. [9]\newline (b) Staying gives a positive shaping reward. Show by telescoping that this cannot make loitering optimal. [8]\newline (c) A different designer rewards +1 for every move that reduces distance. Explain how the agent could exploit this and how to fix it. [8]\end{prob}
+
+\begin{soln}\textbf{(a)} $5\to4$: $0.9(-4)+5=\mathbf{1.4}$. $4\to5$: $0.9(-5)+4=\mathbf{-0.5}$. Stay at 4: $0.9(-4)+4=\mathbf{0.4}$.
+
+\textbf{(b)} Over any trajectory, $\sum_t\gamma^tF_t=\gamma^T\Phi(s_T)-\Phi(s_0)$. For a trajectory that loiters forever this tends to $-\Phi(s_0)=d(s_0)$; for one that reaches the objective ($\Phi=0$) it equals $d(s_0)$ too. Every policy's return is shifted by the same constant $d(s_0)$, so the ranking of policies --- and the optimal policy --- is unchanged. Loitering earns shaping reward but forgoes the real objective reward.
+
+\textbf{(c)} The agent can oscillate (step away, then back) collecting +1 on every approach without ever capturing the objective: reward hacking. Fix it by using potential-based shaping (stepping away then costs exactly what the return step gives back), capping or annealing shaping rewards, and auditing replays for degenerate behaviour.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 6 (bonus): The tempting shortcut \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}A unit in corridor cell S0 can move Right through S1 and S2 to the objective (each move costs $-1$; entering the objective from S2 gives $+20$ and ends the episode), or Left (stays in S0, cost $-1$). From S0 only, it can also \textit{Dash} along an exposed road: with probability 0.6 it reaches the objective ($+20$), otherwise it is ambushed ($-30$); either way the episode ends. $\gamma=0.9$.
+
+(a) Compute $V^*$ for S2, S1 and S0 and the value of Dash. Which action is optimal in S0? [5]\newline (b) Above what success probability $p$ would Dash become optimal? [3]\newline (c) Run three synchronous value-iteration sweeps from $V=0$ and show how S0's preferred action changes. [5]\newline (d) Q-learning with $\alpha=0.5$, all $Q=0$, experiences in order: S0 Right $\to$ S1 ($-1$); S1 Right $\to$ S2 ($-1$); S2 Right $\to$ objective ($+20$); S0 Dash $\to$ ambush ($-30$); S0 Right $\to$ S1 ($-1$); S1 Right $\to$ S2 ($-1$). Give every updated value. [5]\newline (e) With $\varepsilon=0.2$ over three actions in S0, what is the probability of choosing the greedy action? [2]\end{prob}
+
+\begin{soln}\textbf{(a)} $V^*(\text{S2})=20$; $V^*(\text{S1})=-1+0.9(20)=17$; Right from S0: $-1+0.9(17)=\mathbf{14.3}$. Dash: $0.6(20)+0.4(-30)=\mathbf{0}$. Right is optimal by a wide margin.
+
+\textbf{(b)} $20p-30(1-p)=14.3\Rightarrow50p=44.3\Rightarrow p=\mathbf{0.886}$: the shortcut needs better than 88.6\% odds.
+
+\textbf{(c)} Sweep 1: S2 $=20$, S1 $=-1$, S0 $=\max(\text{Dash }0,\text{ Right }-1)=0$ (Dash preferred). Sweep 2: S1 $=17$; S0 still 0 (Right $=-1+0.9(-1)=-1.9$). Sweep 3: S0 $=-1+0.9(17)=14.3$ (Right preferred). Early in planning the immediate gamble looks best, because the value of the safe route has not yet propagated back --- the same reason a half-trained agent can prefer risky shortcuts.
+
+\textbf{(d)} $Q(\text{S0,R})=-0.5$; $Q(\text{S1,R})=-0.5$; $Q(\text{S2,R})=10$; $Q(\text{S0,D})=-15$; $Q(\text{S0,R})=-0.5+0.5(-1+0.9\cdot\max Q(\text{S1})-(-0.5))=-0.75$ (S1's best value was still 0, from an untried Left); $Q(\text{S1,R})=-0.5+0.5(-1+0.9\times10+0.5)=\mathbf{3.75}$.
+
+\textbf{(e)} $0.8+0.2/3=\mathbf{0.867}$; each other action has probability $0.067$.\end{soln}
+
+\end{document}

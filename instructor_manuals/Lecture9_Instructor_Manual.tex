@@ -1,0 +1,309 @@
+\documentclass[11pt]{article}
+\usepackage{notes} % place notes.sty in the same folder
+\definecolor{AccN}{HTML}{5E1F6A}
+\fancyhead[L]{\small\color{NavyN}\nouppercase{\leftmark}}\fancyhead[R]{\small\color{GreyN}Instructor Manual --- Lecture 9}
+\usepackage{longtable,multicol,needspace}
+\setlength{\emergencystretch}{2em}
+\newtcolorbox{instr}[1]{nb,colback=AccN!6,colframe=AccN,title={#1}}
+\newtcolorbox{prob}{nb,colback=BluN!5,colframe=BluN,title={Problem statement}}
+\newtcolorbox{soln}{nb,colback=GrnN!5,colframe=GrnN,title={Model solution and marking points}}
+\newtcolorbox{sayit}{nb,colback=white,colframe=NavyN,title={Read aloud to students}}
+\newtcolorbox{live}[1]{nb,colback=AccN!4,colframe=AccN,title={#1}}
+\begin{document}
+\begin{titlepage}\centering\vspace*{2.2cm}
+{\color{AccN}\large\bfseries LECTURE 9\par}\vspace{0.6cm}
+{\color{NavyN}\Huge\bfseries Culmination \& Revision\par}\vspace{0.6cm}
+{\color{AccN}\rule{0.7\textwidth}{1.5pt}}\par\vspace{0.6cm}
+{\LARGE Instructor Manual\par}\vspace{0.4cm}
+{\large\begin{minipage}{0.85\textwidth}\centering Integrating eight lectures into one coherent defence-AI framework\\Concept map \textbullet\ case-study threads \textbullet\ algorithm selection \textbullet\ key formulas \textbullet\ misconceptions \textbullet\ ethics\end{minipage}\par}\vspace{2cm}
+{\large AK DHAMIJA, Researcher \& Instructor, AI \& Machine Learning\par}\vspace{0.2cm}
+{\normalsize \href{mailto:dhamija.ak@gmail.com}{dhamija.ak@gmail.com} \quad\textbullet\quad 9811453163\par}\vspace{0.3cm}
+{Unit 4: Simulation Strategies in Warfare --- AI \& Machine Learning in Warfare\par}\vfill
+\begin{tcolorbox}[colback=NavyN!4,colframe=NavyN,boxrule=0.6pt,arc=2pt,width=0.9\textwidth]\small
+\textbf{This manual contains:} the 45-minute session plan with timings; a slide-by-slide teaching guide for all 14 slides; key messages, facilitation tips, anticipated questions with model answers, misconceptions and in-class activities; live demonstrations with the interactive studio; consistency notes on the source material; the complete quiz answer key with rationale and scoring rules; and the assignment with marking scheme and full model solutions.
+\end{tcolorbox}
+\end{titlepage}
+\tableofcontents\newpage
+
+
+\needspace{12\baselineskip}\section{Lecture at a Glance}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.3cm}>{\raggedright\arraybackslash}X@{}}\toprule
+
+\textcolor{NavyN}{Lecture}&9 --- Culmination \& Revision\\
+\textcolor{NavyN}{Duration}&45 minutes: 5 min opening Q\&A, 30 min teaching, 10 min auto-quiz\\
+\textcolor{NavyN}{Slides}&14 (Beamer PDF, 16:9), 9 sections\\
+\textcolor{NavyN}{Prerequisite}&Lecture~8; students should have attempted its quiz and assignment.\\
+\textcolor{NavyN}{Student materials}&\texttt{Lecture9\_Slides\_Beamer.pdf}; \texttt{Lecture9\_Reference\_Text.pdf}; \texttt{Lecture9\_Quiz.html}; \texttt{Lecture9\_Answers\_Assignment.html} (release after the quiz)\\
+\textcolor{NavyN}{Interactive studio}&\texttt{Lecture9\_Revision\_Studio.html} (live demonstrations in Section~\ref{sec:live})\\
+\textcolor{NavyN}{Assessment}&Auto-quiz: 15 MCQs, 40~s each, $+1/-0.25$. Assignment: 4 problems, 100 marks.\\\bottomrule\end{tabularx}\end{center}
+
+\subsection*{Overview}Lecture~9 is the culmination and revision session. It ties the eight technical lectures together with a concept map, a cross-lecture case-study thread (one battlefield, eight algorithms), an algorithm-selection guide, three formula sheets, two slides of exam traps and misconceptions, an integrated end-to-end AI/ML pipeline for defence, eight ethical principles and guidance on what examiners look for. Its aim is integration: students should leave able to choose a method for an unseen problem, justify it, evaluate it honestly and state its limits.
+
+\subsection*{Learning outcomes}By the end of the lecture students should be able to:\begin{enumerate}\item Select an appropriate paradigm and algorithm for an unseen defence problem and justify the choice.\item Recall and apply the key formulas from Lectures~1--8.\item Recognise common misconceptions and statistical traps in exam questions and reports.\item Describe an integrated pipeline from sensors to decision support with human control.\item Apply ethical principles to a proposed AI system.\end{enumerate}
+
+\subsection*{Syllabus mapping}\begin{itemize}\item Revision of all Unit~4 syllabus items: paradigms; supervised classification and regression; unsupervised clustering and anomaly detection; RL (Q-learning, policy gradients, multi-agent)\end{itemize}
+
+\needspace{12\baselineskip}\section{Session Plan (45 Minutes)}
+
+\begin{center}\begin{tikzpicture}[x=0.3444cm,y=1cm]
+\fill[AmbN!40](0,0)rectangle(5,1);\node[font=\scriptsize\bfseries,align=center]at(2.5,0.5){Q\&A\\recap};
+\fill[AccN!25](5.00,0)rectangle(7.50,1);\draw[white,thick](5.00,0)--(5.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(6.25,0.5){\parbox{0.9cm}{\centering \S1}};
+\fill[NavyN!18](7.50,0)rectangle(10.00,1);\draw[white,thick](7.50,0)--(7.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(8.75,0.5){\parbox{0.9cm}{\centering \S2}};
+\fill[AccN!25](10.00,0)rectangle(14.50,1);\draw[white,thick](10.00,0)--(10.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(12.25,0.5){\parbox{0.9cm}{\centering \S3}};
+\fill[NavyN!18](14.50,0)rectangle(20.50,1);\draw[white,thick](14.50,0)--(14.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(17.50,0.5){\parbox{0.9cm}{\centering \S4}};
+\fill[AccN!25](20.50,0)rectangle(25.00,1);\draw[white,thick](20.50,0)--(20.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(22.75,0.5){\parbox{0.9cm}{\centering \S5}};
+\fill[NavyN!18](25.00,0)rectangle(27.50,1);\draw[white,thick](25.00,0)--(25.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(26.25,0.5){\parbox{0.9cm}{\centering \S6}};
+\fill[AccN!25](27.50,0)rectangle(30.00,1);\draw[white,thick](27.50,0)--(27.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(28.75,0.5){\parbox{0.9cm}{\centering \S7}};
+\fill[NavyN!18](30.00,0)rectangle(32.50,1);\draw[white,thick](30.00,0)--(30.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(31.25,0.5){\parbox{0.9cm}{\centering \S8}};
+\fill[AccN!25](32.50,0)rectangle(35.00,1);\draw[white,thick](32.50,0)--(32.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(33.75,0.5){\parbox{0.9cm}{\centering \S9}};
+\fill[RedN!30](35,0)rectangle(45,1);\node[font=\scriptsize\bfseries,align=center]at(40,0.5){Auto-quiz\\15 Q $\times$ 40 s};
+\draw[NavyN](0,0)rectangle(45,1);
+\foreach \tt in {0,5,10,15,20,25,30,35,40,45}{\draw[NavyN](\tt,0)--(\tt,-0.12);\node[font=\tiny,below]at(\tt,-0.12){\tt};}
+\node[font=\scriptsize,below]at(22.5,-0.45){minutes};
+\end{tikzpicture}\end{center}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.2}\begin{tabularx}{\textwidth}{@{}l l X r@{}}\toprule\textbf{Clock} & \textbf{Slides} & \textbf{Segment} & \textbf{Min}\\\midrule
+
+0:00--5:00 & --- & \textbf{Opening Q\&A and recap} (see prompts below) & 5\\
+
+5:00--7:30 & 2 & 1. Concept Map (1 slide) & 2.5\\
+
+7:30--10:00 & 3 & 2. Case-Study Thread (1 slide) & 2.5\\
+
+10:00--14:30 & 4--5 & 3. Algorithm Selection (2 slides) & 4.5\\
+
+14:30--20:30 & 6--8 & 4. Formula Sheets (3 slides) & 6\\
+
+20:30--25:00 & 9--10 & 5. Misconceptions (2 slides) & 4.5\\
+
+25:00--27:30 & 11 & 6. Integrated Pipeline (1 slide) & 2.5\\
+
+27:30--30:00 & 12 & 7. Ethics (1 slide) & 2.5\\
+
+30:00--32:30 & 13 & 8. Assessment (1 slide) & 2.5\\
+
+32:30--35:00 & 14 & 9. Looking Forward (1 slide) & 2.5\\
+
+35:00--45:00 & --- & \textbf{Auto-quiz} (instructions 1 min, 15 questions $\times$ 40 s = 10 min of answering; collect scores) & 10\\\bottomrule\end{tabularx}\end{center}
+
+Slide 1 is the title slide and is shown while students settle. The teaching segment covers 13 content slides in 30 minutes, an average pace of 0.4 slides per minute. 
+
+The pace allows time for the in-class activities in Section~\ref{sec:act}.
+
+\begin{instr}{Opening Q\&A prompts (first 5 minutes)}\begin{enumerate}\item From Lecture~8: what does CTDE stand for and why is it needed?\item What does QMIX's monotonicity constraint guarantee?\item Where does the course draw the line on lethal autonomy?\end{enumerate}Take two or three answers per prompt; correct misconceptions briefly and note any topic that needs revisiting.\end{instr}
+
+\needspace{12\baselineskip}\section{Slide-by-Slide Teaching Guide}
+
+Each subsection gives the slide range, the suggested time, what to emphasise, and the slide titles in order. Numbers refer to pages of the Beamer PDF.
+
+\needspace{8\baselineskip}\subsection{1. Concept Map \normalfont\small\color{GreyN}(slide 2, about 2.5 min)}
+
+\textbf{Teaching note.} The decision tree from problem type to paradigm: labels $\to$ supervised; structure $\to$ unsupervised; sequential decisions $\to$ RL; multiple agents $\to$ MARL.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}2 & Course Concept Map --- One Decision Tree, One Toolkit\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{2. Case-Study Thread \normalfont\small\color{GreyN}(slide 3, about 2.5 min)}
+
+\textbf{Teaching note.} Walk the case-study table row by row; ask for the key number and its caveat for each lecture.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}3 & Cross-Lecture Case-Study Thread --- One Battlefield, Eight Algorithms\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{3. Algorithm Selection \normalfont\small\color{GreyN}(slides 4--5, about 4.5 min)}
+
+\textbf{Teaching note.} The selection guide and the course scoreboard; stress that ``best'' depends on metric, data and constraint.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}4 & Algorithm Selection Guide --- From Problem Statement to Method\\
+5 & Best Performers by Task --- the Course Scoreboard\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{4. Formula Sheets \normalfont\small\color{GreyN}(slides 6--8, about 6 min)}
+
+\textbf{Teaching note.} Three formula sheets. Do not read them; pick one formula per sheet and ask a student to explain each symbol.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}6 & Key Formulas (I) --- Data, Supervised Learning \& Fusion (L1--L3)\\
+7 & Key Formulas (II) --- Unsupervised Learning \& Anomaly Detection (L4--L5)\\
+8 & Key Formulas (III) --- Reinforcement Learning \& MARL (L6--L8)\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{5. Misconceptions \normalfont\small\color{GreyN}(slides 9--10, about 4.5 min)}
+
+\textbf{Teaching note.} Exam traps (more data always helps, AUC means ready, $p$ is the probability $H_0$ is true, MAPPO beat humans, \ldots). Have the class vote true/false before revealing each.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}9 & Common Misconceptions --- Exam Traps and Conceptual Errors (I)\\
+10 & Common Misconceptions (II) --- More Traps\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{6. Integrated Pipeline \normalfont\small\color{GreyN}(slide 11, about 2.5 min)}
+
+\textbf{Teaching note.} The integrated pipeline: sensing, fusion, classification, anomaly screening, decision support, human authority, monitoring and retraining.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}11 & Integrated AI/ML Pipeline for Defence --- End-to-End Architecture\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{7. Ethics \normalfont\small\color{GreyN}(slide 12, about 2.5 min)}
+
+\textbf{Teaching note.} Eight principles; apply them to one system discussed in the course.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}12 & Ethical AI in Defence --- Eight Non-Negotiable Principles\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{8. Assessment \normalfont\small\color{GreyN}(slide 13, about 2.5 min)}
+
+\textbf{Teaching note.} What examiners reward: justification, correct metrics, uncertainty, limitations, ethics.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}13 & Assessment Preparation --- What Examiners Look For\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{9. Looking Forward \normalfont\small\color{GreyN}(slide 14, about 2.5 min)}
+
+\textbf{Teaching note.} What the course equips students to do next; bridge to the project session.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}14 & Looking Forward --- What This Course Equips You To Do\\\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{Key Messages}Students should leave the room able to state these in their own words:\begin{keypoint}\begin{enumerate}\item Start from the problem and the data, not the algorithm.\item Every headline number needs a baseline, the right metric and an uncertainty.\item The statistical traps of Lecture~1 recur in every later lecture.\item Defence AI is a socio-technical system: humans, data, models, monitoring and law.\item Clear limitations are a strength, not a weakness.\end{enumerate}\end{keypoint}
+
+\needspace{12\baselineskip}\section{Facilitation Tips}\begin{itemize}\item Run this lecture interactively: cold-call for each case-study row and each misconception.\item Use the quiz as a diagnostic: questions most students miss tell you what to revisit before the final assessment.\item Encourage students to bring their project questions; Lecture~10 is assessment, not tutoring.\end{itemize}
+
+\needspace{12\baselineskip}\section{Anticipated Questions and Model Answers}
+
+\begin{question}{anticipated question}\textbf{Q:} What should we memorise for the exam?\par\smallskip\textbf{A:} The formulas on the three sheets, the meaning of each symbol and when the method applies; examiners reward correct reasoning over recall.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} How do I choose between two equally good algorithms?\par\smallskip\textbf{A:} Use operational constraints: latency, explainability, data availability, robustness to shift and maintenance burden.\end{question}
+
+\needspace{12\baselineskip}\section{Common Misconceptions}\begin{center}\small\renewcommand{\arraystretch}{1.35}\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}\toprule\textbf{Misconception} & \textbf{Correction}\\\midrule``The most complex model is the best answer.'' & Examiners reward fit-for-purpose justification.\\
+``Results from one simulation run are evidence.'' & Report repeated runs with spread and confidence intervals.\\\bottomrule\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{In-Class Activities and Discussion Prompts}\label{sec:act}\begin{itemize}\item \textbf{Method roulette:} draw a random problem card (e.g.\ ``classify unknown emitters with 20 labels'') and a student proposes method, metric and main risk in 60 seconds.\item \textbf{Trap hunt:} distribute a short fictitious evaluation report containing five errors; teams find them.\end{itemize}
+
+\needspace{12\baselineskip}\section{Run It Live: Studio Demonstrations}\label{sec:live}
+
+Project \texttt{Lecture9\_Revision\_Studio.html} (it is a single HTML file and runs offline in any browser; every result updates as an input changes). Each demonstration below follows the same rhythm: \textbf{set} the inputs, \textbf{ask} the class to commit to a prediction (a show of hands or a one-word answer), then \textbf{reveal} the result and \textbf{land} the point. The numbers are exactly what the page shows for the settings given; simulations use fixed random seeds, so they repeat every time. The 45-minute plan has little slack: choose the one demonstration marked \emph{first choice} for class, and use the others in a tutorial, a second session, or as homework with the drill cards at the bottom of the page.
+
+\begin{live}{Demo 1: What does one alarm mean? (about 3 min, with \S2 Case-Study Thread) --- \emph{first choice}}\textbf{Set.} Part~1, Step~1 defaults: 2,000 tracks a day, 4 hostile, classifier recall 0.95 and false-positive rate 0.01; ESM confirmation 0.8 detection, 0.1 false alarm.\par\smallskip\textbf{Ask.} ``What share of classifier alarms are hostile, before and after ESM confirmation?''\par\smallskip\textbf{Reveal.} Classifier: 23.8 alarms a day (3.80 true), precision \textbf{16.0\%}. After ESM: 5.04 alarms, precision \textbf{60.4\%}, at the cost of 0.76 hostiles a day lost. With 40 hostiles a day: 66.0\% and 93.9\%.\par\smallskip\textbf{Land the point.} Precision follows the base rate (Lecture~1); confirmation trades a little recall for much better precision, and that trade is a command decision.\end{live}
+
+\begin{live}{Demo 2: Fuse two range estimates (about 2 min, with \S4 Formula Sheets)}\textbf{Set.} Step~2 defaults: radar 52~km (variance 4), IR 49~km (variance 16).\par\smallskip\textbf{Ask.} ``Where does the fused estimate land?''\par\smallskip\textbf{Reveal.} 51.40~km, variance 3.20 ($\sigma=1.79$~km), radar weight 80\%. Make the IR variance 4: 50.50~km, variance 2.00, weight 50\%.\par\smallskip\textbf{Land the point.} The fused estimate is always more certain than either input and leans toward the more precise sensor: the scalar Kalman update from Lecture~3.\end{live}
+
+\begin{live}{Demo 3: Who sets the engagement threshold? (about 2 min, with \S7 Ethics)}\textbf{Set.} Step~3 defaults: a missed hostile costs 50, a false cue 1.\par\smallskip\textbf{Ask.} ``At what probability should a track be cued for engagement?''\par\smallskip\textbf{Reveal.} Above \textbf{2.0\%}. If a miss costs only 5: \textbf{16.7\%}.\par\smallskip\textbf{Land the point.} The threshold follows from costs that are a command and legal judgement, not a technical setting, and it is only meaningful if the probabilities are calibrated.\end{live}
+
+\needspace{12\baselineskip}\section{Consistency Notes on the Source Material}These notes record where the original PowerPoint deck contained an inconsistency and how the current slides, reference text, quiz and assignment handle it. Students who have seen the old deck may raise them.\begin{itemize}\item The source deck's revision table quotes ``91.2\% CNN (vs 58.7\% transfer)'' for Lecture~1, whereas Lecture~1 and its pitfall slide give 94.1\% (Afghanistan) $\to$ 58.7\% (Iraq). The new slides use 94.1\%.\end{itemize}
+
+\needspace{12\baselineskip}\section{Quiz Administration and Answer Key}
+
+\begin{sayit}``You will now take a 15-question quiz. Each question has four options and exactly one correct answer. You have 40 seconds per question; the quiz advances automatically when time runs out. A correct answer scores $+1$, a wrong answer $-0.25$, and an unanswered question 0. The maximum is 15 and the minimum is $-3.75$. Because of the negative marking, guessing blindly among four options gains nothing on average --- answer when you can eliminate options. Your score and a full review appear at the end.''\end{sayit}
+
+\textbf{Delivery.} Open \texttt{Lecture9\_Quiz.html} on each student device (or project it and collect answers on paper). The page enforces the timer and computes the score with negative marking. Release \texttt{Lecture9\_Answers\_Assignment.html} only after all students have finished.
+
+\subsection*{Answer key}\begin{center}\small\renewcommand{\arraystretch}{1.3}\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}\hline \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{11} & \textbf{12} & \textbf{13} & \textbf{14} & \textbf{15}\\\hline C & D & B & A & C & B & C & A & D & C & B & A & D & B & D\\\hline\end{tabular}\end{center}
+
+\textbf{Interpreting scores.} 12 or more: secure command of the lecture. 9--11.75: good, review missed items. Below 9: revisit the reference text before the assignment. If more than half the class misses a question, revisit that point in the next lecture's opening Q\&A.
+
+\subsection*{Questions, options and rationale}
+
+{\small
+
+\noindent\textbf{Q1.} You have unlabelled SIGINT intercepts and want to find recurring emitter types. The first method to try is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Random forest\item[B.] DQN\item[\textbf{C.}] \textbf{k-Means/GMM clustering (with DBSCAN for noise)}~{\color{GrnN}$\checkmark$}\item[D.] Logistic regression\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} No labels and a grouping goal: unsupervised clustering.\par\medskip
+
+\noindent\textbf{Q2.} Labelled radar tracks, tabular features, rare bomber class: a strong default is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Naive Bayes\item[B.] PPO\item[C.] k-Means\item[\textbf{D.}] \textbf{Random forest or XGBoost with class weights, evaluated by per-class recall}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} L2: RF 97.5\%; boosting gave the best bomber recall.\par\medskip
+
+\noindent\textbf{Q3.} A drone must output continuous thrust: choose:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] DQN\item[\textbf{B.}] \textbf{PPO or SAC with a Gaussian policy}~{\color{GrnN}$\checkmark$}\item[C.] Ward clustering\item[D.] Ridge regression\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Continuous actions call for policy-gradient methods.\par\medskip
+
+\noindent\textbf{Q4.} Six cooperating units with intermittent comms: the default method is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{MAPPO under CTDE}~{\color{GrnN}$\checkmark$}\item[B.] IQL\item[C.] Single-agent DQN\item[D.] Lasso\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Centralised training, decentralised execution; MAPPO 82.4\%.\par\medskip
+
+\noindent\textbf{Q5.} Which formula gives the probability that an alarm is real?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] $TP/(TP+FN)$\item[B.] $1-(1-\alpha)^m$\item[\textbf{C.}] \textbf{$sp/(sp+(1-c)(1-p))$}~{\color{GrnN}$\checkmark$}\item[D.] $2/\|w\|$\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Positive predictive value (Bayes), dominated by the base rate p.\par\medskip
+
+\noindent\textbf{Q6.} The scalar Kalman gain $P/(P+R)$ is near 1 when:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] The sensor is very noisy\item[\textbf{B.}] \textbf{The prediction is very uncertain relative to the sensor}~{\color{GrnN}$\checkmark$}\item[C.] Both are equal\item[D.] There is no measurement\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Trust the measurement when it is more precise than the prediction.\par\medskip
+
+\noindent\textbf{Q7.} Silhouette 0.712 with ARI 0.847 between k-Means and Ward indicates:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Random clusters\item[B.] Overfitting\item[\textbf{C.}] \textbf{Strong, method-independent cluster structure}~{\color{GrnN}$\checkmark$}\item[D.] Too many features\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Convergent validity across methods.\par\medskip
+
+\noindent\textbf{Q8.} Why is a 3-tier IF to AE to analyst design used?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Cheap screening, then expensive confirmation, keeps compute and false alerts manageable}~{\color{GrnN}$\checkmark$}\item[B.] It raises accuracy above any single model\item[C.] It avoids training\item[D.] It needs no thresholds\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Serial tiers trade a little sensitivity for far fewer false alarms.\par\medskip
+
+\noindent\textbf{Q9.} Which DQN component prevents over-estimation?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Replay buffer\item[B.] Dueling head\item[C.] Epsilon decay\item[\textbf{D.}] \textbf{Double DQN's split of selection and evaluation}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Max over noisy estimates is biased upward.\par\medskip
+
+\noindent\textbf{Q10.} PPO's clipping keeps:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Rewards bounded\item[B.] The critic fixed\item[\textbf{C.}] \textbf{Each policy update close to the previous policy}~{\color{GrnN}$\checkmark$}\item[D.] Exploration constant\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Trust-region behaviour without second-order optimisation.\par\medskip
+
+\noindent\textbf{Q11.} COMA solves which MARL problem?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Non-stationarity\item[\textbf{B.}] \textbf{Credit assignment (free-riding)}~{\color{GrnN}$\checkmark$}\item[C.] Partial observability\item[D.] Communication\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Counterfactual baselines credit each agent's marginal contribution.\par\medskip
+
+\noindent\textbf{Q12.} AI-equipped units win 62\% overall vs 80\%, yet win more in every terrain. This is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Simpson's paradox caused by unequal assignment to hard terrain}~{\color{GrnN}$\checkmark$}\item[B.] Regression to the mean\item[C.] The base-rate fallacy\item[D.] Overfitting\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Compute totals from counts and stratify by the confounder.\par\medskip
+
+\noindent\textbf{Q13.} A model reaches 99\% in simulation and 80\% in the field. The most likely cause is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Label noise\item[B.] A bug in the metric\item[C.] Too few parameters\item[\textbf{D.}] \textbf{Distribution shift / sim-to-real gap}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Address with domain randomisation and deployment-domain testing.\par\medskip
+
+\noindent\textbf{Q14.} For lethal engagements the course recommends:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Level 4 autonomy\item[\textbf{B.}] \textbf{Level 2: AI recommends, humans approve each action, with audit logs}~{\color{GrnN}$\checkmark$}\item[C.] Level 3 if accuracy exceeds 95\%\item[D.] No logging\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} IHL distinction and proportionality need accountable human judgement.\par\medskip
+
+\noindent\textbf{Q15.} An answer stating 'the AI always beats humans' should prompt you to check:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Nothing\item[B.] The colour of the charts\item[C.] Only the learning rate\item[\textbf{D.}] \textbf{Sample size, confidence intervals, simulation conditions and opponent adaptivity}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Be suspicious of absolutes; MAPPO 82.4\% vs 81.3\% is not a demonstrated difference.\par\medskip
+
+}
+
+\needspace{12\baselineskip}\section{Assignment: Marking Scheme and Model Solutions}
+
+\textbf{Instructions.} Four integrative problems, 100 marks, about 3 hours. Each draws on several lectures; answers must cite numbers and state limitations.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{0.85\textwidth}{@{}l X r@{}}\toprule\textbf{\#} & \textbf{Problem} & \textbf{Marks}\\\midrule1 & End-to-end ISR pipeline & 30\\
+2 & Reading an evaluation report critically & 25\\
+3 & From simulation to fielded autonomy & 25\\
+4 & Statistical traps in an after-action report & 20\\\midrule & \textbf{Total} & \textbf{100}\\\bottomrule\end{tabularx}\end{center}
+
+\begin{instr}{General marking guidance}\begin{itemize}
+\item Marks for each part are shown in square brackets in the problem statement.
+\item Award method marks for correct working even when an arithmetic slip carries through; deduct once for the slip, not again for its consequences.
+\item For interpretive parts, full marks need (i) the correct conclusion, (ii) the reason, and (iii) an operational implication or caveat.
+\item Answers that state a number without uncertainty, baseline or caveat where one is required lose a mark per part.
+\item Suggested deadline: one week after the lecture; return marked work before the next quiz on the same topic.
+\end{itemize}\end{instr}
+
+\needspace{8\baselineskip}\subsection{Problem 1: End-to-end ISR pipeline \normalfont\small\color{GreyN}(30 marks)}
+
+\begin{prob}A theatre ISR cell receives radar tracks (labelled history available), SIGINT intercepts (unlabelled), network logs, and wants a decision-support tool for allocating two ISR drones.
+
+(a) Map each data stream to a learning paradigm and algorithm, with justification. [10]\newline (b) Identify three Lecture-1 data pitfalls likely in these streams and how you would test for each. [9]\newline (c) Specify how outputs reach the commander, with autonomy level and audit. [6]\newline (d) Estimate the end-to-end latency budget. [5]\end{prob}
+
+\begin{soln}\textbf{(a)} Radar: supervised classification (RF/XGBoost, class weights, per-class recall). SIGINT: clustering (k-Means/GMM + DBSCAN noise for novel emitters) and Isolation Forest for zero-day signals. Network logs: tiered anomaly detection (IF $\rightarrow$ autoencoder $\rightarrow$ analyst; graph methods for lateral movement). Drone allocation: RL (PPO/SAC for continuous control; MAPPO for coordinating two drones), trained in simulation with domain randomisation.
+
+\textbf{(b)} Survivorship/selection bias in labelled tracks (only engagements that were recorded) --- compare label sources and coverage; distribution shift from exercise to theatre --- KS tests on features and deployment-domain validation; base-rate effects in anomaly alerts --- compute precision at the operational base rate. Also possible: confounding in effectiveness analyses (Simpson) --- stratify.
+
+\textbf{(c)} A fused common picture with threat classes, calibrated confidences and explanations; ranked anomaly alerts; drone-tasking recommendations (top-3 with values) requiring commander approval (Level 2); logs of inputs, recommendations, decisions and outcomes.
+
+\textbf{(d)} Edge inference 10--100 ms; fusion and decision support 0.1--1 s; human decision 1--10 s: roughly 1.5--11 s sensor-to-action, which is acceptable for ISR tasking but not for terminal air defence.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 2: Reading an evaluation report critically \normalfont\small\color{GreyN}(25 marks)}
+
+\begin{prob}A vendor reports: ``Our threat detector is 99.2\% accurate (tested on 2,000 balanced samples) and outperforms the incumbent (98.9\%). In the field it will cut missed threats dramatically.'' The operational stream contains 1 threat per 5,000 tracks.
+
+(a) Compute the 95\% confidence interval for 99.2\% on 2,000 samples, and comment on the comparison. [6]\newline (b) Assuming sensitivity and specificity of 99.2\%, compute the PPV in the field. [7]\newline (c) List four questions you would put to the vendor. [8]\newline (d) Write a one-paragraph recommendation. [4]\end{prob}
+
+\begin{soln}\textbf{(a)} SE $=\sqrt{0.992(0.008)/2000}=0.0020$; CI $99.2\pm0.4\%=(98.8,99.6)$. The incumbent's 98.9\% lies inside: no demonstrated superiority; a paired (McNemar) test on the same samples is needed.
+
+\textbf{(b)} $p=0.0002$: PPV $=0.992(0.0002)/(0.992(0.0002)+0.008(0.9998))=0.000198/0.008197=\mathbf{2.4\%}$. About 41 false alarms per true threat.
+
+\textbf{(c)} Per-class recall on the threat class and its CI; performance on data from our theatre (shift); how test data were collected (survivorship, duplicates, leakage); calibration and threshold choice; adversarial robustness; latency; results across repeated trials.
+
+\textbf{(d)} Do not accept the claim as stated: the accuracy advantage is within sampling error and field precision would be about 2\%. Request deployment-domain evaluation at the operational base rate, threat-class recall with confidence intervals, and a two-stage alert design before procurement.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 3: From simulation to fielded autonomy \normalfont\small\color{GreyN}(25 marks)}
+
+\begin{prob}A MARL team policy scores 88\% in simulation (CommsMAPPO). Analogous drone results fell from 94\% to 78\% without domain randomisation and to 88\% with it.
+
+(a) Estimate a plausible field range for the MARL policy and justify. [6]\newline (b) Identify three ways an adaptive adversary could exploit the policy. [9]\newline (c) Propose a validation and governance plan, including an autonomy level. [10]\end{prob}
+
+\begin{soln}\textbf{(a)} Applying the drone gaps: about 72\% without randomisation (a 16-point drop), about 82\% with it (a 6-point drop); multi-agent coordination, communications denial and human OPFOR may widen this, so plan for a 65--80\% range until field data exist.
+
+\textbf{(b)} Spoofing or jamming the learned message channel; predictable sequencing (e.g. SEAD-first) baited by decoy SAMs; exploiting reward artefacts (e.g. reluctance to fire) or out-of-distribution scenarios.
+
+\textbf{(c)} Domain randomisation; league training against diverse opponents; red-teaming; staged trials (simulation $\rightarrow$ hardware-in-the-loop $\rightarrow$ live) with pre-set acceptance thresholds and CIs; probing and securing messages; Level-2 operation with human approval of engagements; audit logging; monitoring and periodic re-validation.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 4: Statistical traps in an after-action report \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}An after-action report claims: (i) battalions given a new simulator after the worst scores of the year improved by 11 points; (ii) of 20 tactics tested, tactic 7 was significant ($p=0.03$); (iii) catering quality correlates with win rate ($r=0.71$).
+
+For each claim, name the trap, explain it, and propose a correct analysis. [20]\end{prob}
+
+\begin{soln}\textbf{(i)} Regression to the mean: units selected for extreme low scores tend to improve anyway. Compare with a control group of equally low-scoring units without the simulator (or randomise); estimate the effect as the difference in improvement.
+
+\textbf{(ii)} Multiple testing: with 20 tests, $P(\ge1$ false positive$)=64\%$. Apply Bonferroni ($0.05/20=0.0025$; 0.03 fails) and confirm in a fresh, pre-registered test.
+
+\textbf{(iii)} Confounding: budget/readiness drives both. Compute the partial correlation controlling for budget (it fell to 0.09 in the course example) or use a controlled design; correlation is a question, not an answer.\end{soln}
+
+\end{document}
