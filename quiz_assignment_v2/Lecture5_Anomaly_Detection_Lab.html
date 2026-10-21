@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anomaly Detection Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one scrolling study sheet with sticky index; each demo is a worksheet panel, controls left, evidence right. Course palette: navy + Lecture 5 accent. */
+
+:root{
+  --bg:#F6F7F8; --surface:#FFFFFF; --fg:#18243A; --muted:#5D6878; --line:#DCDFE4;
+  --navy:#1B3A5E; --accent:#A93226; --accent-soft:#F9E9E7; --a:#2869A0; --b:#B8430F; --good:#1E7A45; --good-soft:#E4F3EA; --warn:#A6620C; --warn-soft:#FBF0DD; --dot:#B9C2CD;
+  --font-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#F08A7C; --accent-soft:#2E1B19; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; --dot:#4A5666; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#F08A7C; --accent-soft:#2E1B19; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; --dot:#4A5666; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15.5px;line-height:1.55;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+header.top{display:grid;gap:6px;padding-block:8px 18px;border-bottom:2px solid var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
+.lede{color:var(--muted);max-width:72ch;margin:0}
+nav.idx{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:6px 18px;padding-block:10px;border-bottom:1px solid var(--line)}
+nav.idx a{color:var(--navy);text-decoration:none;font-weight:500;font-size:14px}
+nav.idx a:hover,nav.idx a:focus-visible{color:var(--accent);text-decoration:underline}
+section{padding-block:26px 4px}
+h2{font-size:22px;margin:0 0 4px;color:var(--navy);text-wrap:balance}
+h2 .tag{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--accent);margin-right:10px;vertical-align:2px}
+h3{font-size:16px;margin:0}
+.intro{color:var(--muted);max-width:76ch;margin:0 0 14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start}
+@media (max-width:780px){.duo{grid-template-columns:minmax(0,1fr)}}
+.duo>*,.stack>*{min-width:0}
+.stack{display:grid;gap:12px;align-content:start}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.fields.two{grid-template-columns:repeat(2,minmax(0,1fr))}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}.fields.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
+.fields>label{align-content:end}
+input[type=number],select{font-family:var(--font-mono);font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rangerow{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:10px;align-items:center}
+.rangerow output{font-family:var(--font-mono);text-align:right;color:var(--fg)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;font-size:14px;font-weight:600;border-radius:6px;padding:7px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--surface)}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.4;cursor:default}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) fit-content(60%);gap:4px 14px;font-size:14.5px;padding:12px 14px;border-radius:6px;background:var(--accent-soft);margin:0}
+.kv dt{margin:0}.kv dd{margin:0;overflow-wrap:anywhere;font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500}
+.kv dd.big{font-size:18px;color:var(--accent);font-weight:600}
+.verdict{font-size:14.5px;margin:0;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0}
+.note{font-size:14px;margin:0;padding:10px 12px;border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 6px 6px 0}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+svg,canvas{display:block;width:100%;height:auto;max-width:100%}
+canvas{border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+svg text{fill:var(--muted);font-family:var(--font-mono);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.hi{color:var(--accent);font-weight:600}
+.flaws{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.flaw{display:grid;gap:8px;align-content:start}
+.flaw .disc{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.03em}
+.flaw p{margin:0;font-size:14.5px}
+details{border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}
+details p{margin-top:6px!important}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+</style>
+
+</head><body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Unit 4 &middot; AI &amp; Machine Learning in Warfare &middot; Lecture 5</div>
+  <h1>Anomaly Detection Lab</h1>
+  <p class="lede">See a point that passes every per-feature check but fails Mahalanobis, size an alert threshold to your analysts' capacity, race CUSUM against EWMA to catch a slow drift, and watch an isolation forest separate an outlier in a few cuts. Every result updates as you change the inputs.</p>
+  <p class="lede" style="font-size:13.5px">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</header>
+<nav class="idx" aria-label="Sections"><a href="#maha">Mahalanobis vs z</a><a href="#budget">Alert budget</a><a href="#chart">CUSUM & EWMA</a><a href="#iso">Isolation forest</a><a href="#drill">Drill</a></nav>
+<section id="maha">
+  <h2><span class="tag">DEMO 1</span>Normal on each feature, abnormal together</h2>
+  <p class="intro">A vehicle's engine temperature and fuel flow are standardised and strongly correlated. A z-score check flags a reading only if one feature is extreme. The Mahalanobis distance D&sup2; = z&#7488;&Sigma;&#8315;&sup1;z also asks whether the <i>combination</i> is plausible; under normality D&sup2; follows &chi;&sup2; with 2 degrees of freedom.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="mr">Correlation &rho;<div class="rangerow"><input id="mr" type="range" min="0" max="0.95" step="0.05" value="0.85"><output id="mro"></output></div></label>
+      <label for="mx">Test reading: temperature z&#8321;<div class="rangerow"><input id="mx" type="range" min="-4" max="4" step="0.1" value="1.8"><output id="mxo"></output></div></label>
+      <label for="my">Test reading: fuel flow z&#8322;<div class="rangerow"><input id="my" type="range" min="-4" max="4" step="0.1" value="-1.8"><output id="myo"></output></div></label>
+      <label for="ma">Alarm tail probability<select id="ma"><option value="0.01">1 in 100</option><option value="0.001" selected>1 in 1,000</option><option value="0.0001">1 in 10,000</option></select></label>
+      <dl class="kv"><dt>Largest |z| (z-check threshold)</dt><dd id="a1"></dd><dt>Mahalanobis D&sup2; (threshold)</dt><dd class="big" id="a2"></dd><dt>Tail probability of this reading</dt><dd id="a3"></dd></dl>
+      <p class="verdict" id="aver"></p>
+    </div>
+    <div class="stack"><svg id="asvg" viewBox="0 0 400 400" role="img" aria-label="Baseline cloud, z-score box, Mahalanobis ellipse and test reading"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--a)"></i>z-check box</span><span><i class="sw" style="background:var(--accent)"></i>Mahalanobis threshold ellipse</span><span><i class="sw" style="background:var(--b)"></i>test reading</span></div></div>
+  </div>
+</section>
+
+<section id="budget">
+  <h2><span class="tag">DEMO 2</span>Set the threshold by analyst capacity</h2>
+  <p class="intro">Normal sessions and attack sessions score as two normal curves a distance d&prime; apart. The threshold is set so the daily alert count matches what analysts can triage. With a rare threat, even a good detector produces mostly false alerts: the base-rate effect.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields two"><label for="bn">Sessions per day<input id="bn" type="number" value="1000000" min="1000" step="1000"></label><label for="ba">Attack sessions per day<input id="ba" type="number" value="20" min="1" step="1"></label>
+      <label for="bc">Analyst capacity (alerts/day)<input id="bc" type="number" value="200" min="1" step="10"></label><label for="bd">Detector separation d&prime;<input id="bd" type="number" value="3" min="0.5" max="8" step="0.25"></label></div>
+      <dl class="kv"><dt>Score threshold</dt><dd id="b1"></dd><dt>False-positive rate</dt><dd id="b2"></dd><dt>Attacks caught per day (recall)</dt><dd class="big" id="b3"></dd><dt>Alerts that are real (precision)</dt><dd class="big" id="b4"></dd><dt>False alerts per real one</dt><dd id="b5"></dd></dl>
+      <p class="verdict" id="bver"></p>
+    </div>
+    <div class="stack"><svg id="bsvg" viewBox="0 0 440 300" role="img" aria-label="ROC curve on a log false-positive axis with operating point"></svg>
+      <p class="note">The false-positive axis is logarithmic: at a million sessions a day, the difference between 10&#8315;&#8308; and 10&#8315;&sup3; is 900 alerts.</p></div>
+  </div>
+</section>
+
+<section id="chart">
+  <h2><span class="tag">DEMO 3</span>Catch a drift: Shewhart, CUSUM and EWMA</h2>
+  <p class="intro">A gearbox vibration sensor reads N(0,&nbsp;1) until sample 60, when its mean shifts by &delta;. Shewhart alarms on a single reading beyond &plusmn;3. CUSUM accumulates S&#8314; = max(0, S&#8314; + x &minus; k) and alarms above h. EWMA smooths z = &lambda;x + (1&minus;&lambda;)z and alarms beyond its 3&sigma; limit. The table gives this run's first alarm, then the mean delay after a shift and the false alarms per 1,000 in-control samples, averaged over many simulated runs.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="cd">Mean shift &delta; (in &sigma;)<div class="rangerow"><input id="cd" type="range" min="0" max="3" step="0.1" value="1"><output id="cdo"></output></div></label>
+      <div class="fields three"><label for="ck">CUSUM k<input id="ck" type="number" value="0.5" min="0" max="2" step="0.1"></label><label for="ch">CUSUM h<input id="ch" type="number" value="5" min="1" max="12" step="0.5"></label><label for="cl">EWMA &lambda;<input id="cl" type="number" value="0.2" min="0.05" max="1" step="0.05"></label></div>
+      <div class="btns"><button type="button" id="cnew">New sensor run</button></div>
+      <div class="tbl"><table style="font-size:13px"><thead><tr><th>Method</th><th>This run</th><th>Delay</th><th>False /1k</th></tr></thead><tbody id="ctab"></tbody></table></div>
+      <p class="verdict" id="cver"></p>
+    </div>
+    <div class="stack"><svg id="csvg" viewBox="0 0 440 430" role="img" aria-label="Sensor stream, CUSUM statistic and EWMA statistic"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--dot)"></i>readings</span><span><i class="sw" style="background:var(--accent)"></i>statistic</span><span><i class="sw" style="background:var(--b)"></i>alarm limit / first alarm</span></div></div>
+  </div>
+</section>
+
+<section id="iso">
+  <h2><span class="tag">DEMO 4</span>Isolation forest: outliers need fewer cuts</h2>
+  <p class="intro">Each tree splits the data at random points within its range until the reading is alone. Outliers are isolated in few cuts. The score s = 2<sup>&minus;E[h]/c(&psi;)</sup> compares the mean path length E[h] with c(&psi;), the average for a random point in a sample of size &psi;. Scores near 1 are anomalous; near 0.5 or below are normal.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="ix">Test reading x<div class="rangerow"><input id="ix" type="range" min="-6" max="6" step="0.1" value="3.5"><output id="ixo"></output></div></label>
+      <div class="fields two"><label for="ip">Sample size &psi;<select id="ip"><option>32</option><option selected>64</option><option>128</option><option>256</option></select></label><label for="it">Trees<select id="it"><option>10</option><option selected>100</option><option>300</option></select></label></div>
+      <dl class="kv"><dt>Mean path length E[h]</dt><dd id="i1"></dd><dt>Normaliser c(&psi;)</dt><dd id="i2"></dd><dt>Anomaly score s</dt><dd class="big" id="i3"></dd><dt>Score of a typical reading (x = 0)</dt><dd id="i4"></dd></dl>
+      <p class="verdict" id="iver"></p>
+    </div>
+    <div class="stack"><svg id="isvg" viewBox="0 0 440 290" role="img" aria-label="Anomaly score across x with the data shown below"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>score s(x)</span><span><i class="sw" style="background:var(--dot)"></i>baseline readings</span><span><i class="sw" style="background:var(--b)"></i>test reading</span></div></div>
+  </div>
+</section>
+
+<section id="drill">
+  <h2><span class="tag">DRILL</span>What went wrong?</h2>
+  <p class="intro">Decide before you open each answer.</p>
+  <div class="flaws" id="drillbox"></div>
+</section>
+
+<footer>AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; Unit 4: Simulation Strategies in Warfare &middot; Lecture 5</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id), v=id=>{const x=parseFloat($(id).value);return isFinite(x)?x:0};
+const pc=(x,d=1)=>isFinite(x)?(100*x).toFixed(d)+'%':'—', f=(x,d=2)=>isFinite(x)?x.toFixed(d):'—';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function Phi(x){const s=x<0?-1:1;x=Math.abs(x)/Math.SQRT2;const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return 0.5*(1+s*y);}
+function invPhi(p){const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924],b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857],c=[-0.00778489400243029,-0.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878],d=[0.00778469570904146,0.32246712907004,2.445134137143,3.75440866190742];const pl=0.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+function rng(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}}
+function gauss(r){const u=Math.max(1e-12,r()),w=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*w);}
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function axes(s,o){/* o: {x0,x1,y0,y1,xmin,xmax,ymin,ymax,xt:[],yt:[],xl,yl,fx,fy} returns X,Y */
+ const X=t=>o.x0+(t-o.xmin)/(o.xmax-o.xmin)*(o.x1-o.x0),Y=t=>o.y0-(t-o.ymin)/(o.ymax-o.ymin)*(o.y0-o.y1);
+ el('line',{x1:o.x0,y1:o.y0,x2:o.x1,y2:o.y0,stroke:css('--line')},s);el('line',{x1:o.x0,y1:o.y0,x2:o.x0,y2:o.y1,stroke:css('--line')},s);
+ (o.yt||[]).forEach(t=>{el('line',{x1:o.x0,y1:Y(t),x2:o.x1,y2:Y(t),stroke:css('--line'),'stroke-dasharray':'2 3'},s);const tx=el('text',{x:o.x0-5,y:Y(t)+4,'text-anchor':'end'},s);tx.textContent=o.fy?o.fy(t):t;});
+ (o.xt||[]).forEach(t=>{const tx=el('text',{x:X(t),y:o.y0+15,'text-anchor':'middle'},s);tx.textContent=o.fx?o.fx(t):t;});
+ if(o.xl){const t=el('text',{x:(o.x0+o.x1)/2,y:o.y0+30,'text-anchor':'middle'},s);t.textContent=o.xl;}
+ if(o.yl){const t=el('text',{x:12,y:(o.y0+o.y1)/2,'text-anchor':'middle',transform:'rotate(-90 12 '+((o.y0+o.y1)/2)+')'},s);t.textContent=o.yl;}
+ return [X,Y];}
+function path(pts,X,Y){return pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join('');}
+function drill(id,items){const box=$(id);items.forEach(([d,s,a])=>{const e=document.createElement('div');e.className='panel flaw';e.innerHTML='<div class="disc">'+d+'</div><p>'+s+'</p><details><summary>Show the answer</summary><p>'+a+'</p></details>';box.appendChild(e);});}
+function onTheme(fn){try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',fn);new MutationObserver(fn).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});}catch(e){}}
+
+function niceT(a,b){const r=b-a,st=Math.pow(10,Math.floor(Math.log10(r/4)));const m=[1,2,5,10].find(k=>r/(k*st)<=6)*st;const out=[];for(let t=Math.ceil(a/m)*m;t<=b+1e-9;t+=m)out.push(+t.toFixed(6));return out;}
+/* upper tail Q(x)=1-Phi(x), accurate far into the tail */
+function Q(x){if(x<0)return 1-Q(-x);if(x<3)return 1-Phi(x);let cf=x;for(let k=60;k>=1;k--)cf=x+k/cf;return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI)/cf;}
+const fmtN=x=>Number.isInteger(x)?x.toLocaleString('en-GB'):x>=100?Math.round(x).toLocaleString('en-GB'):x>=10?x.toFixed(1):x.toFixed(2);
+const sci=x=>x>=0.01?pc(x,2):x.toExponential(1).replace('e-',' × 10⁻').replace(/⁻(\d+)/,(m,d)=>'⁻'+d.split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join(''));
+
+/* Demo 1 */
+const ZB=(()=>{const r=rng(19),z=[];for(let i=0;i<300;i++)z.push([gauss(r),gauss(r)]);return z;})();
+function maha(){
+  const rho=+$('mr').value,x=+$('mx').value,y=+$('my').value,al=+$('ma').value;$('mro').textContent=rho.toFixed(2);$('mxo').textContent=x.toFixed(1);$('myo').textContent=y.toFixed(1);
+  const D2=(x*x-2*rho*x*y+y*y)/(1-rho*rho),T=-2*Math.log(al),zt=invPhi(1-al/2),zm=Math.max(Math.abs(x),Math.abs(y)),zf=zm>zt,mf=D2>T;
+  $('a1').textContent=f(zm,2)+' ('+f(zt,2)+')';$('a2').textContent=f(D2,1)+' ('+f(T,1)+')';$('a3').textContent=sci(Math.exp(-D2/2));
+  $('aver').textContent=mf&&!zf?'Missed by the z-check, caught by Mahalanobis. Each value is ordinary on its own, but with ρ = '+rho.toFixed(2)+' high temperature should come with high fuel flow, not low. This is how a spoofed or faulty sensor slips past per-feature limits.':zf&&mf?'Both checks alarm: at least one feature is extreme on its own.':zf&&!mf?'The z-check alarms but Mahalanobis does not: the reading is extreme along the correlated direction, where the joint distribution expects large values.':'Neither check alarms: the reading is consistent with the baseline.';
+  const s=$('asvg');s.innerHTML='';const R=6,tk=[-6,-4,-2,0,2,4,6];const [X,Y]=axes(s,{x0:34,x1:394,y0:366,y1:6,xmin:-R,xmax:R,ymin:-R,ymax:R,xt:tk,yt:tk,});
+  const c=Math.sqrt(1-rho*rho);ZB.forEach(z=>el('circle',{cx:X(z[0]),cy:Y(rho*z[0]+c*z[1]),r:2.2,fill:css('--dot')},s));
+  el('rect',{x:X(-zt),y:Y(zt),width:X(zt)-X(-zt),height:Y(-zt)-Y(zt),fill:'none',stroke:css('--a'),'stroke-width':2,'stroke-dasharray':'6 4'},s);
+  const e=[];for(let i=0;i<=120;i++){const t=2*Math.PI*i/120,u=Math.sqrt(T);e.push([u*Math.cos(t),u*(rho*Math.cos(t)+c*Math.sin(t))]);}
+  el('path',{d:path(e.map(p=>[Math.max(-R,Math.min(R,p[0])),Math.max(-R,Math.min(R,p[1]))]),X,Y)+'Z',fill:css('--accent'),'fill-opacity':0.08,stroke:css('--accent'),'stroke-width':2.2},s);
+  el('circle',{cx:X(x),cy:Y(y),r:7,fill:css('--b'),stroke:css('--surface'),'stroke-width':2},s);
+}
+['mr','mx','my','ma'].forEach(i=>$(i).addEventListener('input',maha));
+
+/* Demo 2 */
+function budget(){
+  const N=Math.max(1,v('bn')),A=Math.min(Math.max(1,v('ba')),N),C=Math.max(1,v('bc')),d=Math.max(0.1,v('bd'));
+  const alerts=t=>(N-A)*Q(t)+A*Q(t-d),solve=c=>{let lo=-10,hi=20;if(alerts(lo)<=c)return lo;for(let i=0;i<200;i++){const m=(lo+hi)/2;if(alerts(m)>c)lo=m;else hi=m;}return (lo+hi)/2;};
+  const t=solve(C),fpr=Q(t),tpr=Q(t-d),tp=A*tpr,fp=(N-A)*fpr,prec=tp/(tp+fp),t2=solve(2*C),tpr2=Q(t2-d);
+  $('b1').textContent=f(t,2);$('b2').textContent=sci(fpr);$('b3').textContent=fmtN(tp)+' of '+fmtN(A)+' ('+pc(tpr,0)+')';$('b4').textContent=pc(prec,1);$('b5').textContent=fmtN(fp/Math.max(tp,1e-9));
+  $('bver').textContent='Analysts triage '+fmtN(C)+' alerts a day and only '+fmtN(tp)+' are real. Doubling analyst capacity would raise recall only to '+pc(tpr2,0)+'; raising d′ by 1 (better features or a second-stage model) is usually worth more.';
+  const s=$('bsvg');s.innerHTML='';const [X,Y]=axes(s,{x0:50,x1:430,y0:255,y1:10,xmin:-7,xmax:0,ymin:0,ymax:1,xt:[-7,-6,-5,-4,-3,-2,-1,0],yt:[0,0.25,0.5,0.75,1],fx:t=>t===0?'1':'10'+'⁻'+String(-t).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join(''),fy:t=>pc(t,0),xl:'false-positive rate (log scale)',yl:'recall'});
+  const pts=[],ch=[];for(let tt=12;tt>=-4;tt-=0.05){const fp_=Q(tt);if(fp_<1e-7)continue;pts.push([Math.log10(fp_),Q(tt-d)]);}
+  for(let lx=-7;lx<=0;lx+=0.05)ch.push([lx,Math.pow(10,lx)]);
+  el('path',{d:path(ch,X,Y),stroke:css('--muted'),'stroke-dasharray':'4 4',fill:'none'},s);
+  el('path',{d:path(pts,X,Y),stroke:css('--accent'),'stroke-width':2.4,fill:'none'},s);
+  const lx=Math.max(-7,Math.log10(fpr));el('line',{x1:X(lx),y1:Y(0),x2:X(lx),y2:Y(1),stroke:css('--b'),'stroke-dasharray':'3 3'},s);el('circle',{cx:X(lx),cy:Y(tpr),r:6,fill:css('--b')},s);
+  const tx=el('text',{x:X(lx)+(lx>-1.5?-8:8),y:Y(tpr)-10,'text-anchor':lx>-1.5?'end':'start'},s);tx.textContent=fmtN(C)+' alerts/day';
+}
+['bn','ba','bc','bd'].forEach(i=>$(i).addEventListener('input',budget));
+
+/* Demo 3 */
+let cseed=4;
+function detectors(k,h,lam){
+  return {
+    she:()=>{return x=>Math.abs(x)>3;},
+    cus:()=>{let S=0;return x=>{S=Math.max(0,S+x-k);if(S>h){S=0;return true;}return false;};},
+    ewm:()=>{let z=0,t=0;return x=>{t++;z=lam*x+(1-lam)*z;const L=3*Math.sqrt(lam/(2-lam)*(1-Math.pow(1-lam,2*t)));if(Math.abs(z)>L){z=0;t=0;return true;}return false;};}};
+}
+function cchart(){
+  const d=+$('cd').value,k=Math.max(0,v('ck')),h=Math.max(0.5,v('ch')),lam=Math.min(1,Math.max(0.05,v('cl')));$('cdo').textContent=d.toFixed(1)+'σ';
+  const r=rng(cseed*131+7),N=120,SH=60,x=[];for(let i=0;i<N;i++)x.push(gauss(r)+(i>=SH?d:0));
+  let S=0;const cs=[],ew=[],el_=[];let z=0;for(let i=0;i<N;i++){S=Math.max(0,S+x[i]-k);cs.push(S);z=lam*x[i]+(1-lam)*z;ew.push(z);el_.push(3*Math.sqrt(lam/(2-lam)*(1-Math.pow(1-lam,2*(i+1)))));}
+  const first=fn=>{for(let i=0;i<N;i++)if(fn(i))return i;return -1;};
+  const fa={she:first(i=>Math.abs(x[i])>3),cus:first(i=>cs[i]>h),ewm:first(i=>Math.abs(ew[i])>el_[i])};
+  const D=detectors(k,h,lam),rs=rng(2024),stat={};
+  for(const m of ['she','cus','ewm']){let tot=0,cap=0;for(let run=0;run<300;run++){const det=D[m]();let t=0;for(;t<1000;t++){if(det(gauss(rs)+d))break;}if(t>=1000)cap++;tot+=t+1;}
+    let fals=0;for(let run=0;run<30;run++){const det=D[m]();for(let t=0;t<1000;t++)if(det(gauss(rs)))fals++;}stat[m]={delay:tot/300,cap,fals:fals/30};}
+  const nm={she:'Shewhart',cus:'CUSUM',ewm:'EWMA'},show=i=>i<0?'none':i<SH?i+' (false)':i+' (+'+(i-SH)+')';
+  $('ctab').innerHTML=['she','cus','ewm'].map(m=>'<tr><td>'+nm[m]+'</td><td>'+show(fa[m])+'</td><td>'+(stat[m].cap?'≥ ':'')+f(stat[m].delay,1)+'</td><td>'+f(stat[m].fals,1)+'</td></tr>').join('');
+  let best='she';for(const m of ['cus','ewm'])if(stat[m].delay<stat[best].delay)best=m;[...$('ctab').rows].forEach((tr,i)=>{if(['she','cus','ewm'][i]===best)tr.cells[2].className='hi';});
+  $('cver').textContent=(d===0?'No shift: every alarm is false. The last column is the price of each chart\'s sensitivity.':d<1.5?'For a small shift, the memory in CUSUM and EWMA catches it '+f(stat.she.delay/Math.max(stat[best].delay,1),1)+'× faster than Shewhart, which waits for one extreme reading. Compare the false-alarm column before declaring a winner.':'For a large shift, Shewhart is competitive: a single reading is already extreme. CUSUM\'s k should be about half the shift you most need to catch.')+' (CUSUM here watches for upward shifts only; Shewhart and EWMA are two-sided.)';
+  const s=$('csvg');s.innerHTML='';const xt=[0,20,40,60,80,100,120];
+  const P=(y0,y1,lo,hi,yt,yl,last)=>axes(s,{x0:48,x1:430,y0,y1,xmin:0,xmax:N,ymin:lo,ymax:hi,xt:last?xt:[],yt,yl,xl:last?'sample':''});
+  const mark=(X,Y,lo,hi,i)=>{if(i>=0)el('line',{x1:X(i),y1:Y(lo),x2:X(i),y2:Y(hi),stroke:css('--b'),'stroke-width':1.6},s);};
+  const shiftL=(X,Y,lo,hi)=>el('line',{x1:X(SH),y1:Y(lo),x2:X(SH),y2:Y(hi),stroke:css('--muted'),'stroke-dasharray':'4 3'},s);
+  const hi1=Math.max(4,d+3.5);let [X,Y]=P(120,8,-4,hi1,[-3,0,3],'reading');shiftL(X,Y,-4,hi1);
+  [-3,3].forEach(l=>el('line',{x1:X(0),y1:Y(l),x2:X(N),y2:Y(l),stroke:css('--b'),'stroke-dasharray':'5 3'},s));
+  x.forEach((q,i)=>el('circle',{cx:X(i),cy:Y(Math.max(-4,Math.min(hi1,q))),r:2,fill:css('--dot')},s));mark(X,Y,-4,hi1,fa.she);
+  const hi2=Math.max(h*1.4,Math.max(...cs)*1.05);[X,Y]=P(258,150,0,hi2,niceT(0,hi2),'CUSUM');shiftL(X,Y,0,hi2);
+  el('line',{x1:X(0),y1:Y(h),x2:X(N),y2:Y(h),stroke:css('--b'),'stroke-dasharray':'5 3'},s);el('path',{d:path(cs.map((q,i)=>[i,q]),X,Y),stroke:css('--accent'),'stroke-width':2,fill:'none'},s);mark(X,Y,0,hi2,fa.cus);
+  const m3=Math.max(1,...ew.map(Math.abs),...el_)*1.1;[X,Y]=P(395,292,-m3,m3,niceT(-m3,m3),'EWMA',true);shiftL(X,Y,-m3,m3);
+  el('path',{d:path(el_.map((q,i)=>[i,q]),X,Y),stroke:css('--b'),'stroke-dasharray':'5 3',fill:'none'},s);el('path',{d:path(el_.map((q,i)=>[i,-q]),X,Y),stroke:css('--b'),'stroke-dasharray':'5 3',fill:'none'},s);
+  el('path',{d:path(ew.map((q,i)=>[i,q]),X,Y),stroke:css('--accent'),'stroke-width':2,fill:'none'},s);mark(X,Y,-m3,m3,fa.ewm);
+}
+['cd','ck','ch','cl'].forEach(i=>$(i).addEventListener('input',cchart));$('cnew').addEventListener('click',()=>{cseed=(cseed*17+5)%9973;cchart();});
+
+/* Demo 4 */
+const IB=(()=>{const r=rng(55),a=[];for(let i=0;i<1000;i++)a.push(gauss(r));return a;})();
+const cN=n=>n>2?2*(Math.log(n-1)+0.5772156649)-2*(n-1)/n:n===2?1:0;
+function plen(x,D,dep,lim,r){if(D.length<=1||dep>=lim)return dep+cN(D.length);let lo=Infinity,hi=-Infinity;for(const q of D){if(q<lo)lo=q;if(q>hi)hi=q;}if(lo===hi)return dep+cN(D.length);
+  const p=lo+r()*(hi-lo);return plen(x,D.filter(q=>x<p?q<p:q>=p),dep+1,lim,r);}
+function Eh(x,psi,T){const r=rng(9001),lim=Math.ceil(Math.log2(psi));let s=0;for(let t=0;t<T;t++){const D=[];for(let i=0;i<psi;i++)D.push(IB[Math.floor(r()*IB.length)]);s+=plen(x,D,0,lim,r);}return s/T;}
+function iso(){
+  const x=+$('ix').value,psi=+$('ip').value,T=+$('it').value;$('ixo').textContent=x.toFixed(1);
+  const c=cN(psi),sc=e=>Math.pow(2,-e/c),e=Eh(x,psi,T),s0=sc(Eh(0,psi,T)),sv=sc(e);
+  $('i1').textContent=f(e,2)+' cuts';$('i2').textContent=f(c,2);$('i3').textContent=f(sv,3);$('i4').textContent=f(s0,3);
+  $('iver').textContent=(sv>0.62?'Strongly anomalous: isolated in about '+f(e,1)+' cuts against '+f(c,1)+' for a typical point.':sv>0.55?'Borderline: somewhat easier to isolate than a typical reading. Review if alert capacity allows.':'Normal: it takes as many cuts to isolate as an ordinary reading.')+' Trees stop at depth '+Math.ceil(Math.log2(psi))+', so very distant readings all score alike: the forest ranks unusualness; it does not measure distance.';
+  const s=$('isvg');s.innerHTML='';const [X,Y]=axes(s,{x0:48,x1:430,y0:245,y1:10,xmin:-6,xmax:6,ymin:0.3,ymax:0.9,xt:[-6,-4,-2,0,2,4,6],yt:[0.3,0.4,0.5,0.6,0.7,0.8,0.9],xl:'reading x (σ units)',yl:'score s'});
+  for(let i=0;i<250;i++){const q=IB[i];if(q>-6&&q<6)el('line',{x1:X(q),y1:Y(0.3),x2:X(q),y2:Y(0.3)-9,stroke:css('--dot')},s);}
+  const cur=[];for(let g=-6;g<=6.001;g+=0.25)cur.push([g,Math.min(0.9,sc(Eh(g,psi,Math.min(T,100))))]);
+  el('path',{d:path(cur,X,Y),stroke:css('--accent'),'stroke-width':2.4,fill:'none'},s);
+  el('line',{x1:X(0),y1:Y(0.5),x2:X(6),y2:Y(0.5),stroke:css('--muted'),'stroke-dasharray':'2 3'},s);el('line',{x1:X(-6),y1:Y(0.5),x2:X(0),y2:Y(0.5),stroke:css('--muted'),'stroke-dasharray':'2 3'},s);
+  el('line',{x1:X(x),y1:Y(0.3),x2:X(x),y2:Y(Math.min(0.9,sv)),stroke:css('--b'),'stroke-dasharray':'3 3'},s);el('circle',{cx:X(x),cy:Y(Math.min(0.9,sv)),r:6,fill:css('--b')},s);
+}
+['ix','ip','it'].forEach(i=>$(i).addEventListener('input',iso));
+
+drill('drillbox',[
+ ['Base rate','A detector with 99% recall and a 1% false-positive rate is deployed on 1,000,000 sessions a day containing 20 intrusions. The brief calls it "99% accurate".','<b>Base-rate neglect.</b> It raises about 10,000 false alerts a day for 20 real ones, a precision of 0.2%. Report precision and alerts per day at the operating threshold, not accuracy.'],
+ ['Per-feature limits','Every telemetry channel has its own ±3σ alarm. A spoofed track with a plausible speed and a plausible heading, but an implausible combination of the two, raises nothing.','<b>Ignoring correlation.</b> Per-feature checks test a box; normal data fill an ellipse. Use a joint check such as Mahalanobis distance, or a model of how the channels relate.'],
+ ['Baseline','The mean and covariance for a network baseline come from a month of logs that already contained a slow exfiltration.','<b>Contaminated baseline.</b> The attack is learned as normal and inflates the spread, masking itself. Curate the training window and use robust estimates (median and MAD, minimum covariance determinant).'],
+ ['Slow and low','An adversary keeps each day\'s exfiltration just under the Shewhart 3σ limit, and the detector never fires.','<b>A memoryless chart against a persistent shift.</b> CUSUM and EWMA accumulate small deviations. Expect adversaries to learn any fixed threshold; vary thresholds and combine detectors.'],
+ ['Concept drift','An autoencoder trained on peacetime traffic floods the cell with alerts on the first day of a major exercise.','<b>Drift, not attack.</b> The definition of normal changed. Keep regime-specific baselines, monitor the alert rate, and retrain with care, never on data that may contain the attack.'],
+ ['Evaluation','An isolation forest scores AUC 0.98 on a random train/test split of six months of logs. In service it misses a new campaign.','<b>Leaky, optimistic evaluation.</b> A random split lets the model see the same campaigns in training and testing. Evaluate on a later time period, include novel attack types, and report precision at the alert budget.']]);
+function all(){maha();budget();cchart();iso();}
+all();onTheme(all);
+
+})();
+</script>
+
+</body></html>

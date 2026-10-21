@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Can Lie Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one scrolling study sheet with sticky index; each trap is a worksheet panel: controls left, evidence right. Course palette: navy + Lecture 1 orange. */
+:root{
+  --bg:#F6F6F4; --surface:#FFFFFF; --fg:#18243A; --muted:#5D6878; --line:#DCDFE4;
+  --navy:#1B3A5E; --accent:#B8430F; --accent-soft:#FBEDE5; --a:#2869A0; --b:#B8430F; --good:#1E7A45; --good-soft:#E4F3EA; --warn:#A6620C; --warn-soft:#FBF0DD;
+  --font-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#F08A55; --accent-soft:#2E1F17; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#F08A55; --accent-soft:#2E1F17; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15.5px;line-height:1.55;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+header.top{display:grid;gap:6px;padding-block:8px 18px;border-bottom:2px solid var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
+.lede{color:var(--muted);max-width:70ch;margin:0}
+nav.idx{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:6px 18px;padding-block:10px;border-bottom:1px solid var(--line)}
+nav.idx a{color:var(--navy);text-decoration:none;font-weight:500;font-size:14px}
+nav.idx a:hover,nav.idx a:focus-visible{color:var(--accent);text-decoration:underline}
+section{padding-block:26px 4px}
+h2{font-size:22px;margin:0 0 4px;color:var(--navy);text-wrap:balance}
+h2 .tag{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--accent);margin-right:10px;vertical-align:2px}
+h3{font-size:16px;margin:0}
+.intro{color:var(--muted);max-width:74ch;margin:0 0 14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+@media (max-width:780px){.duo{grid-template-columns:minmax(0,1fr)}}
+.duo>*{min-width:0}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
+input[type=number]{font-family:var(--font-mono);font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grp{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-radius:6px}
+.grp .ttl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.ttl.ta{color:var(--a)} .ttl.tb{color:var(--b)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.win{font-weight:600}
+.verdict{font-size:14.5px;margin:12px 0 0;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;font-size:14.5px;padding:12px 14px;border-radius:6px;background:var(--accent-soft);margin:0}
+.kv dt{margin:0}.kv dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500}
+.kv dd.big{font-size:18px;color:var(--accent);font-weight:600}
+.note{font-size:14px;margin:10px 0 0;padding:10px 12px;border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 6px 6px 0}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.rangerow{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:10px;align-items:center}
+.rangerow output{font-family:var(--font-mono);text-align:right}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--muted);font-family:var(--font-mono);font-size:11px}
+.chart-axis{stroke:var(--line)}
+#ans4 svg text{font-size:7.5px}
+.ans4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.ans4{grid-template-columns:minmax(0,1fr)}}
+.ans4 figure{margin:0;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.ans4 figcaption{font-size:12.5px;color:var(--muted);text-align:center}
+.flaws{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.flaw{display:grid;gap:8px;align-content:start}
+.flaw .disc{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.03em}
+.flaw p{margin:0;font-size:14.5px}
+details{border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}
+details p{margin-top:6px!important}
+.dots{display:grid;grid-template-columns:repeat(50,1fr);gap:2px;margin-top:10px}
+.dots i{display:block;aspect-ratio:1;border-radius:1px;background:var(--line)}
+.dots i.tp{background:var(--good)} .dots i.fp{background:var(--warn)} .dots i.fn{background:var(--b);outline:1px solid var(--b)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+</head><body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Unit 4 &middot; AI &amp; Machine Learning in Warfare &middot; Lecture 1, Part A</div>
+  <h1>Data Can Lie</h1>
+  <p class="lede">Six traps that fool analysts before any algorithm runs. Each one is live: change the numbers and watch the conclusion move. Finish with the spot-the-flaw drill.</p>
+  <p class="lede" style="font-size:13.5px">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</header>
+
+<nav class="idx" aria-label="Sections">
+  <a href="#simpson">Simpson's paradox</a><a href="#sig">Significance &amp; power</a><a href="#multi">Many tests</a><a href="#rtm">Regression to the mean</a><a href="#base">Base rates</a><a href="#anscombe">One number lies</a><a href="#flaws">Spot the flaw</a>
+</nav>
+
+<section id="simpson">
+  <h2><span class="tag">TRAP 1</span>Simpson's paradox: never add or average percentages</h2>
+  <p class="intro">Kidney-stone treatment data (Charig et al., 1986). Treatment A wins in both stone sizes yet loses overall, because A was given most of the hard, large-stone cases. Edit the counts to build your own reversal, or the defence version: AI-assisted units sent to the hardest sectors.</p>
+  <div class="panel duo">
+    <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <div class="grp"><div class="ttl ta">Treatment A</div>
+        <div class="fields"><label for="as">Small: successes<input id="as" type="number" value="81" min="0"></label><label for="an">Small: cases<input id="an" type="number" value="87" min="1"></label>
+        <label for="al">Large: successes<input id="al" type="number" value="192" min="0"></label><label for="aln">Large: cases<input id="aln" type="number" value="263" min="1"></label></div></div>
+      <div class="grp"><div class="ttl tb">Treatment B</div>
+        <div class="fields"><label for="bs">Small: successes<input id="bs" type="number" value="234" min="0"></label><label for="bn">Small: cases<input id="bn" type="number" value="270" min="1"></label>
+        <label for="bl">Large: successes<input id="bl" type="number" value="55" min="0"></label><label for="bln">Large: cases<input id="bln" type="number" value="80" min="1"></label></div></div>
+    </div>
+    <div>
+      <div class="tbl"><table><thead><tr><th>Group</th><th>A</th><th>B</th><th>Better</th></tr></thead><tbody id="stab"></tbody></table></div>
+      <svg id="ssvg" viewBox="0 0 420 150" role="img" aria-label="Success rates by group"></svg>
+      <p class="verdict" id="sver"></p>
+    </div>
+  </div>
+</section>
+
+<section id="sig">
+  <h2><span class="tag">TRAP 2</span>Significance, power and "almost significant"</h2>
+  <p class="intro">A radar-absorbent coating is trialled: detection rate with the coating versus without. A p-value is the probability of data this extreme <em>if there were no effect</em>, not the probability that there is no effect.</p>
+  <div class="panel duo">
+    <div class="fields">
+      <label for="sn">Sorties per arm<input id="sn" type="number" value="40" min="2" step="5"></label>
+      <label for="sp1">Rate, arm 1<input id="sp1" type="number" value="0.65" min="0" max="1" step="0.01"></label>
+      <label for="sp2">Rate, arm 2<input id="sp2" type="number" value="0.45" min="0" max="1" step="0.01"></label>
+    </div>
+    <div>
+      <dl class="kv">
+        <dt>Difference</dt><dd id="g1"></dd>
+        <dt>z (pooled) and two-sided p</dt><dd class="big" id="g2"></dd>
+        <dt>95% CI for the difference</dt><dd id="g3"></dd>
+        <dt>Power to detect this difference</dt><dd id="g4"></dd>
+        <dt>Sorties per arm for 80% power</dt><dd id="g5"></dd>
+      </dl>
+      <p class="verdict" id="gver"></p>
+    </div>
+  </div>
+</section>
+
+<section id="multi">
+  <h2><span class="tag">TRAP 3</span>Test enough tactics and one will "work"</h2>
+  <p class="intro">If none of the tactics has any real effect, each test still has an &alpha; chance of a false positive. Slide the number of tactics tested.</p>
+  <div class="panel duo">
+    <div style="display:grid;gap:12px">
+      <label for="mk">Tactics tested<div class="rangerow"><input id="mk" type="range" min="1" max="100" value="20"><output id="mko">20</output></div></label>
+      <label for="ma">Significance level &alpha;<input id="ma" type="number" value="0.05" min="0.001" max="0.5" step="0.005"></label>
+    </div>
+    <div>
+      <dl class="kv"><dt>Chance at least one looks significant</dt><dd class="big" id="m1"></dd><dt>Expected false "discoveries"</dt><dd id="m2"></dd><dt>Bonferroni threshold per test</dt><dd id="m3"></dd></dl>
+      <svg id="msvg" viewBox="0 0 420 130" role="img" aria-label="Family-wise false-positive probability against number of tests"></svg>
+    </div>
+  </div>
+</section>
+
+<section id="rtm">
+  <h2><span class="tag">TRAP 4</span>Regression to the mean: the flight-instructor illusion</h2>
+  <p class="intro">Cadets are scored on two landings (mean 70, s.d. 10). Instructors praise the best first landings and see them get worse; they criticise the worst and see them improve. Nothing they said caused it: extreme scores are partly luck, and luck does not repeat.</p>
+  <div class="panel duo">
+    <div style="display:grid;gap:12px">
+      <label for="rr">Test&ndash;retest correlation &rho;<div class="rangerow"><input id="rr" type="range" min="0" max="0.95" step="0.05" value="0.5"><output id="rro">0.50</output></div></label>
+      <label for="rq">Selected group (top or bottom share)<div class="rangerow"><input id="rq" type="range" min="0.02" max="0.5" step="0.01" value="0.10"><output id="rqo">10%</output></div></label>
+      <dl class="kv"><dt>Praised group: first landing</dt><dd id="r1"></dd><dt>Praised group: second landing</dt><dd class="big" id="r2"></dd><dt>Criticised group: first &rarr; second</dt><dd id="r3"></dd></dl>
+    </div>
+    <div><svg id="rsvg" viewBox="0 0 420 300" role="img" aria-label="Scatter of first and second landing scores"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--good)"></i>praised (top)</span><span><i class="sw" style="background:var(--b)"></i>criticised (bottom)</span><span>dashed: no change line</span></div></div>
+  </div>
+</section>
+
+<section id="base">
+  <h2><span class="tag">TRAP 5</span>Base rates: why a "99% accurate" detector mostly cries wolf</h2>
+  <p class="intro">Precision depends on how rare the threat is, not only on the detector. The grid shows 1,000 tracks scaled so the threats are visible.</p>
+  <div class="panel duo">
+    <div class="fields">
+      <label for="bsn">Sensitivity<input id="bsn" type="number" value="0.99" min="0" max="1" step="0.01"></label>
+      <label for="bsp">Specificity<input id="bsp" type="number" value="0.99" min="0" max="1" step="0.001"></label>
+      <label for="bpr">Threats per 1,000 tracks<input id="bpr" type="number" value="1" min="0" max="1000" step="1"></label>
+    </div>
+    <div>
+      <dl class="kv"><dt>Alarms that are real threats</dt><dd class="big" id="b1"></dd><dt>Per 100,000 tracks: true / false alarms</dt><dd id="b2"></dd></dl>
+      <p class="verdict" id="bver"></p>
+      <div class="dots" id="bdots" aria-hidden="true"></div>
+      <div class="legend"><span><i class="sw" style="background:var(--good)"></i>threat flagged</span><span><i class="sw" style="background:var(--b)"></i>threat missed</span><span><i class="sw" style="background:var(--warn)"></i>false alarm</span><span id="bscale"></span></div>
+    </div>
+  </div>
+</section>
+
+<section id="anscombe">
+  <h2><span class="tag">TRAP 6</span>One number cannot describe a relationship</h2>
+  <p class="intro">Anscombe's quartet (1973): all four datasets share the same means, variances, correlation (0.816) and regression line, y = 3 + 0.5x. Always plot the data.</p>
+  <div class="panel"><div class="ans4" id="ans4"></div></div>
+</section>
+
+<section id="flaws">
+  <h2><span class="tag">DRILL</span>Spot the flaw</h2>
+  <p class="intro">Name the trap before opening the answer. Each scenario comes from a different discipline and has a direct twin in defence analysis.</p>
+  <div class="flaws" id="flawlist"></div>
+</section>
+
+<footer>AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; Unit 4: Simulation Strategies in Warfare &middot; Lecture 1, Part A</footer>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id), v=id=>{const x=parseFloat($(id).value);return isFinite(x)?x:0};
+const pc=(x,d=1)=>isFinite(x)?(100*x).toFixed(d)+'%':'—', f=(x,d=2)=>isFinite(x)?x.toFixed(d):'—';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function Phi(x){const s=x<0?-1:1;x=Math.abs(x)/Math.SQRT2;const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return 0.5*(1+s*y);}
+function invPhi(p){const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924],b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857],c=[-0.00778489400243029,-0.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878],d=[0.00778469570904146,0.32246712907004,2.445134137143,3.75440866190742];const pl=0.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,parent){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(parent)parent.appendChild(e);return e;}
+
+/* Trap 1 */
+function simpson(){
+  const A=[[v('as'),v('an')],[v('al'),v('aln')]],B=[[v('bs'),v('bn')],[v('bl'),v('bln')]];
+  const rows=[['Small stones',A[0],B[0]],['Large stones',A[1],B[1]],['All patients',[A[0][0]+A[1][0],A[0][1]+A[1][1]],[B[0][0]+B[1][0],B[0][1]+B[1][1]]]];
+  let html='',w=[];
+  rows.forEach(([n,a,b])=>{const ra=a[0]/a[1],rb=b[0]/b[1],win=ra>rb?'A':rb>ra?'B':'tie';w.push(win);
+    html+='<tr><td>'+n+'</td><td'+(win==='A'?' class="win"':'')+'>'+a[0]+'/'+a[1]+' = '+pc(ra)+'</td><td'+(win==='B'?' class="win"':'')+'>'+b[0]+'/'+b[1]+' = '+pc(rb)+'</td><td>'+win+'</td></tr>';});
+  $('stab').innerHTML=html;
+  const s=$('ssvg');s.innerHTML='';const W=420,x0=110,bw=(W-x0-20);
+  rows.forEach(([n,a,b],i)=>{const y=12+i*44;el('text',{x:0,y:y+16},s).textContent=n;
+    [[a,css('--a'),'A'],[b,css('--b'),'B']].forEach(([g,col,lab],j)=>{const r=g[0]/g[1];el('rect',{x:x0,y:y+j*16,width:Math.max(0,bw*Math.min(1,r)),height:13,fill:col,rx:2},s);const t=el('text',{x:x0+bw*Math.min(1,r)+4,y:y+j*16+11},s);t.textContent=lab+' '+pc(r,0);});});
+  const sub=w[0]===w[1]&&w[0]!=='tie',rev=sub&&w[2]!==w[0]&&w[2]!=='tie';
+  const shareA=A[1][1]/(A[0][1]+A[1][1]),shareB=B[1][1]/(B[0][1]+B[1][1]);
+  $('sver').innerHTML=rev?('<b>Reversal.</b> '+w[0]+' is better in both groups but worse overall. '+pc(shareA,0)+' of A\'s cases were large stones against '+pc(shareB,0)+' of B\'s: the totals compare different case mixes. Trust the within-group comparison, and always show counts with percentages.'):(sub?'No reversal with these counts: the same treatment wins within groups and overall.':'The groups disagree; no single winner. Look at counts and at why cases were assigned as they were.');
+}
+
+/* Trap 2 */
+function sig(){
+  const n=Math.max(2,v('sn')),p1=v('sp1'),p2=v('sp2'),d=p1-p2,pb=(p1+p2)/2;
+  const se0=Math.sqrt(pb*(1-pb)*2/n),z=d/se0,p=2*(1-Phi(Math.abs(z)));
+  const seu=Math.sqrt((p1*(1-p1)+p2*(1-p2))/n),lo=d-1.96*seu,hi=d+1.96*seu,pow=Phi(Math.abs(d)/seu-1.96);
+  const n80=Math.round(Math.pow(1.96+0.8416,2)*(p1*(1-p1)+p2*(1-p2))/(d*d));
+  $('g1').textContent=(d>=0?'+':'')+f(100*d,1)+' points';$('g2').textContent='z = '+f(z,2)+', p = '+f(p,3);
+  $('g3').textContent=(lo>=0?'+':'')+f(100*lo,1)+' to '+(hi>=0?'+':'')+f(100*hi,1)+' points';$('g4').textContent=pc(pow,0);$('g5').textContent=isFinite(n80)?n80:'—';
+  $('gver').innerHTML=p<0.05?('<b>Significant at 5%.</b> Still ask whether a '+f(100*Math.abs(d),1)+'-point difference matters operationally, and whether this was the only test run.'):('<b>Inconclusive, not "no effect".</b> The interval runs from '+f(100*lo,1)+' to '+f(100*hi,1)+' points: it includes zero and also large effects. With '+n+' sorties per arm the trial had only '+pc(pow,0)+' power; about '+n80+' per arm were needed.');
+}
+
+/* Trap 3 */
+function multi(){
+  const k=parseInt($('mk').value,10),a=Math.max(0.0001,v('ma'));$('mko').textContent=k;
+  const fw=1-Math.pow(1-a,k);$('m1').textContent=pc(fw,0);$('m2').textContent=f(k*a,2);$('m3').textContent=f(a/k,4);
+  const s=$('msvg');s.innerHTML='';const x0=34,x1=395,y0=110,y1=8;
+  el('line',{x1:x0,y1:y0,x2:x1,y2:y0,class:'chart-axis','stroke-width':1},s);el('line',{x1:x0,y1:y0,x2:x0,y2:y1,class:'chart-axis','stroke-width':1},s);
+  [0,0.5,1].forEach(t=>{const y=y0-(y0-y1)*t;el('text',{x:2,y:y+4},s).textContent=(t*100)+'%';el('line',{x1:x0,y1:y,x2:x1,y2:y,stroke:css('--line'),'stroke-dasharray':'2 3'},s);});
+  [1,25,50,75,100].forEach(t=>{const x=x0+(x1-x0)*(t-1)/99;el('text',{x:x-6,y:126},s).textContent=t;});
+  let d='';for(let i=1;i<=100;i++){const x=x0+(x1-x0)*(i-1)/99,y=y0-(y0-y1)*(1-Math.pow(1-a,i));d+=(i===1?'M':'L')+x.toFixed(1)+' '+y.toFixed(1);}
+  el('path',{d:d,fill:'none',stroke:css('--accent'),'stroke-width':2},s);
+  const cx=x0+(x1-x0)*(k-1)/99,cy=y0-(y0-y1)*fw;el('circle',{cx:cx,cy:cy,r:4.5,fill:css('--accent')},s);
+}
+
+/* Trap 4 */
+let pts=null;
+function rng(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}}
+function makePts(){const r=rng(7),out=[];for(let i=0;i<400;i++){const u1=Math.max(1e-9,r()),u2=r(),u3=Math.max(1e-9,r()),u4=r();out.push([Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2),Math.sqrt(-2*Math.log(u3))*Math.cos(2*Math.PI*u4)]);}return out;}
+function rtm(){
+  const rho=parseFloat($('rr').value),q=parseFloat($('rq').value);$('rro').textContent=rho.toFixed(2);$('rqo').textContent=Math.round(q*100)+'%';
+  const zq=invPhi(1-q),m=Math.exp(-zq*zq/2)/Math.sqrt(2*Math.PI)/q;
+  $('r1').textContent=f(70+10*m,1);$('r2').textContent=f(70+10*rho*m,1);$('r3').textContent=f(70-10*m,1)+' → '+f(70-10*rho*m,1);
+  if(!pts)pts=makePts();const s=$('rsvg');s.innerHTML='';const X=z=>40+(z+3.2)/6.4*370,Y=z=>270-(z+3.2)/6.4*255;
+  el('line',{x1:40,y1:270,x2:410,y2:270,class:'chart-axis'},s);el('line',{x1:40,y1:270,x2:40,y2:15,class:'chart-axis'},s);
+  [40,70,100].forEach(sc=>{const z=(sc-70)/10;el('text',{x:X(z)-8,y:286},s).textContent=sc;el('text',{x:8,y:Y(z)+4},s).textContent=sc;});
+  el('text',{x:180,y:299},s).textContent='first landing';
+  el('line',{x1:X(-3.2),y1:Y(-3.2),x2:X(3.2),y2:Y(3.2),stroke:css('--muted'),'stroke-dasharray':'4 4'},s);
+  const c=Math.sqrt(1-rho*rho);
+  pts.forEach(([a,b])=>{const y=rho*a+c*b;const col=a>zq?css('--good'):a<-zq?css('--b'):css('--line');el('circle',{cx:X(a),cy:Y(Math.max(-3.2,Math.min(3.2,y))),r:2.6,fill:col},s);});
+  [[m,css('--good')],[-m,css('--b')]].forEach(([mm,col])=>{el('line',{x1:X(mm)-14,y1:Y(rho*mm),x2:X(mm)+14,y2:Y(rho*mm),stroke:col,'stroke-width':3},s);el('line',{x1:X(mm),y1:Y(mm),x2:X(mm),y2:Y(rho*mm),stroke:col,'stroke-width':1.5,'stroke-dasharray':'3 2'},s);});
+}
+
+/* Trap 5 */
+function base(){
+  const se=v('bsn'),sp=v('bsp'),k=Math.max(0,Math.min(1000,v('bpr'))),prev=k/1000;
+  const ppv=se*prev/(se*prev+(1-sp)*(1-prev));$('b1').textContent=pc(ppv,1);
+  const tp=100000*prev*se,fp=100000*(1-prev)*(1-sp);$('b2').textContent=Math.round(tp).toLocaleString()+' / '+Math.round(fp).toLocaleString();
+  $('bver').innerHTML='Out of every '+Math.round(tp+fp).toLocaleString()+' alarms, about '+Math.round(tp).toLocaleString()+' are real. '+(ppv<0.5?'Most alarms are false even though the detector is accurate: confirm with a second, independent sensor.':'Here most alarms are real because threats are common enough.');
+  // scaled icon array: 1000 cells; show threats scaled so at least 20 cells are threats
+  const scale=prev>0?Math.max(1,Math.ceil(20/(1000*prev))):1;const thr=Math.min(1000,Math.round(1000*prev*scale));const tpc=Math.round(thr*se),fnc=thr-tpc,fpc=Math.min(1000-thr,Math.round((1000-thr)*(1-sp)*scale));
+  const d=$('bdots');let h='';for(let i=0;i<1000;i++){h+='<i class="'+(i<tpc?'tp':i<thr?'fn':i<thr+fpc?'fp':'')+'"></i>';}d.innerHTML=h;
+  $('bscale').textContent=scale>1?('grid enlarges both threats and false alarms ×'+scale+' to stay readable; their ratio is exact'):'grid at true scale';
+}
+
+/* Trap 6 */
+function anscombe(){
+  const xs=[10,8,13,9,11,14,6,4,12,7,5],D=[[xs,[8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68]],[xs,[9.14,8.14,8.74,8.77,9.26,8.10,6.13,3.10,9.13,7.26,4.74]],[xs,[7.46,6.77,12.74,7.11,7.81,8.84,6.08,5.39,8.15,6.42,5.73]],[[8,8,8,8,8,8,8,19,8,8,8],[6.58,5.76,7.71,8.84,8.47,7.04,5.25,12.50,5.56,7.91,6.89]]];
+  const names=['I: linear with noise','II: a curve','III: one outlier tilts the line','IV: one point creates the correlation'];
+  const box=$('ans4');box.innerHTML='';
+  D.forEach(([x,y],i)=>{const fig=document.createElement('figure');const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 220 150');s.setAttribute('role','img');s.setAttribute('aria-label','Anscombe dataset '+(i+1));
+    const X=t=>24+(t-2)/18*188,Y=t=>132-(t-2)/12*122;
+    el('line',{x1:24,y1:132,x2:214,y2:132,class:'chart-axis'},s);el('line',{x1:24,y1:132,x2:24,y2:8,class:'chart-axis'},s);
+    [4,8,12].forEach(t=>{el('text',{x:4,y:Y(t)+4},s).textContent=t;});[5,10,15,20].forEach(t=>{el('text',{x:X(t)-6,y:146},s).textContent=t;});
+    el('line',{x1:X(3),y1:Y(3+1.5),x2:X(20),y2:Y(13),stroke:css('--accent'),'stroke-width':1.6},s);
+    x.forEach((xx,j)=>el('circle',{cx:X(xx),cy:Y(y[j]),r:3.2,fill:css('--navy')},s));
+    fig.appendChild(s);const cap=document.createElement('figcaption');cap.textContent=names[i];fig.appendChild(cap);box.appendChild(fig);});
+}
+
+/* Drill */
+const FL=[
+ ['Aeronautics, 1943','Returning bombers show bullet holes on the wings and fuselage. Engineers propose armouring those areas.','<b>Survivorship bias.</b> The holes mark where aircraft could be hit and still return. Aircraft hit in the engines and cockpit did not come back. Armour where the returning aircraft show no holes. Defence twin: training an AI only on engagements that were won.'],
+ ['Fleet maintenance','Vehicles that received the most maintenance hours had the most breakdowns, so a report recommends cutting maintenance.','<b>Reverse causation.</b> Failing vehicles attract maintenance. Compare similar vehicles over time, or randomise a maintenance schedule.'],
+ ['Statistics','Across 17 European countries, stork pairs correlate with birth rates (r ≈ 0.62).','<b>Confounding.</b> Land area and rural population drive both. A third variable can create a strong correlation between two unrelated quantities.'],
+ ['Psychology','Flight instructors find that cadets praised after an excellent landing usually do worse next time, so they stop praising.','<b>Regression to the mean.</b> An excellent landing is partly luck, and the next one is usually closer to the cadet\'s average whatever the instructor says. Use a control group before crediting or blaming feedback.'],
+ ['Engineering, 1986','Before the Challenger launch, O-ring damage was plotted against temperature using only the flights that had damage. No trend was visible.','<b>Missing data and selection.</b> The damage-free flights, all at warmer temperatures, were left out; with them included, a strong cold-temperature effect appears. The launch was also far colder than any tested temperature.'],
+ ['Machine learning','A classifier separates wolves from huskies with high accuracy. An explanation tool shows it is looking at the snow in the background.','<b>Shortcut learning.</b> The model learned a cue correlated with the labels, not the animals. Defence twin: a target detector that keys on the airfield, not the aircraft.'],
+ ['Wargame analysis','Twenty new tactics are tested in simulation; one beats the baseline with p = 0.03, and the report recommends adopting it.','<b>Multiple testing (p-hacking).</b> With 20 tests at α = 0.05, there is a 64% chance at least one looks significant by luck. Pre-register the test, apply Bonferroni or Holm, and replicate.'],
+ ['Sensor procurement','A detector with 99% sensitivity and 99% specificity is deployed where 1 track in 1,000 is a threat. Commanders are told 99% of its alarms are real.','<b>Base-rate fallacy.</b> About 9% of alarms are real (Trap 5). Accuracy figures must be read against how rare the threat is.']
+];
+const fl=$('flawlist');FL.forEach(([disc,sc,ans])=>{const d=document.createElement('div');d.className='panel flaw';d.innerHTML='<div class="disc">'+disc+'</div><p>'+sc+'</p><details><summary>Show the flaw</summary><p>'+ans+'</p></details>';fl.appendChild(d);});
+
+['as','an','al','aln','bs','bn','bl','bln'].forEach(i=>$(i).addEventListener('input',simpson));
+['sn','sp1','sp2'].forEach(i=>$(i).addEventListener('input',sig));
+['mk','ma'].forEach(i=>$(i).addEventListener('input',multi));
+['rr','rq'].forEach(i=>$(i).addEventListener('input',rtm));
+['bsn','bsp','bpr'].forEach(i=>$(i).addEventListener('input',base));
+function all(){simpson();sig();multi();rtm();base();anscombe();}
+all();
+try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',all);new MutationObserver(all).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});}catch(e){}
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Policy Gradient Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one scrolling study sheet with sticky index; each demo is a worksheet panel, controls left, evidence right. Course palette: navy + Lecture 7 accent. */
+
+:root{
+  --bg:#F6F7F8; --surface:#FFFFFF; --fg:#18243A; --muted:#5D6878; --line:#DCDFE4;
+  --navy:#1B3A5E; --accent:#1B7A5E; --accent-soft:#E3F3EE; --a:#2869A0; --b:#B8430F; --good:#1E7A45; --good-soft:#E4F3EA; --warn:#A6620C; --warn-soft:#FBF0DD; --dot:#B9C2CD;
+  --font-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#6CD1B0; --accent-soft:#15291F; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; --dot:#4A5666; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#6CD1B0; --accent-soft:#15291F; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; --dot:#4A5666; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15.5px;line-height:1.55;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+header.top{display:grid;gap:6px;padding-block:8px 18px;border-bottom:2px solid var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
+.lede{color:var(--muted);max-width:72ch;margin:0}
+nav.idx{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:6px 18px;padding-block:10px;border-bottom:1px solid var(--line)}
+nav.idx a{color:var(--navy);text-decoration:none;font-weight:500;font-size:14px}
+nav.idx a:hover,nav.idx a:focus-visible{color:var(--accent);text-decoration:underline}
+section{padding-block:26px 4px}
+h2{font-size:22px;margin:0 0 4px;color:var(--navy);text-wrap:balance}
+h2 .tag{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--accent);margin-right:10px;vertical-align:2px}
+h3{font-size:16px;margin:0}
+.intro{color:var(--muted);max-width:76ch;margin:0 0 14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start}
+@media (max-width:780px){.duo{grid-template-columns:minmax(0,1fr)}}
+.duo>*,.stack>*{min-width:0}
+.stack{display:grid;gap:12px;align-content:start}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.fields.two{grid-template-columns:repeat(2,minmax(0,1fr))}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}.fields.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
+.fields>label{align-content:end}
+input[type=number],select{font-family:var(--font-mono);font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rangerow{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:10px;align-items:center}
+.rangerow output{font-family:var(--font-mono);text-align:right;color:var(--fg)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;font-size:14px;font-weight:600;border-radius:6px;padding:7px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--surface)}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.4;cursor:default}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) fit-content(60%);gap:4px 14px;font-size:14.5px;padding:12px 14px;border-radius:6px;background:var(--accent-soft);margin:0}
+.kv dt{margin:0}.kv dd{margin:0;overflow-wrap:anywhere;font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500}
+.kv dd.big{font-size:18px;color:var(--accent);font-weight:600}
+.verdict{font-size:14.5px;margin:0;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0}
+.note{font-size:14px;margin:0;padding:10px 12px;border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 6px 6px 0}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+svg,canvas{display:block;width:100%;height:auto;max-width:100%}
+canvas{border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+svg text{fill:var(--muted);font-family:var(--font-mono);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.hi{color:var(--accent);font-weight:600}
+.flaws{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.flaw{display:grid;gap:8px;align-content:start}
+.flaw .disc{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.03em}
+.flaw p{margin:0;font-size:14.5px}
+details{border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}
+details p{margin-top:6px!important}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+</style>
+
+</head><body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Unit 4 &middot; AI &amp; Machine Learning in Warfare &middot; Lecture 7</div>
+  <h1>Policy Gradient Lab</h1>
+  <p class="lede">Train a softmax policy with REINFORCE and see what a baseline does to the noise, learn a continuous aim with a Gaussian policy and an entropy bonus, explore PPO's clipped objective, and compute generalised advantage estimates by hand. Every result updates as you change the inputs.</p>
+  <p class="lede" style="font-size:13.5px">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</header>
+<nav class="idx" aria-label="Sections"><a href="#rf">REINFORCE & baselines</a><a href="#gauss">Gaussian policy</a><a href="#ppo">PPO clipping</a><a href="#gae">GAE</a><a href="#drill">Drill</a></nav>
+<section id="rf">
+  <h2><span class="tag">DEMO 1</span>REINFORCE, with and without a baseline</h2>
+  <p class="intro">A drone picks one of three ingress routes with a softmax policy &pi;(a) &prop; e<sup>&theta;<sub>a</sub></sup>. Route rewards are noisy, with means 1.0, 1.5 and 2.0 plus a common offset. REINFORCE updates &theta; &larr; &theta; + &alpha;(r &minus; b)&nabla;log &pi;(a). The offset changes nothing about which route is best, but without a baseline b it inflates the noise in every update.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields two"><label for="fo">Reward offset (added to every route)<input id="fo" type="number" value="10" step="1"></label><label for="fb">Baseline<select id="fb"><option value="1">Running mean of rewards</option><option value="0">None</option></select></label></div>
+      <label for="fa">Learning rate &alpha;<div class="rangerow"><input id="fa" type="range" min="0.005" max="0.2" step="0.005" value="0.02"><output id="fao"></output></div></label>
+      <label for="fs">Reward noise s.d.<div class="rangerow"><input id="fs" type="range" min="0" max="3" step="0.1" value="1"><output id="fso"></output></div></label>
+      <div class="btns"><button type="button" id="frun">New 500-step run</button></div>
+      <dl class="kv"><dt>Final &pi;(route 1, 2, 3)</dt><dd id="f1"></dd><dt>Gradient noise at start (total variance): no baseline &middot; baseline</dt><dd id="f2"></dd><dt>Runs that end preferring route 3 (of 40 seeds): no baseline &middot; baseline</dt><dd class="big" id="f3"></dd></dl>
+      <p class="verdict" id="fver"></p>
+    </div>
+    <div class="stack"><svg id="fsvg" viewBox="0 0 440 280" role="img" aria-label="Route probabilities over training steps"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--muted)"></i>route 1 (mean 1.0)</span><span><i class="sw" style="background:var(--a)"></i>route 2 (1.5)</span><span><i class="sw" style="background:var(--accent)"></i>route 3 (2.0, best)</span></div></div>
+  </div>
+</section>
+
+<section id="gauss">
+  <h2><span class="tag">DEMO 2</span>A Gaussian policy for a continuous aim</h2>
+  <p class="intro">An aim point a is drawn from N(&mu;, &sigma;&sup2;); the reward is &minus;(a &minus; 3)&sup2;, so the target is a = 3. Each update samples a batch, subtracts the batch-mean baseline and steps &mu; and log &sigma; along the policy gradient. Without an entropy bonus, &sigma; keeps shrinking and exploration dies; with bonus &beta;, the optimum is &sigma;* = &radic;(&beta;/2).</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields three"><label for="ga">Learning rate<input id="ga" type="number" value="0.05" min="0.001" max="0.5" step="0.01"></label><label for="gs0">Initial &sigma;<input id="gs0" type="number" value="1.5" min="0.1" step="0.1"></label><label for="gn">Batch size<input id="gn" type="number" value="16" min="2" max="256" step="1"></label></div>
+      <label for="gb">Entropy bonus &beta;<div class="rangerow"><input id="gb" type="range" min="0" max="1" step="0.05" value="0"><output id="gbo"></output></div></label>
+      <div class="btns"><button type="button" id="grun">Run 50 updates</button><button type="button" class="ghost" id="g0">Reset policy</button></div>
+      <dl class="kv"><dt>Updates</dt><dd id="h1"></dd><dt>&mu; (target 3)</dt><dd class="big" id="h2"></dd><dt>&sigma; (optimum &radic;(&beta;/2))</dt><dd class="big" id="h3"></dd><dt>Expected reward &minus;[(&mu;&minus;3)&sup2; + &sigma;&sup2;]</dt><dd id="h4"></dd></dl>
+      <p class="verdict" id="hver"></p>
+    </div>
+    <div class="stack"><svg id="gsvg" viewBox="0 0 440 300" role="img" aria-label="Policy density and parameter history"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>current policy density</span><span><i class="sw" style="background:var(--b)"></i>target a = 3</span><span><i class="sw" style="background:var(--a)"></i>&mu; history (lower panel)</span><span><i class="sw" style="background:var(--warn)"></i>&sigma; history</span></div></div>
+  </div>
+</section>
+
+<section id="ppo">
+  <h2><span class="tag">DEMO 3</span>PPO's clipped objective</h2>
+  <p class="intro">PPO maximises min(&rho;A, clip(&rho;, 1&minus;&epsilon;, 1+&epsilon;)A), where &rho; = &pi;<sub>new</sub>(a|s)/&pi;<sub>old</sub>(a|s). Once the new policy has moved far enough in the helpful direction, the objective goes flat and the gradient becomes zero, so one batch cannot push the policy too far.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="pe">Clip range &epsilon;<div class="rangerow"><input id="pe" type="range" min="0.05" max="0.5" step="0.05" value="0.2"><output id="peo"></output></div></label>
+      <label for="pA">Advantage A<div class="rangerow"><input id="pA" type="range" min="-2" max="2" step="0.1" value="1"><output id="pAo"></output></div></label>
+      <label for="pr">Probability ratio &rho;<div class="rangerow"><input id="pr" type="range" min="0" max="2.5" step="0.01" value="1.35"><output id="pro"></output></div></label>
+      <dl class="kv"><dt>Unclipped &rho;A</dt><dd id="q1"></dd><dt>PPO objective</dt><dd class="big" id="q2"></dd><dt>Gradient with respect to &rho;</dt><dd class="big" id="q3"></dd></dl>
+      <p class="verdict" id="qver"></p>
+    </div>
+    <div class="stack"><svg id="psvg" viewBox="0 0 440 280" role="img" aria-label="PPO objective against probability ratio"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--muted)"></i>unclipped &rho;A</span><span><i class="sw" style="background:var(--accent)"></i>PPO objective</span><span><i class="sw" style="background:var(--warn)"></i>zero-gradient region</span></div></div>
+  </div>
+</section>
+
+<section id="gae">
+  <h2><span class="tag">DEMO 4</span>Generalised advantage estimation by hand</h2>
+  <p class="intro">TD errors &delta;<sub>t</sub> = r<sub>t</sub> + &gamma;V(s<sub>t+1</sub>) &minus; V(s<sub>t</sub>) are combined as A<sub>t</sub> = &Sigma;<sub>l</sub> (&gamma;&lambda;)<sup>l</sup>&delta;<sub>t+l</sub>. &lambda; = 0 gives the one-step TD advantage (low variance, biased if V is wrong); &lambda; = 1 gives the Monte Carlo return minus V (unbiased, high variance).</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="er">Rewards r&#8320;&hellip;r&#8324; (comma-separated)<input id="er" type="text" value="0, 0, 1, 0, 5" style="font-family:var(--font-mono);font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%"></label>
+      <label for="ev">Critic values V(s&#8320;)&hellip;V(s&#8325;); the last is the bootstrap value (0 if the episode ended)<input id="ev" type="text" value="3.0, 3.2, 3.6, 3.0, 4.5, 0" style="font-family:var(--font-mono);font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%"></label>
+      <div class="fields two"><label for="eg">&gamma;<input id="eg" type="number" value="0.9" min="0" max="1" step="0.01"></label><label for="el">&lambda;<input id="el" type="number" value="0.95" min="0" max="1" step="0.05"></label></div>
+      <div class="tbl"><table><thead><tr><th>t</th><th>r</th><th>V(s)</th><th>&delta;</th><th>A (GAE)</th></tr></thead><tbody id="etab"></tbody></table></div>
+    </div>
+    <div class="stack"><svg id="esvg" viewBox="0 0 440 260" role="img" aria-label="Advantage at t = 0 against lambda"></svg>
+      <dl class="kv"><dt>A&#8320; with &lambda; = 0 (one-step TD)</dt><dd id="e1"></dd><dt>A&#8320; with &lambda; = 1 (Monte Carlo)</dt><dd id="e2"></dd><dt>A&#8320; with chosen &lambda;</dt><dd class="big" id="e3"></dd></dl>
+      <p class="verdict" id="ever"></p></div>
+  </div>
+</section>
+
+<section id="drill">
+  <h2><span class="tag">DRILL</span>What went wrong?</h2>
+  <p class="intro">Decide before you open each answer.</p>
+  <div class="flaws" id="drillbox"></div>
+</section>
+
+<footer>AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; Unit 4: Simulation Strategies in Warfare &middot; Lecture 7</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id), v=id=>{const x=parseFloat($(id).value);return isFinite(x)?x:0};
+const pc=(x,d=1)=>isFinite(x)?(100*x).toFixed(d)+'%':'—', f=(x,d=2)=>isFinite(x)?x.toFixed(d):'—';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function Phi(x){const s=x<0?-1:1;x=Math.abs(x)/Math.SQRT2;const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return 0.5*(1+s*y);}
+function invPhi(p){const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924],b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857],c=[-0.00778489400243029,-0.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878],d=[0.00778469570904146,0.32246712907004,2.445134137143,3.75440866190742];const pl=0.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+function rng(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}}
+function gauss(r){const u=Math.max(1e-12,r()),w=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*w);}
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function axes(s,o){/* o: {x0,x1,y0,y1,xmin,xmax,ymin,ymax,xt:[],yt:[],xl,yl,fx,fy} returns X,Y */
+ const X=t=>o.x0+(t-o.xmin)/(o.xmax-o.xmin)*(o.x1-o.x0),Y=t=>o.y0-(t-o.ymin)/(o.ymax-o.ymin)*(o.y0-o.y1);
+ el('line',{x1:o.x0,y1:o.y0,x2:o.x1,y2:o.y0,stroke:css('--line')},s);el('line',{x1:o.x0,y1:o.y0,x2:o.x0,y2:o.y1,stroke:css('--line')},s);
+ (o.yt||[]).forEach(t=>{el('line',{x1:o.x0,y1:Y(t),x2:o.x1,y2:Y(t),stroke:css('--line'),'stroke-dasharray':'2 3'},s);const tx=el('text',{x:o.x0-5,y:Y(t)+4,'text-anchor':'end'},s);tx.textContent=o.fy?o.fy(t):t;});
+ (o.xt||[]).forEach(t=>{const tx=el('text',{x:X(t),y:o.y0+15,'text-anchor':'middle'},s);tx.textContent=o.fx?o.fx(t):t;});
+ if(o.xl){const t=el('text',{x:(o.x0+o.x1)/2,y:o.y0+30,'text-anchor':'middle'},s);t.textContent=o.xl;}
+ if(o.yl){const t=el('text',{x:12,y:(o.y0+o.y1)/2,'text-anchor':'middle',transform:'rotate(-90 12 '+((o.y0+o.y1)/2)+')'},s);t.textContent=o.yl;}
+ return [X,Y];}
+function path(pts,X,Y){return pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join('');}
+function drill(id,items){const box=$(id);items.forEach(([d,s,a])=>{const e=document.createElement('div');e.className='panel flaw';e.innerHTML='<div class="disc">'+d+'</div><p>'+s+'</p><details><summary>Show the answer</summary><p>'+a+'</p></details>';box.appendChild(e);});}
+function onTheme(fn){try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',fn);new MutationObserver(fn).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});}catch(e){}}
+
+function niceT(a,b){const r=b-a,st=Math.pow(10,Math.floor(Math.log10(r/4)));const m=[1,2,5,10].find(k=>r/(k*st)<=6)*st;const out=[];for(let t=Math.ceil(a/m)*m;t<=b+1e-9;t+=m)out.push(+t.toFixed(6));return out;}
+const sm=th=>{const m=Math.max(...th),e=th.map(x=>Math.exp(x-m)),s=e.reduce((a,b)=>a+b,0);return e.map(x=>x/s);};
+
+/* Demo 1 */
+const MU=[1,1.5,2];let fseed=1;
+function runRF(seed,steps,al,off,sig,useB,rec){
+  const r=rng(seed);let th=[0,0,0],b=null;const hist=rec?[[0,...sm(th)]]:null;
+  for(let t=1;t<=steps;t++){const p=sm(th),u=r();const a=u<p[0]?0:u<p[0]+p[1]?1:2;const rew=MU[a]+off+gauss(r)*sig;
+    if(b===null)b=rew;const adv=rew-(useB?b:0);for(let k=0;k<3;k++)th[k]+=al*adv*((k===a?1:0)-p[k]);if(useB)b+=0.05*(rew-b);
+    if(rec&&t%5===0)hist.push([t,...sm(th)]);}
+  return rec?hist:sm(th);
+}
+function rf(){
+  const off=v('fo'),al=+$('fa').value,sig=+$('fs').value,useB=$('fb').value==='1';$('fao').textContent=al.toFixed(3);$('fso').textContent=sig.toFixed(1);
+  const H=runRF(fseed*7919+1,500,al,off,sig,useB,true),last=H[H.length-1];
+  const p=1/3,nrm=2/3,gv=bb=>{let e2=0;MU.forEach(m=>{e2+=p*(((m+off-bb)**2+sig*sig)*nrm);});let Eg=[0,0,0];MU.forEach((m,a)=>{for(let k=0;k<3;k++)Eg[k]+=p*(m+off-bb)*((k===a?1:0)-p);});return e2-Eg.reduce((s,x)=>s+x*x,0);};
+  const v0=gv(0),v1=gv(off+1.5);
+  let c0=0,c1=0;for(let s=0;s<40;s++){const a=runRF(1000+s,500,al,off,sig,false,false),b=runRF(1000+s,500,al,off,sig,true,false);if(a[2]>=Math.max(a[0],a[1]))c0++;if(b[2]>=Math.max(b[0],b[1]))c1++;}
+  $('f1').textContent=last.slice(1).map(x=>x.toFixed(2)).join(', ');$('f2').textContent=f(v0,1)+' · '+f(v1,2);$('f3').textContent=c0+' · '+c1;
+  $('fver').textContent=Math.abs(off)>=3?'Without a baseline every route\'s reward is about '+f(off+1.5,0)+', so whichever route is sampled gets pushed up hard: the gradient variance is '+f(v0/v1,0)+'× larger and runs lock onto an early, lucky choice. Subtracting a baseline leaves the expected gradient unchanged and removes most of that noise.':'With rewards already centred near zero, the baseline matters less. Raise the offset to see the variance problem appear.';
+  const s=$('fsvg');s.innerHTML='';const [X,Y]=axes(s,{x0:48,x1:430,y0:240,y1:10,xmin:0,xmax:500,ymin:0,ymax:1,xt:[0,100,200,300,400,500],yt:[0,0.25,0.5,0.75,1],fy:t=>t.toFixed(2),xl:'training step',yl:'probability'});
+  [css('--muted'),css('--a'),css('--accent')].forEach((c,k)=>el('path',{d:path(H.map(h=>[h[0],h[k+1]]),X,Y),stroke:c,'stroke-width':k===2?2.6:2,fill:'none'},s));
+}
+['fo','fb','fa','fs'].forEach(i=>$(i).addEventListener('input',rf));$('frun').addEventListener('click',()=>{fseed++;rf();});
+
+/* Demo 2 */
+let G2;
+function greset(){G2={mu:0,ls:Math.log(Math.max(0.1,v('gs0'))),n:0,hist:[],r:rng(31)};G2.hist.push([0,G2.mu,Math.exp(G2.ls)]);gdraw();}
+function gupdate(){const al=Math.max(0.001,v('ga')),N=Math.max(2,Math.round(v('gn'))),beta=+$('gb').value,sg=Math.exp(G2.ls);const A=[],R=[];
+  for(let i=0;i<N;i++){const a=G2.mu+sg*gauss(G2.r);A.push(a);R.push(-((a-3)**2));}const b=R.reduce((x,y)=>x+y,0)/N;let gm=0,gl=0;
+  for(let i=0;i<N;i++){const z=(A[i]-G2.mu)/sg;gm+=(R[i]-b)*z/sg;gl+=(R[i]-b)*(z*z-1);}gm/=N;gl=gl/N+beta;
+  const cap=x=>Math.max(-5,Math.min(5,x));G2.mu+=al*cap(gm);G2.ls=Math.max(-5,Math.min(2,G2.ls+al*cap(gl)));G2.n++;G2.hist.push([G2.n,G2.mu,Math.exp(G2.ls)]);}
+function gdraw(){
+  const beta=+$('gb').value,sg=Math.exp(G2.ls);$('gbo').textContent=beta.toFixed(2);
+  $('h1').textContent=G2.n;$('h2').textContent=f(G2.mu,3);$('h3').textContent=f(sg,3)+' ('+f(Math.sqrt(beta/2),3)+')';$('h4').textContent=f(-((G2.mu-3)**2+sg*sg),3);
+  $('hver').textContent=!G2.n?'Press Run to take 50 policy-gradient steps.':beta===0&&sg<0.25?'σ is collapsing toward zero: the policy has stopped exploring. That is harmless while the target stays put, but if it moved the agent would never notice. An entropy bonus keeps σ from vanishing.':beta>0&&Math.abs(sg-Math.sqrt(beta/2))<0.15*Math.sqrt(beta/2)+0.03?'σ has settled near √(β/2) = '+f(Math.sqrt(beta/2),2)+'. The bonus buys continued exploration at a cost of σ² in expected reward.':'μ moves toward the target while σ '+(beta>0?'heads for √(β/2) = '+f(Math.sqrt(beta/2),2):'shrinks')+'. Gradient estimates are noisy: a larger batch makes the path smoother.';
+  const s=$('gsvg');s.innerHTML='';const xs=[];for(let a=-3;a<=7.001;a+=0.05)xs.push(a);const dens=a=>Math.exp(-0.5*((a-G2.mu)/sg)**2)/(sg*Math.sqrt(2*Math.PI));const top=Math.max(0.5,dens(G2.mu))*1.08;
+  let [X,Y]=axes(s,{x0:48,x1:430,y0:125,y1:8,xmin:-3,xmax:7,ymin:0,ymax:top,xt:[-2,0,2,4,6],yt:[],xl:'',yl:'density'});{const t=el('text',{x:X(3)+5,y:Y(top)+12},s);t.textContent='target';}
+  el('path',{d:path(xs.map(a=>[a,Math.min(top,dens(a))]),X,Y),stroke:css('--accent'),'stroke-width':2.4,fill:css('--accent'),'fill-opacity':0.12},s);
+  el('line',{x1:X(3),y1:Y(0),x2:X(3),y2:Y(top),stroke:css('--b'),'stroke-width':2,'stroke-dasharray':'5 3'},s);
+  const H=G2.hist,nx=Math.max(10,G2.n),ym=Math.max(3.5,...H.map(h=>Math.max(h[1],h[2])))*1.05,ylo=Math.min(0,...H.map(h=>h[1]));
+  [X,Y]=axes(s,{x0:48,x1:430,y0:262,y1:160,xmin:0,xmax:nx,ymin:ylo,ymax:ym,xt:niceT(0,nx),yt:niceT(ylo,ym),xl:'update'});
+  el('line',{x1:X(0),y1:Y(3),x2:X(nx),y2:Y(3),stroke:css('--b'),'stroke-dasharray':'5 3'},s);
+  el('path',{d:path(H.map(h=>[h[0],h[1]]),X,Y),stroke:css('--a'),'stroke-width':2.2,fill:'none'},s);el('path',{d:path(H.map(h=>[h[0],h[2]]),X,Y),stroke:css('--warn'),'stroke-width':2.2,fill:'none'},s);
+}
+$('grun').addEventListener('click',()=>{for(let i=0;i<50;i++)gupdate();gdraw();});$('g0').addEventListener('click',greset);['gs0'].forEach(i=>$(i).addEventListener('change',greset));$('gb').addEventListener('input',gdraw);
+
+/* Demo 3 */
+function ppo(){
+  const e=+$('pe').value,A=+$('pA').value,rho=+$('pr').value;$('peo').textContent=e.toFixed(2);$('pAo').textContent=A.toFixed(1);$('pro').textContent=rho.toFixed(2);
+  const L=r=>Math.min(r*A,Math.min(Math.max(r,1-e),1+e)*A),zero=r=>A>0?r>1+e:A<0?r<1-e:true;
+  $('q1').textContent=f(rho*A,3);$('q2').textContent=f(L(rho),3);$('q3').textContent=zero(rho)?'0 (clipped)':f(A,2);
+  $('qver').textContent=A===0?'A zero advantage gives no gradient at all.':A>0?(rho>1+e?'The action was better than expected and is already '+pc(rho-1,0)+' more likely than under the old policy, beyond the 1 + ε limit. The objective is flat here, so this sample stops pushing.':rho<1-e?'The action was good but has become less likely. The objective is not clipped on this side, so the full gradient pulls the probability back up.':'Inside the trust region: the gradient is A, encouraging this good action.'):(rho<1-e?'The action was worse than expected and is already '+pc(1-rho,0)+' less likely than before. Further reduction earns nothing: the gradient is zero.':rho>1+e?'A bad action that has become more likely: the objective is unclipped on this side, so the full gradient pushes it back down.':'Inside the trust region: the gradient is A, discouraging this bad action.');
+  const s=$('psvg');s.innerHTML='';const m=Math.max(0.5,2.6*Math.abs(A)),lo=A>=0?-0.3*m:-m,hi=A>=0?m:0.3*m;
+  const [X,Y]=axes(s,{x0:48,x1:430,y0:240,y1:10,xmin:0,xmax:2.5,ymin:lo,ymax:hi,xt:[0,0.5,1,1.5,2,2.5],yt:niceT(lo,hi),xl:'probability ratio ρ',yl:'objective'});
+  if(A!==0){const a0=A>0?1+e:0,a1=A>0?2.5:1-e;el('rect',{x:X(a0),y:Y(hi),width:X(a1)-X(a0),height:Y(lo)-Y(hi),fill:css('--warn'),'fill-opacity':0.13},s);}
+  [1-e,1,1+e].forEach(q=>el('line',{x1:X(q),y1:Y(lo),x2:X(q),y2:Y(hi),stroke:css('--line'),'stroke-dasharray':q===1?'':'3 3'},s));
+  const pts=[];for(let r=0;r<=2.5001;r+=0.01)pts.push(r);
+  el('path',{d:path(pts.map(r=>[r,r*A]),X,Y),stroke:css('--muted'),'stroke-dasharray':'5 4','stroke-width':1.6,fill:'none'},s);
+  el('path',{d:path(pts.map(r=>[r,L(r)]),X,Y),stroke:css('--accent'),'stroke-width':3,fill:'none'},s);
+  el('circle',{cx:X(rho),cy:Y(L(rho)),r:6,fill:css('--b')},s);
+}
+['pe','pA','pr'].forEach(i=>$(i).addEventListener('input',ppo));
+
+/* Demo 4 */
+function gaeAll(R,V,g,l){const T=R.length,d=R.map((r,t)=>r+g*V[t+1]-V[t]),A=new Array(T);let acc=0;for(let t=T-1;t>=0;t--){acc=d[t]+g*l*acc;A[t]=acc;}return {d,A};}
+function gae(){
+  const R=$('er').value.split(/[,\s;]+/).filter(Boolean).map(Number),V=$('ev').value.split(/[,\s;]+/).filter(Boolean).map(Number),g=Math.min(1,Math.max(0,v('eg'))),l=Math.min(1,Math.max(0,v('el')));
+  const s=$('esvg');s.innerHTML='';
+  if(!R.length||R.some(x=>!isFinite(x))||V.some(x=>!isFinite(x))||V.length!==R.length+1){$('etab').innerHTML='<tr><td colspan="5">Enter T rewards and T + 1 values (the last value is the bootstrap).</td></tr>';['e1','e2','e3'].forEach(i=>$(i).textContent='—');$('ever').textContent='';return;}
+  const o=gaeAll(R,V,g,l);$('etab').innerHTML=R.map((r,t)=>'<tr><td>'+t+'</td><td>'+r+'</td><td>'+V[t]+'</td><td>'+f(o.d[t],3)+'</td><td class="'+(t===0?'hi':'')+'">'+f(o.A[t],3)+'</td></tr>').join('');
+  const a0=gaeAll(R,V,g,0).A[0],a1=gaeAll(R,V,g,1).A[0];$('e1').textContent=f(a0,3);$('e2').textContent=f(a1,3);$('e3').textContent=f(o.A[0],3);
+  const big=o.d.reduce((b,x,i)=>Math.abs(x)>Math.abs(o.d[b])?i:b,0);
+  $('ever').textContent=Math.sign(a0)!==Math.sign(a1)&&Math.abs(a1-a0)>0.1?'The two extremes disagree in sign: the critic misjudges a later state (largest δ is '+f(o.d[big],2)+' at t = '+big+'), so the one-step estimate inherits its error, while the Monte Carlo estimate sees the real rewards. λ near 0.95 keeps most of the real signal while damping noise from far ahead.':'λ slides the estimate between the one-step TD value ('+f(a0,2)+') and the Monte Carlo value ('+f(a1,2)+'). Higher λ trusts the observed rewards more and the critic less.';
+  const C=[];for(let q=0;q<=1.0001;q+=0.02)C.push([q,gaeAll(R,V,g,q).A[0]]);const lo=Math.min(0,...C.map(c=>c[1])),hi=Math.max(0.1,...C.map(c=>c[1])),pad=(hi-lo)*0.08;
+  const [X,Y]=axes(s,{x0:48,x1:430,y0:220,y1:10,xmin:0,xmax:1,ymin:lo-pad,ymax:hi+pad,xt:[0,0.25,0.5,0.75,1],yt:niceT(lo-pad,hi+pad),xl:'λ',yl:'A₀'});
+  el('line',{x1:X(0),y1:Y(0),x2:X(1),y2:Y(0),stroke:css('--muted')},s);el('path',{d:path(C,X,Y),stroke:css('--accent'),'stroke-width':2.6,fill:'none'},s);el('circle',{cx:X(l),cy:Y(o.A[0]),r:6,fill:css('--b')},s);
+}
+['er','ev','eg','el'].forEach(i=>$(i).addEventListener('input',gae));
+
+drill('drillbox',[
+ ['Variance','REINFORCE on a mission simulator whose rewards are all between 95 and 105 learns erratically and settles on a poor tactic.','<b>No baseline.</b> With every reward near 100, every sampled action is reinforced strongly and the gradient is mostly noise. Subtract a baseline (a learned V(s) or the running mean) or normalise advantages; the expected gradient is unchanged.'],
+ ['Exploration','A Gaussian targeting policy\'s σ falls to 0.01 within a few hundred updates. When the target behaviour changes, performance collapses and never recovers.','<b>Entropy collapse.</b> Without an entropy bonus or a floor on σ, the policy stops exploring and cannot rediscover good actions. Track entropy as a training diagnostic and add a bonus (SAC builds this in).'],
+ ['PPO tuning','To learn faster, the team raises PPO\'s ε to 0.8 and runs 30 epochs per batch. Returns spike, then crash.','<b>Removing the trust region.</b> Large ε and many epochs let the policy move far from the one that collected the data, and the advantage estimates no longer apply. Keep ε near 0.1–0.3, monitor the KL divergence, and stop epochs early if it grows.'],
+ ['Bounded actions','A drone throttle in [0, 1] is sampled from an unbounded Gaussian and clipped by the simulator. Training is unstable near full throttle.','<b>A mismatched log-probability.</b> The gradient treats clipped actions as if they had been taken as sampled. Squash with tanh and correct the log-probability, or use a Beta distribution.'],
+ ['Reporting','A learning curve from one random seed shows the new method beating PPO, and the brief claims superiority.','<b>One seed proves nothing.</b> Policy-gradient results vary widely between seeds. Run at least five to ten, report the mean with confidence intervals, and give each method the same tuning budget.'],
+ ['Sim to real','A swarm policy trained in a calm-air simulator fails in the first gusty field trial.','<b>The reality gap.</b> The policy has exploited simulator regularities. Randomise wind, sensor noise and dynamics in training, test on held-out conditions, and keep a classical fallback controller.']]);
+function all(){rf();gdraw();ppo();gae();}
+greset();rf();ppo();gae();onTheme(all);
+
+})();
+</script>
+
+</body></html>

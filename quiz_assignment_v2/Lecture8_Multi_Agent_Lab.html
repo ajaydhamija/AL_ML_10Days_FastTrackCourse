@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Multi-agent Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one scrolling study sheet with sticky index; each demo is a worksheet panel, controls left, evidence right. Course palette: navy + Lecture 8 accent. */
+
+:root{
+  --bg:#F6F7F8; --surface:#FFFFFF; --fg:#18243A; --muted:#5D6878; --line:#DCDFE4;
+  --navy:#1B3A5E; --accent:#9B5E1A; --accent-soft:#F6EDE2; --a:#2869A0; --b:#B8430F; --good:#1E7A45; --good-soft:#E4F3EA; --warn:#A6620C; --warn-soft:#FBF0DD; --dot:#B9C2CD;
+  --font-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#E8B06A; --accent-soft:#2C2216; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; --dot:#4A5666; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#E8B06A; --accent-soft:#2C2216; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; --dot:#4A5666; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15.5px;line-height:1.55;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+header.top{display:grid;gap:6px;padding-block:8px 18px;border-bottom:2px solid var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
+.lede{color:var(--muted);max-width:72ch;margin:0}
+nav.idx{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:6px 18px;padding-block:10px;border-bottom:1px solid var(--line)}
+nav.idx a{color:var(--navy);text-decoration:none;font-weight:500;font-size:14px}
+nav.idx a:hover,nav.idx a:focus-visible{color:var(--accent);text-decoration:underline}
+section{padding-block:26px 4px}
+h2{font-size:22px;margin:0 0 4px;color:var(--navy);text-wrap:balance}
+h2 .tag{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--accent);margin-right:10px;vertical-align:2px}
+h3{font-size:16px;margin:0}
+.intro{color:var(--muted);max-width:76ch;margin:0 0 14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start}
+@media (max-width:780px){.duo{grid-template-columns:minmax(0,1fr)}}
+.duo>*,.stack>*{min-width:0}
+.stack{display:grid;gap:12px;align-content:start}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.fields.two{grid-template-columns:repeat(2,minmax(0,1fr))}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}.fields.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
+.fields>label{align-content:end}
+input[type=number],select{font-family:var(--font-mono);font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rangerow{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:10px;align-items:center}
+.rangerow output{font-family:var(--font-mono);text-align:right;color:var(--fg)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;font-size:14px;font-weight:600;border-radius:6px;padding:7px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--surface)}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.4;cursor:default}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) fit-content(60%);gap:4px 14px;font-size:14.5px;padding:12px 14px;border-radius:6px;background:var(--accent-soft);margin:0}
+.kv dt{margin:0}.kv dd{margin:0;overflow-wrap:anywhere;font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500}
+.kv dd.big{font-size:18px;color:var(--accent);font-weight:600}
+.verdict{font-size:14.5px;margin:0;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0}
+.note{font-size:14px;margin:0;padding:10px 12px;border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 6px 6px 0}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+svg,canvas{display:block;width:100%;height:auto;max-width:100%}
+canvas{border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+svg text{fill:var(--muted);font-family:var(--font-mono);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.hi{color:var(--accent);font-weight:600}
+.flaws{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.flaw{display:grid;gap:8px;align-content:start}
+.flaw .disc{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.03em}
+.flaw p{margin:0;font-size:14.5px}
+details{border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}
+details p{margin-top:6px!important}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+</style>
+
+</head><body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Unit 4 &middot; AI &amp; Machine Learning in Warfare &middot; Lecture 8</div>
+  <h1>Multi-Agent Lab</h1>
+  <p class="lede">Watch value decomposition miss a narrow coordination peak, find the best randomised patrol in a security game, run fictitious play to equilibrium, share credit with difference rewards and Shapley values, and test whether a win rate really beats 50%. Every result updates as you change the inputs.</p>
+  <p class="lede" style="font-size:13.5px">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</header>
+<nav class="idx" aria-label="Sections"><a href="#vdn">Coordination & VDN</a><a href="#sec">Security game</a><a href="#fp">Fictitious play</a><a href="#cred">Credit</a><a href="#eval">Evaluation</a><a href="#drill">Drill</a></nav>
+<section id="vdn">
+  <h2><span class="tag">DEMO 1</span>A coordination peak that decomposition misses</h2>
+  <p class="intro">Two agents each pick action 1, 2 or 3 and share the team reward in the matrix (rows: agent 1; columns: agent 2). VDN approximates the joint value as Q&#8321;(a&#8321;) + Q&#8322;(a&#8322;), and each agent then acts greedily on its own Q. Independent learners each learn alone, treating the partner as part of the environment; a joint learner sees all nine joint actions.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields three" id="vmat"></div>
+      <label for="ve">Exploration &epsilon; for the learners<div class="rangerow"><input id="ve" type="range" min="0.02" max="0.5" step="0.02" value="0.1"><output id="veo"></output></div></label>
+      <div class="btns"><button type="button" class="ghost" id="vpen">Penalty game (lecture)</button><button type="button" class="ghost" id="vsoft">Mild penalty</button></div>
+      <dl class="kv"><dt>VDN Q&#8321;(1, 2, 3)</dt><dd id="u1a"></dd><dt>VDN Q&#8322;(1, 2, 3)</dt><dd id="u1b"></dd><dt>VDN greedy joint action &middot; its true reward</dt><dd class="big" id="u2"></dd><dt>Best joint action &middot; reward</dt><dd id="u3"></dd><dt>Runs reaching the best (of 40): independent &middot; joint learner</dt><dd class="big" id="u4"></dd></dl>
+      <p class="verdict" id="uver"></p>
+    </div>
+    <div class="stack"><div class="tbl"><table><thead><tr><th>a&#8321; \ a&#8322;</th><th>1</th><th>2</th><th>3</th></tr></thead><tbody id="vtab"></tbody></table></div>
+      <p class="note">Each cell: true team reward, then VDN's additive fit in brackets. The fit is the best least-squares match over all nine cells.</p></div>
+  </div>
+</section>
+
+<section id="sec">
+  <h2><span class="tag">DEMO 2</span>A Stackelberg security game</h2>
+  <p class="intro">One patrol covers target 1 (fuel depot) with probability c and target 2 (bridge) with 1 &minus; c. The attacker watches long enough to learn c, then strikes whichever target pays them more (ties go the defender's way). Defaults follow the lecture text.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields four"><label for="s1u">Att. T1 uncovered<input id="s1u" type="number" value="10"></label><label for="s1c">Att. T1 covered<input id="s1c" type="number" value="-5"></label><label for="s2u">Att. T2 uncovered<input id="s2u" type="number" value="6"></label><label for="s2c">Att. T2 covered<input id="s2c" type="number" value="-3"></label>
+      <label for="d1u">Def. T1 uncovered<input id="d1u" type="number" value="-10"></label><label for="d1c">Def. T1 covered<input id="d1c" type="number" value="5"></label><label for="d2u">Def. T2 uncovered<input id="d2u" type="number" value="-6"></label><label for="d2c">Def. T2 covered<input id="d2c" type="number" value="3"></label></div>
+      <label for="sc">Coverage of target 1, c<div class="rangerow"><input id="sc" type="range" min="0" max="1" step="0.01" value="0.5"><output id="sco"></output></div></label>
+      <dl class="kv"><dt>Attacker payoff: T1 &middot; T2</dt><dd id="t1"></dd><dt>Attacker strikes</dt><dd id="t2"></dd><dt>Defender expected payoff</dt><dd class="big" id="t3"></dd><dt>Optimal commitment c* &middot; defender payoff</dt><dd class="big" id="t4"></dd></dl>
+      <p class="verdict" id="tver"></p>
+    </div>
+    <div class="stack"><svg id="ssvg" viewBox="0 0 440 280" role="img" aria-label="Attacker and defender payoffs against coverage"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--b)"></i>attacker, T1</span><span><i class="sw" style="background:var(--a)"></i>attacker, T2</span><span><i class="sw" style="background:var(--accent)"></i>defender (attacker best-responds)</span></div></div>
+  </div>
+</section>
+
+<section id="fp">
+  <h2><span class="tag">DEMO 3</span>Fictitious play: the average converges, the play cycles</h2>
+  <p class="intro">Each round, both players best-respond to the <i>empirical frequencies</i> of the other's past play. In two-player zero-sum games those frequencies converge to equilibrium, even though each round's play is a pure action that an opponent could exploit. Exploitability here is the total gain available to best-responding players; it is zero only at equilibrium.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="fg">Game<select id="fg"><option value="mp">Matching pennies (equilibrium 50/50)</option><option value="rps">Rock&ndash;paper&ndash;scissors (1/3 each)</option><option value="brps">Weighted RPS (rock beats scissors for 2)</option></select></label>
+      <label for="fn">Rounds<div class="rangerow"><input id="fn" type="range" min="20" max="3000" step="10" value="500"><output id="fno"></output></div></label>
+      <dl class="kv"><dt>Row player's frequencies</dt><dd id="p1"></dd><dt>Equilibrium (row)</dt><dd id="p2"></dd><dt>Exploitability: average strategies</dt><dd class="big" id="p3"></dd><dt>Exploitability: latest round's play</dt><dd id="p4"></dd></dl>
+      <p class="verdict" id="pver"></p>
+    </div>
+    <div class="stack"><svg id="fsvg" viewBox="0 0 440 340" role="img" aria-label="Row frequencies and exploitability over rounds"></svg>
+      <div class="legend" id="flg"></div></div>
+  </div>
+</section>
+
+<section id="cred">
+  <h2><span class="tag">DEMO 4</span>Who mattered? Difference rewards and Shapley credit</h2>
+  <p class="intro">G(S) is the team reward when only the agents in S act (the rest idle). A difference reward credits each agent with G(all) &minus; G(all without it). The Shapley value averages each agent's marginal contribution over every order of arrival, so the credits add up to the team reward even when agents' effects interact.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields four"><label for="cT">G(tank)<input id="cT" type="number" value="40"></label><label for="cA">G(artillery)<input id="cA" type="number" value="15"></label><label for="cD">G(drone)<input id="cD" type="number" value="5"></label><label for="cTA">G(tank, art.)<input id="cTA" type="number" value="95"></label>
+      <label for="cTD">G(tank, drone)<input id="cTD" type="number" value="70"></label><label for="cAD">G(art., drone)<input id="cAD" type="number" value="40"></label><label for="cALL">G(all three)<input id="cALL" type="number" value="100"></label><label>G(none)<input type="number" value="0" disabled></label></div>
+      <div class="tbl"><table><thead><tr><th>Agent</th><th>Difference</th><th>Shapley</th></tr></thead><tbody id="ctab"></tbody></table></div>
+      <p class="verdict" id="cver"></p>
+    </div>
+    <div class="stack"><svg id="csvg" viewBox="0 0 440 260" role="img" aria-label="Credit by agent under two schemes"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--a)"></i>difference reward</span><span><i class="sw" style="background:var(--accent)"></i>Shapley value</span></div></div>
+  </div>
+</section>
+
+<section id="eval">
+  <h2><span class="tag">DEMO 5</span>Is the new agent really better?</h2>
+  <p class="intro">Elo gives the expected score of A against B as 1/(1 + 10<sup>(R<sub>B</sub> &minus; R<sub>A</sub>)/400</sup>). A match result is a noisy estimate of that score: report its confidence interval before claiming an improvement.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields two"><label for="eA">Rating of A<input id="eA" type="number" value="1500" step="10"></label><label for="eB">Rating of B<input id="eB" type="number" value="1700" step="10"></label></div>
+      <div class="fields three"><label for="eW">New agent wins<input id="eW" type="number" value="58" min="0" step="1"></label><label for="eDr">Draws<input id="eDr" type="number" value="0" min="0" step="1"></label><label for="eL">Losses<input id="eL" type="number" value="42" min="0" step="1"></label></div>
+      <dl class="kv"><dt>Elo expected score of A vs B</dt><dd class="big" id="g1"></dd><dt>New agent's score rate (95% Wilson CI)</dt><dd class="big" id="g2"></dd><dt>Implied rating gap (95% CI)</dt><dd id="g3"></dd><dt>p-value against 50%</dt><dd id="g4"></dd><dt>Games needed to confirm this rate (80% power)</dt><dd id="g5"></dd></dl>
+      <p class="verdict" id="gver"></p>
+    </div>
+    <div class="stack"><svg id="esvg" viewBox="0 0 440 280" role="img" aria-label="Elo expected score curve with the match result's interval"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>Elo expected score</span><span><i class="sw" style="background:var(--a)"></i>A vs B</span><span><i class="sw" style="background:var(--b)"></i>match result and 95% CI</span></div></div>
+  </div>
+</section>
+
+<section id="drill">
+  <h2><span class="tag">DRILL</span>What went wrong?</h2>
+  <p class="intro">Decide before you open each answer.</p>
+  <div class="flaws" id="drillbox"></div>
+</section>
+
+<footer>AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; Unit 4: Simulation Strategies in Warfare &middot; Lecture 8</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id), v=id=>{const x=parseFloat($(id).value);return isFinite(x)?x:0};
+const pc=(x,d=1)=>isFinite(x)?(100*x).toFixed(d)+'%':'—', f=(x,d=2)=>isFinite(x)?x.toFixed(d):'—';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function Phi(x){const s=x<0?-1:1;x=Math.abs(x)/Math.SQRT2;const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return 0.5*(1+s*y);}
+function invPhi(p){const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924],b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857],c=[-0.00778489400243029,-0.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878],d=[0.00778469570904146,0.32246712907004,2.445134137143,3.75440866190742];const pl=0.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+function rng(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}}
+function gauss(r){const u=Math.max(1e-12,r()),w=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*w);}
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function axes(s,o){/* o: {x0,x1,y0,y1,xmin,xmax,ymin,ymax,xt:[],yt:[],xl,yl,fx,fy} returns X,Y */
+ const X=t=>o.x0+(t-o.xmin)/(o.xmax-o.xmin)*(o.x1-o.x0),Y=t=>o.y0-(t-o.ymin)/(o.ymax-o.ymin)*(o.y0-o.y1);
+ el('line',{x1:o.x0,y1:o.y0,x2:o.x1,y2:o.y0,stroke:css('--line')},s);el('line',{x1:o.x0,y1:o.y0,x2:o.x0,y2:o.y1,stroke:css('--line')},s);
+ (o.yt||[]).forEach(t=>{el('line',{x1:o.x0,y1:Y(t),x2:o.x1,y2:Y(t),stroke:css('--line'),'stroke-dasharray':'2 3'},s);const tx=el('text',{x:o.x0-5,y:Y(t)+4,'text-anchor':'end'},s);tx.textContent=o.fy?o.fy(t):t;});
+ (o.xt||[]).forEach(t=>{const tx=el('text',{x:X(t),y:o.y0+15,'text-anchor':'middle'},s);tx.textContent=o.fx?o.fx(t):t;});
+ if(o.xl){const t=el('text',{x:(o.x0+o.x1)/2,y:o.y0+30,'text-anchor':'middle'},s);t.textContent=o.xl;}
+ if(o.yl){const t=el('text',{x:12,y:(o.y0+o.y1)/2,'text-anchor':'middle',transform:'rotate(-90 12 '+((o.y0+o.y1)/2)+')'},s);t.textContent=o.yl;}
+ return [X,Y];}
+function path(pts,X,Y){return pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join('');}
+function drill(id,items){const box=$(id);items.forEach(([d,s,a])=>{const e=document.createElement('div');e.className='panel flaw';e.innerHTML='<div class="disc">'+d+'</div><p>'+s+'</p><details><summary>Show the answer</summary><p>'+a+'</p></details>';box.appendChild(e);});}
+function onTheme(fn){try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',fn);new MutationObserver(fn).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});}catch(e){}}
+
+function niceT(a,b){const r=b-a,st=Math.pow(10,Math.floor(Math.log10(r/4)));const m=[1,2,5,10].find(k=>r/(k*st)<=6)*st;const out=[];for(let t=Math.ceil(a/m)*m;t<=b+1e-9;t+=m)out.push(+t.toFixed(6));return out;}
+const am=a=>a.indexOf(Math.max(...a)),sgn=x=>(x>0?'+':'')+f(x,2);
+
+/* Demo 1 */
+const PRE={pen:[[8,-12,-12],[-12,0,0],[-12,0,0]],soft:[[8,-2,-2],[-2,0,0],[-2,0,0]]};
+(function(){const box=$('vmat');for(let i=0;i<3;i++)for(let j=0;j<3;j++){const l=document.createElement('label');l.htmlFor='m'+i+j;l.innerHTML='R('+(i+1)+', '+(j+1)+')<input id="m'+i+j+'" type="number" step="1" value="'+PRE.pen[i][j]+'">';box.appendChild(l);}})();
+const getR=()=>[0,1,2].map(i=>[0,1,2].map(j=>v('m'+i+j)));
+function learn(R,eps,seed,joint){const r=rng(seed),al=0.1;
+  const pick=(q)=>{if(r()<eps)return Math.floor(r()*q.length);const m=Math.max(...q),c=[];q.forEach((x,i)=>{if(x===m)c.push(i);});return c[Math.floor(r()*c.length)];};
+  if(joint){const Q=new Array(9).fill(0);for(let t=0;t<3000;t++){const a=pick(Q);Q[a]+=al*(R[Math.floor(a/3)][a%3]-Q[a]);}const g=am(Q);return R[Math.floor(g/3)][g%3];}
+  const Q1=[0,0,0],Q2=[0,0,0];for(let t=0;t<3000;t++){const a=pick(Q1),b=pick(Q2),x=R[a][b];Q1[a]+=al*(x-Q1[a]);Q2[b]+=al*(x-Q2[b]);}return R[am(Q1)][am(Q2)];}
+function vdn(){
+  const R=getR(),eps=+$('ve').value;$('veo').textContent=eps.toFixed(2);
+  const rm=R.map(r=>(r[0]+r[1]+r[2])/3),cm=[0,1,2].map(j=>(R[0][j]+R[1][j]+R[2][j])/3),g=rm.reduce((a,b)=>a+b,0)/3,Q1=rm.map(x=>x-g/2),Q2=cm.map(x=>x-g/2);
+  const a1=am(Q1),a2=am(Q2),best=Math.max(...R.flat());let bi=0,bj=0;
+  outer:for(let i=0;i<3;i++)for(let j=0;j<3;j++)if(R[i][j]===best){bi=i;bj=j;break outer;}
+  $('u1a').textContent='('+Q1.map(x=>f(x,2)).join(', ')+')';$('u1b').textContent='('+Q2.map(x=>f(x,2)).join(', ')+')';
+  $('u2').textContent='('+(a1+1)+', '+(a2+1)+') · '+R[a1][a2];$('u3').textContent='('+(bi+1)+', '+(bj+1)+') · '+best;
+  let ci=0,cj=0;for(let s=0;s<40;s++){if(learn(R,eps,500+s,false)===best)ci++;if(learn(R,eps,900+s,true)===best)cj++;}
+  $('u4').textContent=ci+' · '+cj;
+  $('vtab').innerHTML=R.map((r,i)=>'<tr><td>'+(i+1)+'</td>'+r.map((x,j)=>'<td class="'+(i===a1&&j===a2?'hi':'')+'">'+x+' <span style="color:var(--muted)">('+f(Q1[i]+Q2[j],1)+')</span></td>').join('')+'</tr>').join('');
+  $('uver').textContent=R[a1][a2]<best?'VDN settles on a joint action worth '+R[a1][a2]+' instead of '+best+'. An additive fit averages each action over all of the partner\'s actions, so a narrow peak surrounded by penalties looks bad to each agent alone. Independent learners fail for the same reason: while the partner explores, action 1 is usually punished. A learner that sees joint actions finds the peak.':'Here the additive fit ranks actions correctly, so decentralised greedy play reaches the best joint action'+(ci<35?'. Independent learners still miss it in '+(40-ci)+' of 40 runs: while the partner explores, action 1 looks worse than it is.':'.')+' Make the off-peak penalty harsher to see VDN fail.';
+}
+for(let i=0;i<3;i++)for(let j=0;j<3;j++)$('m'+i+j).addEventListener('input',vdn);$('ve').addEventListener('input',vdn);
+const setM=M=>{for(let i=0;i<3;i++)for(let j=0;j<3;j++)$('m'+i+j).value=M[i][j];vdn();};
+$('vpen').addEventListener('click',()=>setM(PRE.pen));$('vsoft').addEventListener('click',()=>setM(PRE.soft));
+
+/* Demo 2 */
+function secg(){
+  const s1u=v('s1u'),s1c=v('s1c'),s2u=v('s2u'),s2c=v('s2c'),d1u=v('d1u'),d1c=v('d1c'),d2u=v('d2u'),d2c=v('d2c'),c=+$('sc').value;$('sco').textContent=c.toFixed(2);
+  const Ua1=c=>c*s1c+(1-c)*s1u,Ua2=c=>(1-c)*s2c+c*s2u,Ud1=c=>c*d1c+(1-c)*d1u,Ud2=c=>(1-c)*d2c+c*d2u;
+  const br=c=>{const x=Ua1(c)-Ua2(c);return x>1e-9?1:x<-1e-9?2:(Ud1(c)>=Ud2(c)?1:2);},ud=c=>br(c)===1?Ud1(c):Ud2(c);
+  const cands=[];for(let i=0;i<=1000;i++)cands.push(i/1000);const den=s1u-s1c+s2u-s2c;if(Math.abs(den)>1e-12){const cx=(s1u-s2c)/den;if(cx>=0&&cx<=1)cands.push(cx);}
+  let cs=0,best=-Infinity;cands.forEach(q=>{const u=ud(q);if(u>best+1e-12){best=u;cs=q;}});
+  $('t1').textContent=f(Ua1(c),2)+' · '+f(Ua2(c),2);$('t2').textContent='target '+br(c);$('t3').textContent=f(ud(c),3);$('t4').textContent=f(cs,3)+' · '+f(best,3);
+  const gap=best-ud(c);
+  $('tver').textContent=gap<0.005?'This is the optimal commitment: the attacker is (nearly) indifferent between targets, and ties are assumed to break in the defender\'s favour. In practice, stay a hair on the safe side of c*.':'Moving c to '+f(cs,2)+' would gain the defender '+f(gap,2)+'. At the optimum the attacker is made indifferent, so no target is a better bet than the other. '+(c===0||c===1?'A deterministic patrol is the worst kind: the attacker simply hits the unguarded target.':'');
+  const s=$('ssvg');s.innerHTML='';const ys=[];for(let i=0;i<=200;i++){const q=i/200;ys.push(Ua1(q),Ua2(q),ud(q));}const lo=Math.min(...ys),hi=Math.max(...ys),pad=(hi-lo)*0.06||1;
+  const [X,Y]=axes(s,{x0:48,x1:430,y0:240,y1:10,xmin:0,xmax:1,ymin:lo-pad,ymax:hi+pad,xt:[0,0.25,0.5,0.75,1],yt:niceT(lo-pad,hi+pad),xl:'coverage of target 1, c',yl:'payoff'});
+  el('line',{x1:X(0),y1:Y(0),x2:X(1),y2:Y(0),stroke:css('--muted'),'stroke-width':0.8},s);
+  el('path',{d:path([[0,Ua1(0)],[1,Ua1(1)]],X,Y),stroke:css('--b'),'stroke-width':2,fill:'none'},s);el('path',{d:path([[0,Ua2(0)],[1,Ua2(1)]],X,Y),stroke:css('--a'),'stroke-width':2,fill:'none'},s);
+  const dp=[];for(let i=0;i<=400;i++){const q=i/400;dp.push([q,ud(q)]);}el('path',{d:path(dp,X,Y),stroke:css('--accent'),'stroke-width':3,fill:'none'},s);
+  el('line',{x1:X(cs),y1:Y(lo-pad),x2:X(cs),y2:Y(hi+pad),stroke:css('--muted'),'stroke-dasharray':'4 3'},s);const t=el('text',{x:X(cs)+5,y:Y(hi+pad)+12},s);t.textContent='c* = '+f(cs,2);
+  el('circle',{cx:X(c),cy:Y(ud(c)),r:6,fill:css('--accent'),stroke:css('--surface'),'stroke-width':2},s);
+}
+['s1u','s1c','s2u','s2c','d1u','d1c','d2u','d2c','sc'].forEach(i=>$(i).addEventListener('input',secg));
+
+/* Demo 3 */
+const GAMES={mp:{A:[[1,-1],[-1,1]],eq:[0.5,0.5],n:['heads','tails']},rps:{A:[[0,-1,1],[1,0,-1],[-1,1,0]],eq:[1/3,1/3,1/3],n:['rock','paper','scissors']},brps:{A:[[0,-1,2],[1,0,-1],[-2,1,0]],eq:[0.25,0.5,0.25],n:['rock','paper','scissors']}};
+function fp(){
+  const G=GAMES[$('fg').value],A=G.A,k=A.length,N=+$('fn').value;$('fno').textContent=N;
+  const cR=new Array(k).fill(0),cC=new Array(k).fill(0);let a=0,b=0;cR[0]++;cC[0]++;
+  const ex=(x,y)=>Math.max(...A.map(r=>r.reduce((s,q,j)=>s+q*y[j],0)))-Math.min(...[...Array(k).keys()].map(j=>x.reduce((s,q,i)=>s+q*A[i][j],0)));
+  const H=[];const rec=t=>{const x=cR.map(q=>q/t),y=cC.map(q=>q/t);const xa=new Array(k).fill(0),yb=new Array(k).fill(0);xa[a]=1;yb[b]=1;H.push([t,x,ex(x,y),ex(xa,yb)]);};rec(1);
+  for(let t=2;t<=N;t++){const x=cR.map(q=>q/(t-1)),y=cC.map(q=>q/(t-1));const ru=A.map(r=>r.reduce((s,q,j)=>s+q*y[j],0)),cu=[...Array(k).keys()].map(j=>x.reduce((s,q,i)=>s+q*A[i][j],0));
+    a=ru.indexOf(Math.max(...ru));b=cu.indexOf(Math.min(...cu));cR[a]++;cC[b]++;if(t<50||t%Math.max(1,Math.floor(N/400))===0||t===N)rec(t);}
+  const L=H[H.length-1];$('p1').textContent=L[1].map(q=>f(q,3)).join(', ');$('p2').textContent=G.eq.map(q=>f(q,3)).join(', ');$('p3').textContent=f(L[2],3);$('p4').textContent=f(L[3],2);
+  $('pver').textContent='After '+N+' rounds the averages are within '+f(Math.max(...L[1].map((q,i)=>Math.abs(q-G.eq[i]))),3)+' of equilibrium and their exploitability is '+f(L[2],3)+', yet the latest round is a pure action that a best responder exploits for '+f(L[3],2)+'. Self-play that keeps only its latest policy can cycle like this forever; keep the average policy, or a league of past opponents.';
+  const cols=[css('--a'),css('--b'),css('--good')];$('flg').innerHTML=G.n.map((nm,i)=>'<span><i class="sw" style="background:'+cols[i]+'"></i>row plays '+nm+'</span>').join('')+'<span><i class="sw" style="background:var(--accent)"></i>exploitability, averages</span><span><i class="sw" style="background:var(--muted)"></i>exploitability, latest play</span>';
+  const s=$('fsvg');s.innerHTML='';const lx=t=>Math.log10(t),xm=Math.log10(N),xt=[0,1,2,3].filter(q=>q<=xm+1e-9);const fx=q=>String(Math.round(Math.pow(10,q)));
+  let [X,Y]=axes(s,{x0:48,x1:430,y0:150,y1:8,xmin:0,xmax:xm,ymin:0,ymax:1,xt:[],yt:[0,0.5,1],yl:'frequency'});
+  G.eq.forEach((q,i)=>el('line',{x1:X(0),y1:Y(q),x2:X(xm),y2:Y(q),stroke:cols[i],'stroke-dasharray':'4 4','stroke-opacity':0.7},s));
+  for(let i=0;i<k;i++)el('path',{d:path(H.map(h=>[lx(h[0]),h[1][i]]),X,Y),stroke:cols[i],'stroke-width':2,fill:'none'},s);
+  const em=Math.max(...H.map(h=>Math.max(h[2],h[3])))*1.05;[X,Y]=axes(s,{x0:48,x1:430,y0:300,y1:180,xmin:0,xmax:xm,ymin:0,ymax:em,xt,yt:niceT(0,em),fx,xl:'round (log scale)',yl:'exploitability'});
+  el('path',{d:path(H.map(h=>[lx(h[0]),h[3]]),X,Y),stroke:css('--muted'),'stroke-width':1.4,fill:'none'},s);el('path',{d:path(H.map(h=>[lx(h[0]),h[2]]),X,Y),stroke:css('--accent'),'stroke-width':2.4,fill:'none'},s);
+}
+['fg','fn'].forEach(i=>$(i).addEventListener('input',fp));
+
+/* Demo 4 */
+function cred(){
+  const G=[0,v('cT'),v('cA'),v('cTA'),v('cD'),v('cTD'),v('cAD'),v('cALL')],names=['Tank','Artillery','Drone'],bits=[1,2,4];
+  const diff=bits.map(b=>G[7]-G[7^b]);const perms=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]],sh=[0,0,0];
+  perms.forEach(p=>{let m=0;p.forEach(i=>{sh[i]+=G[m|bits[i]]-G[m];m|=bits[i];});});sh.forEach((x,i)=>sh[i]=x/6);
+  const sd=diff.reduce((a,b)=>a+b,0),ss=sh.reduce((a,b)=>a+b,0);
+  $('ctab').innerHTML=names.map((n,i)=>'<tr><td>'+n+'</td><td>'+f(diff[i],1)+'</td><td>'+f(sh[i],1)+'</td></tr>').join('')+'<tr><td><b>Total</b></td><td>'+f(sd,1)+'</td><td>'+f(ss,1)+'</td></tr>';
+  const top=am(sh);
+  $('cver').textContent='Difference rewards total '+f(sd,1)+' against a team reward of '+f(G[7],1)+': they '+(sd<G[7]?'under-count':sd>G[7]?'over-count':'happen to match')+' because agents\' effects '+(sd!==G[7]?'interact':'are additive here')+'. Shapley values always add up to the team reward; here they credit the '+names[top].toLowerCase()+' most ('+f(sh[top],1)+'). Difference rewards need one counterfactual per agent; exact Shapley needs every subset.';
+  const s=$('csvg');s.innerHTML='';const all=diff.concat(sh),lo=Math.min(0,...all),hi=Math.max(1,...all)*1.1;
+  const [X,Y]=axes(s,{x0:48,x1:430,y0:220,y1:10,xmin:0,xmax:3,ymin:lo,ymax:hi,xt:[],yt:niceT(lo,hi),yl:'credit'});
+  names.forEach((n,i)=>{const cx=X(i+0.5),w=(X(1)-X(0))*0.3;[[diff[i],css('--a'),-1],[sh[i],css('--accent'),1]].forEach(([val,col,side])=>{const y0=Y(Math.max(0,val)),y1=Y(Math.min(0,val));el('rect',{x:side<0?cx-w-2:cx+2,y:y0,width:w,height:Math.max(1,y1-y0),fill:col,rx:2},s);});const t=el('text',{x:cx,y:236,'text-anchor':'middle'},s);t.textContent=n;});
+  el('line',{x1:X(0),y1:Y(0),x2:X(3),y2:Y(0),stroke:css('--muted')},s);
+}
+['cT','cA','cD','cTA','cTD','cAD','cALL'].forEach(i=>$(i).addEventListener('input',cred));
+
+/* Demo 5 */
+function evalg(){
+  const RA=v('eA'),RB=v('eB'),W=Math.max(0,v('eW')),D=Math.max(0,v('eDr')),L=Math.max(0,v('eL')),N=W+D+L,E=1/(1+Math.pow(10,(RB-RA)/400));
+  $('g1').textContent=f(E,3);const s=$('esvg');s.innerHTML='';
+  if(N<1){['g2','g3','g4','g5'].forEach(i=>$(i).textContent='—');$('gver').textContent='Enter at least one game.';return;}
+  const p=(W+D/2)/N,z=1.96,dn=1+z*z/N,cen=(p+z*z/(2*N))/dn,hw=z*Math.sqrt(p*(1-p)/N+z*z/(4*N*N))/dn,lo=Math.max(0,cen-hw),hi=Math.min(1,cen+hw);
+  const elo=q=>400*Math.log10(Math.min(0.999,Math.max(0.001,q))/(1-Math.min(0.999,Math.max(0.001,q))));
+  const zz=(p-0.5)/Math.sqrt(0.25/N),pv=2*(1-Phi(Math.abs(zz))),need=p===0.5?Infinity:Math.pow((1.96*0.5+0.8416*Math.sqrt(p*(1-p)))/(p-0.5),2);
+  $('g2').textContent=pc(p,1)+' ('+pc(lo,1)+'–'+pc(hi,1)+')';$('g3').textContent=sgn(elo(p)).replace(/\.\d+/,'')+' ('+Math.round(elo(lo))+' to '+Math.round(elo(hi))+')';$('g4').textContent=pv<0.001?'< 0.001':f(pv,3);$('g5').textContent=isFinite(need)?Math.ceil(need)+' games':'—';
+  $('gver').textContent=(lo>0.5?'The interval lies above 50%: the new agent is better against this opponent, by roughly '+Math.round(elo(lo))+' to '+Math.round(elo(hi))+' rating points.':hi<0.5?'The interval lies below 50%: the new agent is worse against this opponent.':'The 95% interval includes 50%, so this match cannot distinguish the agents. About '+(isFinite(need)?Math.ceil(need):'—')+' games would be needed to confirm a '+pc(p,0)+' score rate.')+' A win rate against one opponent says nothing about exploitability: test against a pool, including fresh exploiters.';
+  const [X,Y]=axes(s,{x0:48,x1:430,y0:240,y1:10,xmin:-800,xmax:800,ymin:0,ymax:1,xt:[-800,-400,0,400,800],yt:[0,0.25,0.5,0.75,1],xl:'rating difference (A − B)',yl:'expected score'});
+  el('rect',{x:X(-800),y:Y(hi),width:X(800)-X(-800),height:Y(lo)-Y(hi),fill:css('--b'),'fill-opacity':0.12},s);
+  el('line',{x1:X(-800),y1:Y(p),x2:X(800),y2:Y(p),stroke:css('--b'),'stroke-dasharray':'5 3'},s);
+  const pts=[];for(let d=-800;d<=800;d+=10)pts.push([d,1/(1+Math.pow(10,-d/400))]);el('path',{d:path(pts,X,Y),stroke:css('--accent'),'stroke-width':2.6,fill:'none'},s);
+  const ep=Math.max(-800,Math.min(800,elo(p)));el('circle',{cx:X(ep),cy:Y(1/(1+Math.pow(10,-ep/400))),r:6,fill:css('--b')},s);
+  const dA=Math.max(-800,Math.min(800,RA-RB));el('circle',{cx:X(dA),cy:Y(1/(1+Math.pow(10,-dA/400))),r:6,fill:css('--a')},s);
+}
+['eA','eB','eW','eDr','eL'].forEach(i=>$(i).addEventListener('input',evalg));
+
+drill('drillbox',[
+ ['Value decomposition','A UAV pair must both jam (action 1) for a strike to succeed; one jamming alone exposes it. VDN-trained agents never both jam.','<b>A peak VDN cannot represent.</b> An additive (or monotonic, as in QMIX) mix averages action 1 over the partner\'s choices and finds it usually disastrous. Use a centralised critic (MAPPO), richer factorisation (QTRAN, QPLEX, weighted QMIX) or explicit communication.'],
+ ['Self-play','A red-force agent trained by pure self-play beats its latest version 70% of the time, then loses badly to a scripted tactic from six months ago.','<b>Cycling and forgetting.</b> Self-play can chase its own tail in non-transitive games. Train against a league of past and diverse opponents and measure exploitability with a fresh adversary.'],
+ ['Evaluation','A new agent wins 58 of 100 games and the brief says it is "clearly better".','<b>Noise reported as signal.</b> The 95% interval is about 48–67%, which includes 50% (p ≈ 0.11). Roughly 300 games are needed to confirm a 58% rate; report the interval and test against several opponents.'],
+ ['Patrol design','To maximise coverage of the most valuable depot, the patrol visits it every night at 0200.','<b>A predictable, deterministic commitment.</b> The attacker observes and strikes elsewhere, or at another time. Randomise according to the Stackelberg optimum so no target or time is a safe bet.'],
+ ['Credit assignment','A four-agent team shares one reward. One agent learns to stay idle; the team still succeeds most of the time.','<b>Free-riding under a shared reward.</b> Each agent\'s learning signal is swamped by the others\' effects. Use difference rewards, a counterfactual baseline (COMA) or Shapley-style credit.'],
+ ['Rules of engagement','ROE are encoded as a −50 reward for engaging a non-combatant track. In testing the agent occasionally does it when the mission reward is high.','<b>A penalty is a price, not a prohibition.</b> The optimiser trades violations against reward. Use constrained RL for average constraints, a verified shield to block prohibited actions, and keep the legal judgement with a human.']]);
+function all(){vdn();secg();fp();cred();evalg();}
+all();onTheme(all);
+
+})();
+</script>
+
+</body></html>

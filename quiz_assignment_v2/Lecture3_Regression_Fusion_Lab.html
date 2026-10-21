@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Regression and Fusion Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one scrolling study sheet with sticky index; each demo is a worksheet panel, controls left, evidence right. Course palette: navy + Lecture 3 accent. */
+
+:root{
+  --bg:#F6F7F8; --surface:#FFFFFF; --fg:#18243A; --muted:#5D6878; --line:#DCDFE4;
+  --navy:#1B3A5E; --accent:#6B2D8B; --accent-soft:#F2EAF6; --a:#2869A0; --b:#B8430F; --good:#1E7A45; --good-soft:#E4F3EA; --warn:#A6620C; --warn-soft:#FBF0DD; --dot:#B9C2CD;
+  --font-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#C9A0E0; --accent-soft:#271C30; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; --dot:#4A5666; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161D; --surface:#1A212B; --fg:#E3E7EC; --muted:#9AA5B3; --line:#2C3644;
+  --navy:#9DBDE0; --accent:#C9A0E0; --accent-soft:#271C30; --a:#7FB2E5; --b:#F08A55; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; --dot:#4A5666; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15.5px;line-height:1.55;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+header.top{display:grid;gap:6px;padding-block:8px 18px;border-bottom:2px solid var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
+.lede{color:var(--muted);max-width:72ch;margin:0}
+nav.idx{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:6px 18px;padding-block:10px;border-bottom:1px solid var(--line)}
+nav.idx a{color:var(--navy);text-decoration:none;font-weight:500;font-size:14px}
+nav.idx a:hover,nav.idx a:focus-visible{color:var(--accent);text-decoration:underline}
+section{padding-block:26px 4px}
+h2{font-size:22px;margin:0 0 4px;color:var(--navy);text-wrap:balance}
+h2 .tag{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--accent);margin-right:10px;vertical-align:2px}
+h3{font-size:16px;margin:0}
+.intro{color:var(--muted);max-width:76ch;margin:0 0 14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start}
+@media (max-width:780px){.duo{grid-template-columns:minmax(0,1fr)}}
+.duo>*,.stack>*{min-width:0}
+.stack{display:grid;gap:12px;align-content:start}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.fields.two{grid-template-columns:repeat(2,minmax(0,1fr))}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}.fields.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
+.fields>label{align-content:end}
+input[type=number],select{font-family:var(--font-mono);font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rangerow{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:10px;align-items:center}
+.rangerow output{font-family:var(--font-mono);text-align:right;color:var(--fg)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;font-size:14px;font-weight:600;border-radius:6px;padding:7px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--surface)}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.4;cursor:default}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) fit-content(60%);gap:4px 14px;font-size:14.5px;padding:12px 14px;border-radius:6px;background:var(--accent-soft);margin:0}
+.kv dt{margin:0}.kv dd{margin:0;overflow-wrap:anywhere;font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500}
+.kv dd.big{font-size:18px;color:var(--accent);font-weight:600}
+.verdict{font-size:14.5px;margin:0;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0}
+.note{font-size:14px;margin:0;padding:10px 12px;border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 6px 6px 0}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+svg,canvas{display:block;width:100%;height:auto;max-width:100%}
+canvas{border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+svg text{fill:var(--muted);font-family:var(--font-mono);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.hi{color:var(--accent);font-weight:600}
+.flaws{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.flaw{display:grid;gap:8px;align-content:start}
+.flaw .disc{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.03em}
+.flaw p{margin:0;font-size:14.5px}
+details{border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}
+details p{margin-top:6px!important}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+</style>
+
+</head><body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Unit 4 &middot; AI &amp; Machine Learning in Warfare &middot; Lecture 3</div>
+  <h1>Regression &amp; Fusion Lab</h1>
+  <p class="lede">Fit a line and see how far its predictions can be trusted, watch ridge and lasso shrink a coefficient, tune a Kalman tracker, plan medical capacity from a casualty model, and fight a Lanchester battle. Every result updates as you change the inputs.</p>
+  <p class="lede" style="font-size:13.5px">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</header>
+<nav class="idx" aria-label="Sections"><a href="#ols">Least squares</a><a href="#shrink">Ridge vs lasso</a><a href="#kalman">Kalman tracker</a><a href="#cas">Casualty planner</a><a href="#lan">Lanchester</a><a href="#drill">Drill</a></nav>
+<section id="ols">
+  <h2><span class="tag">DEMO 1</span>A fitted line and how far to trust it</h2>
+  <p class="intro">One mission per line: EW intensity level, then duration in hours. The confidence band is for the average mission; the prediction band is for the next single mission. Both widen away from the data.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="odata">Data (x, y per line)<textarea id="odata" rows="7" style="font-family:var(--font-mono);font-size:14px;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%;resize:vertical">1, 6
+2, 9
+3, 9
+4, 13
+5, 13</textarea></label>
+      <label for="ox0">Predict at x<input id="ox0" type="number" value="8" step="0.5"></label>
+      <dl class="kv"><dt>Fitted line</dt><dd id="o1"></dd><dt>R&sup2; &middot; residual s.d.</dt><dd id="o2"></dd><dt>Slope 95% CI</dt><dd id="o3"></dd><dt>Prediction at x</dt><dd class="big" id="o4"></dd><dt>95% interval: mean &middot; single mission</dt><dd id="o5"></dd></dl>
+      <p class="note" id="over"></p>
+    </div>
+    <div class="stack"><svg id="osvg" viewBox="0 0 440 300" role="img" aria-label="Data, fitted line and bands"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--accent);opacity:.35"></i>95% confidence band</span><span><i class="sw" style="background:var(--b);opacity:.25"></i>95% prediction band</span></div></div>
+  </div>
+</section>
+
+<section id="shrink">
+  <h2><span class="tag">DEMO 2</span>Ridge shrinks, lasso selects</h2>
+  <p class="intro">For one standardised feature with least-squares estimate z, ridge gives z/(1+&lambda;) and lasso gives sign(z)&middot;max(|z| &minus; &lambda;/2, 0). Small effects survive ridge but are set exactly to zero by lasso.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="sz">Least-squares coefficient z<div class="rangerow"><input id="sz" type="range" min="-3" max="3" step="0.05" value="0.4"><output id="szo"></output></div></label>
+      <label for="sl">Penalty &lambda;<div class="rangerow"><input id="sl" type="range" min="0" max="4" step="0.05" value="1"><output id="slo"></output></div></label>
+      <dl class="kv"><dt>Ridge estimate</dt><dd class="big" id="s1"></dd><dt>Lasso estimate</dt><dd class="big" id="s2"></dd></dl>
+      <p class="note" id="sver"></p>
+    </div>
+    <div class="stack"><svg id="ssvg" viewBox="0 0 440 280" role="img" aria-label="Shrinkage curves"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--muted)"></i>no penalty</span><span><i class="sw" style="background:var(--a)"></i>ridge</span><span><i class="sw" style="background:var(--b)"></i>lasso</span></div></div>
+  </div>
+</section>
+
+<section id="kalman">
+  <h2><span class="tag">DEMO 3</span>Tune a Kalman tracker</h2>
+  <p class="intro">A target moves along a road at roughly constant speed; a radar measures its position with noise. The filter's assumed process noise Q and measurement noise R set its gain. Too small a Q makes it sluggish when the target manoeuvres; too large a Q makes it chase noise.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <label for="kr">Radar noise s.d. (m)<div class="rangerow"><input id="kr" type="range" min="5" max="80" step="5" value="40"><output id="kro"></output></div></label>
+      <label for="kq">Filter's assumed Q (log&#8321;&#8320;)<div class="rangerow"><input id="kq" type="range" min="-2" max="3" step="0.1" value="0.5"><output id="kqo"></output></div></label>
+      <label for="km">Target manoeuvres at step 25<select id="km"><option value="0">No</option><option value="1" selected>Yes: speeds up</option></select></label>
+      <div class="btns"><button type="button" id="krun">New target run</button></div>
+      <dl class="kv"><dt>Position error, raw radar (RMSE)</dt><dd id="k1"></dd><dt>Position error, filter (RMSE)</dt><dd class="big" id="k2"></dd><dt>Steady-state position gain</dt><dd id="k3"></dd></dl>
+    </div>
+    <div class="stack"><svg id="ksvg" viewBox="0 0 440 290" role="img" aria-label="Truth, measurements and Kalman estimate"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--muted)"></i>true position</span><span><i class="sw" style="background:var(--dot)"></i>radar measurements</span><span><i class="sw" style="background:var(--accent)"></i>Kalman estimate</span></div></div>
+  </div>
+</section>
+
+<section id="cas">
+  <h2><span class="tag">DEMO 4</span>Casualty planner: plan for the tail</h2>
+  <p class="intro">A Poisson regression ln &mu; = &beta;&#8320; + &beta;&#8321;x gives expected casualties per company-day, where x is the number of enemy artillery battalions in range. Real casualty data are over-dispersed; the negative binomial (dispersion k) gives a heavier tail.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields three"><label for="cb0">&beta;&#8320;<input id="cb0" type="number" value="0.5" step="0.05"></label><label for="cb1">&beta;&#8321;<input id="cb1" type="number" value="0.25" step="0.05"></label><label for="cx">Battalions x<input id="cx" type="number" value="4" min="0" step="1"></label></div>
+      <div class="fields two"><label for="cmod">Model<select id="cmod"><option value="p">Poisson</option><option value="nb">Negative binomial</option></select></label><label for="ck">Dispersion k (NB)<input id="ck" type="number" value="1.5" min="0.1" step="0.1"></label></div>
+      <label for="cn">Planning threshold: casualties &ge;<input id="cn" type="number" value="8" min="0" step="1"></label>
+      <dl class="kv"><dt>Expected casualties &mu;</dt><dd class="big" id="c1"></dd><dt>Rate ratio per battalion</dt><dd id="c2"></dd><dt>P(none) &middot; P(&ge; threshold)</dt><dd id="c3"></dd><dt>95th percentile (plan for this)</dt><dd class="big" id="c4"></dd></dl>
+    </div>
+    <div class="stack"><svg id="csvg" viewBox="0 0 440 260" role="img" aria-label="Casualty distribution"></svg><p class="note">Casualty estimates are planning inputs with stated assumptions, not forecasts of fact. Size medical and evacuation capacity for the tail.</p></div>
+  </div>
+</section>
+
+<section id="lan">
+  <h2><span class="tag">DEMO 5</span>A Lanchester square-law battle</h2>
+  <p class="intro">dB/dt = &minus;r&middot;R and dR/dt = &minus;b&middot;B. Fighting strength grows with the square of numbers, so concentration pays.</p>
+  <div class="panel duo">
+    <div class="stack">
+      <div class="fields two"><label for="lb0">Blue units B&#8320;<input id="lb0" type="number" value="60" min="1"></label><label for="lr0">Red units R&#8320;<input id="lr0" type="number" value="50" min="1"></label>
+      <label for="lbb">Blue kill rate b<input id="lbb" type="number" value="0.029" step="0.001" min="0.0001"></label><label for="lrr">Red kill rate r<input id="lrr" type="number" value="0.041" step="0.001" min="0.0001"></label></div>
+      <dl class="kv"><dt>Force ratio needed by Blue &radic;(r/b)</dt><dd id="l1"></dd><dt>Actual ratio B&#8320;/R&#8320;</dt><dd id="l2"></dd><dt>Outcome</dt><dd class="big" id="l3"></dd><dt>Duration (hours)</dt><dd id="l4"></dd></dl>
+      <p class="note" id="lver"></p>
+    </div>
+    <div class="stack"><svg id="lsvg" viewBox="0 0 440 260" role="img" aria-label="Force strengths over time"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--a)"></i>Blue</span><span><i class="sw" style="background:var(--b)"></i>Red</span></div></div>
+  </div>
+</section>
+
+<section id="drill">
+  <h2><span class="tag">DRILL</span>What went wrong?</h2>
+  <p class="intro">Decide before you open each answer.</p>
+  <div class="flaws" id="drillbox"></div>
+</section>
+
+<footer>AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; Unit 4: Simulation Strategies in Warfare &middot; Lecture 3</footer>
+</div>
+<script>
+(function(){
+
+const $=id=>document.getElementById(id), v=id=>{const x=parseFloat($(id).value);return isFinite(x)?x:0};
+const pc=(x,d=1)=>isFinite(x)?(100*x).toFixed(d)+'%':'—', f=(x,d=2)=>isFinite(x)?x.toFixed(d):'—';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function Phi(x){const s=x<0?-1:1;x=Math.abs(x)/Math.SQRT2;const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return 0.5*(1+s*y);}
+function invPhi(p){const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924],b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857],c=[-0.00778489400243029,-0.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878],d=[0.00778469570904146,0.32246712907004,2.445134137143,3.75440866190742];const pl=0.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+function rng(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}}
+function gauss(r){const u=Math.max(1e-12,r()),w=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*w);}
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function axes(s,o){/* o: {x0,x1,y0,y1,xmin,xmax,ymin,ymax,xt:[],yt:[],xl,yl,fx,fy} returns X,Y */
+ const X=t=>o.x0+(t-o.xmin)/(o.xmax-o.xmin)*(o.x1-o.x0),Y=t=>o.y0-(t-o.ymin)/(o.ymax-o.ymin)*(o.y0-o.y1);
+ el('line',{x1:o.x0,y1:o.y0,x2:o.x1,y2:o.y0,stroke:css('--line')},s);el('line',{x1:o.x0,y1:o.y0,x2:o.x0,y2:o.y1,stroke:css('--line')},s);
+ (o.yt||[]).forEach(t=>{el('line',{x1:o.x0,y1:Y(t),x2:o.x1,y2:Y(t),stroke:css('--line'),'stroke-dasharray':'2 3'},s);const tx=el('text',{x:o.x0-5,y:Y(t)+4,'text-anchor':'end'},s);tx.textContent=o.fy?o.fy(t):t;});
+ (o.xt||[]).forEach(t=>{const tx=el('text',{x:X(t),y:o.y0+15,'text-anchor':'middle'},s);tx.textContent=o.fx?o.fx(t):t;});
+ if(o.xl){const t=el('text',{x:(o.x0+o.x1)/2,y:o.y0+30,'text-anchor':'middle'},s);t.textContent=o.xl;}
+ if(o.yl){const t=el('text',{x:12,y:(o.y0+o.y1)/2,'text-anchor':'middle',transform:'rotate(-90 12 '+((o.y0+o.y1)/2)+')'},s);t.textContent=o.yl;}
+ return [X,Y];}
+function path(pts,X,Y){return pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join('');}
+function drill(id,items){const box=$(id);items.forEach(([d,s,a])=>{const e=document.createElement('div');e.className='panel flaw';e.innerHTML='<div class="disc">'+d+'</div><p>'+s+'</p><details><summary>Show the answer</summary><p>'+a+'</p></details>';box.appendChild(e);});}
+function onTheme(fn){try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',fn);new MutationObserver(fn).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});}catch(e){}}
+
+const T975=[12.706,4.303,3.182,2.776,2.571,2.447,2.365,2.306,2.262,2.228,2.201,2.179,2.160,2.145,2.131,2.120,2.110,2.101,2.093,2.086,2.080,2.074,2.069,2.064,2.060,2.056,2.052,2.048,2.045,2.042];
+const tq=df=>df<1?NaN:df<=30?T975[df-1]:1.96+2.4/df;
+function lgam(z){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61503916999185,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];if(z<0.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-lgam(1-z);z-=1;let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);const t=z+g+0.5;return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
+
+/* Demo 1 */
+function ols(){
+  const P=$('odata').value.split('\n').map(l=>l.split(/[,\s;]+/).filter(Boolean).map(Number)).filter(a=>a.length>=2&&isFinite(a[0])&&isFinite(a[1]));
+  const n=P.length,s=$('osvg');s.innerHTML='';
+  if(n<3){$('o1').textContent='need at least 3 points';return;}
+  const mx=P.reduce((a,p)=>a+p[0],0)/n,my=P.reduce((a,p)=>a+p[1],0)/n,Sxx=P.reduce((a,p)=>a+(p[0]-mx)**2,0),Sxy=P.reduce((a,p)=>a+(p[0]-mx)*(p[1]-my),0);
+  if(Sxx===0){$('o1').textContent='x values must differ';return;}
+  const b1=Sxy/Sxx,b0=my-b1*mx,res=P.map(p=>p[1]-(b0+b1*p[0])),SSr=res.reduce((a,r)=>a+r*r,0),SSt=P.reduce((a,p)=>a+(p[1]-my)**2,0),sd=Math.sqrt(SSr/(n-2)),t=tq(n-2),se1=sd/Math.sqrt(Sxx);
+  const x0=v('ox0'),y0=b0+b1*x0,hm=t*sd*Math.sqrt(1/n+(x0-mx)**2/Sxx),hp=t*sd*Math.sqrt(1+1/n+(x0-mx)**2/Sxx);
+  $('o1').textContent='y = '+f(b0,2)+' + '+f(b1,2)+'x';$('o2').textContent=f(1-SSr/SSt,3)+' · '+f(sd,2);$('o3').textContent=f(b1-t*se1,2)+' to '+f(b1+t*se1,2);
+  $('o4').textContent=f(y0,2);$('o5').textContent='± '+f(hm,2)+' · ± '+f(hp,2);
+  const xs=P.map(p=>p[0]),xmin=Math.min(...xs,x0),xmax=Math.max(...xs,x0),pad=(xmax-xmin)*0.08||1;
+  const lo=xmin-pad,hi=xmax+pad,band=(x,k)=>t*sd*Math.sqrt(k+1/n+(x-mx)**2/Sxx),ys=[];for(let x=lo;x<=hi;x+=(hi-lo)/60){ys.push(b0+b1*x+band(x,1),b0+b1*x-band(x,1));}P.forEach(p=>ys.push(p[1]));
+  const ymin=Math.min(...ys),ymax=Math.max(...ys);
+  const [X,Y]=axes(s,{x0:44,x1:430,y0:265,y1:10,xmin:lo,xmax:hi,ymin:ymin,ymax:ymax,xt:niceT(lo,hi),yt:niceT(ymin,ymax),xl:'x'});
+  const pts=k=>{const up=[],dn=[];for(let i=0;i<=60;i++){const x=lo+(hi-lo)*i/60;up.push([x,b0+b1*x+band(x,k)]);dn.push([x,b0+b1*x-band(x,k)]);}return path(up.concat(dn.reverse()),X,Y)+'Z';};
+  el('path',{d:pts(1),fill:css('--b'),'fill-opacity':0.18,stroke:'none'},s);el('path',{d:pts(0),fill:css('--accent'),'fill-opacity':0.3,stroke:'none'},s);
+  el('path',{d:path([[lo,b0+b1*lo],[hi,b0+b1*hi]],X,Y),stroke:css('--fg'),'stroke-width':1.5},s);
+  P.forEach(p=>el('circle',{cx:X(p[0]),cy:Y(p[1]),r:4,fill:css('--navy')},s));
+  el('line',{x1:X(x0),y1:Y(y0-hp),x2:X(x0),y2:Y(y0+hp),stroke:css('--b'),'stroke-width':3},s);el('circle',{cx:X(x0),cy:Y(y0),r:5,fill:css('--b')},s);
+  const ext=x0<Math.min(...xs)||x0>Math.max(...xs);
+  $('over').textContent=ext?'x = '+x0+' is outside the observed range ('+Math.min(...xs)+'–'+Math.max(...xs)+'): this is extrapolation, and the interval assumes the straight line continues.':'Inside the data range. For planning a single mission, use the wider prediction interval.';
+}
+function niceT(a,b){const r=b-a,st=Math.pow(10,Math.floor(Math.log10(r/4)));const m=[1,2,5,10].find(k=>r/(k*st)<=6)*st;const out=[];for(let t=Math.ceil(a/m)*m;t<=b+1e-9;t+=m)out.push(+t.toFixed(6));return out;}
+['odata','ox0'].forEach(i=>$(i).addEventListener('input',ols));
+
+/* Demo 2 */
+function shrink(){
+  const z=parseFloat($('sz').value),l=parseFloat($('sl').value);$('szo').textContent=z.toFixed(2);$('slo').textContent=l.toFixed(2);
+  const ri=z/(1+l),la=Math.sign(z)*Math.max(Math.abs(z)-l/2,0);$('s1').textContent=f(ri,3);$('s2').textContent=f(la,3);
+  $('sver').textContent=la===0&&z!==0?'Lasso has removed this feature entirely (|z| ≤ λ/2 = '+f(l/2,2)+'), while ridge keeps a shrunken value. That is why lasso selects features.':'Both keep the feature. Ridge scales it by 1/(1+λ); lasso subtracts a fixed λ/2.';
+  const s=$('ssvg');s.innerHTML='';const [X,Y]=axes(s,{x0:40,x1:430,y0:245,y1:10,xmin:-3,xmax:3,ymin:-3,ymax:3,xt:[-3,-2,-1,0,1,2,3],yt:[-3,-2,-1,0,1,2,3],xl:'least-squares z'});
+  const g=fn=>{const p=[];for(let x=-3;x<=3.001;x+=0.02)p.push([x,fn(x)]);return path(p,X,Y);};
+  el('path',{d:g(x=>x),stroke:css('--muted'),'stroke-dasharray':'4 4',fill:'none'},s);
+  el('path',{d:g(x=>x/(1+l)),stroke:css('--a'),'stroke-width':2,fill:'none'},s);
+  el('path',{d:g(x=>Math.sign(x)*Math.max(Math.abs(x)-l/2,0)),stroke:css('--b'),'stroke-width':2,fill:'none'},s);
+  el('line',{x1:X(z),y1:Y(-3),x2:X(z),y2:Y(3),stroke:css('--line')},s);
+  el('circle',{cx:X(z),cy:Y(ri),r:5,fill:css('--a')},s);el('circle',{cx:X(z),cy:Y(la),r:5,fill:css('--b')},s);
+}
+['sz','sl'].forEach(i=>$(i).addEventListener('input',shrink));
+
+/* Demo 3 */
+let kseed=5;
+function kal(){
+  const sR=parseFloat($('kr').value),lq=parseFloat($('kq').value),Q=Math.pow(10,lq),man=$('km').value==='1';$('kro').textContent=sR;$('kqo').textContent=lq.toFixed(1);
+  const r=rng(kseed),N=50,dt=1;let x=0,vel=20;const truth=[],meas=[];
+  for(let k=0;k<N;k++){if(man&&k===25)vel=45;x+=vel*dt+gauss(r)*2;truth.push(x);meas.push(x+gauss(r)*sR);}
+  let xe=[meas[0],0],P=[[sR*sR,0],[0,400]];const est=[],gains=[];const R=sR*sR;
+  for(let k=0;k<N;k++){
+    if(k>0){xe=[xe[0]+xe[1]*dt,xe[1]];const a=P[0][0]+2*dt*P[0][1]+dt*dt*P[1][1]+Q*dt*dt*dt/3,b=P[0][1]+dt*P[1][1]+Q*dt*dt/2,d=P[1][1]+Q*dt;P=[[a,b],[b,d]];}
+    const S=P[0][0]+R,K=[P[0][0]/S,P[1][0]/S],y=meas[k]-xe[0];xe=[xe[0]+K[0]*y,xe[1]+K[1]*y];P=[[(1-K[0])*P[0][0],(1-K[0])*P[0][1]],[P[1][0]-K[1]*P[0][0],P[1][1]-K[1]*P[0][1]]];
+    est.push(xe[0]);gains.push(K[0]);}
+  const rm=a=>Math.sqrt(a.reduce((s,q,i)=>s+(q-truth[i])**2,0)/N);
+  $('k1').textContent=f(rm(meas),1)+' m';$('k2').textContent=f(rm(est),1)+' m';$('k3').textContent=f(gains[N-1],2);
+  const s=$('ksvg');s.innerHTML='';const dev=a=>a.map((q,i)=>q-20*i);const all=dev(truth).concat(dev(meas),dev(est));
+  const ym=Math.min(...all),yM=Math.max(...all);
+  const [X,Y]=axes(s,{x0:48,x1:430,y0:255,y1:10,xmin:0,xmax:N-1,ymin:ym,ymax:yM,xt:[0,10,20,30,40],yt:niceT(ym,yM),xl:'time step (position shown relative to 20 m per step)'});
+  dev(meas).forEach((q,i)=>el('circle',{cx:X(i),cy:Y(q),r:2.5,fill:css('--dot')},s));
+  el('path',{d:path(dev(truth).map((q,i)=>[i,q]),X,Y),stroke:css('--muted'),'stroke-width':2,fill:'none'},s);
+  el('path',{d:path(dev(est).map((q,i)=>[i,q]),X,Y),stroke:css('--accent'),'stroke-width':2.2,fill:'none'},s);
+}
+['kr','kq','km'].forEach(i=>$(i).addEventListener('input',kal));$('krun').addEventListener('click',()=>{kseed=(kseed*7+3)%9973;kal();});
+
+/* Demo 4 */
+function cas(){
+  const mu=Math.exp(v('cb0')+v('cb1')*v('cx')),nb=$('cmod').value==='nb',k=Math.max(0.1,v('ck')),thr=Math.max(0,Math.round(v('cn')));
+  const pmf=y=>nb?Math.exp(lgam(y+k)-lgam(k)-lgam(y+1)+k*Math.log(k/(k+mu))+y*Math.log(mu/(k+mu))):Math.exp(-mu+y*Math.log(mu)-lgam(y+1));
+  const M=Math.max(15,Math.ceil(mu*4+10)),p=[];let c=0,q95=null,below=0;for(let y=0;y<=M;y++){p.push(pmf(y));c+=p[y];if(q95===null&&c>=0.95)q95=y;if(y<thr)below+=p[y];}
+  $('c1').textContent=f(mu,2);$('c2').textContent=f(Math.exp(v('cb1')),2)+'×';$('c3').textContent=pc(p[0])+' · '+pc(1-below);$('c4').textContent=q95+' casualties';
+  const s=$('csvg');s.innerHTML='';const show=Math.min(M,Math.max(14,q95+4)),ymax=Math.max(...p.slice(0,show+1))*1.12;
+  const [X,Y]=axes(s,{x0:44,x1:430,y0:225,y1:10,xmin:-0.6,xmax:show+0.6,ymin:0,ymax:ymax,xt:niceT(0,show).filter(t=>Number.isInteger(t)),yt:niceT(0,ymax),fy:t=>t.toFixed(2),xl:'casualties per company-day'});
+  const bw=(X(1)-X(0))*0.72;for(let y=0;y<=show;y++){el('rect',{x:X(y)-bw/2,y:Y(p[y]),width:bw,height:Y(0)-Y(p[y]),fill:y>=thr?css('--b'):css('--accent'),'fill-opacity':0.85},s);}
+  el('line',{x1:X(mu),y1:Y(0),x2:X(mu),y2:Y(ymax),stroke:css('--fg'),'stroke-dasharray':'4 3'},s);
+}
+['cb0','cb1','cx','cmod','ck','cn'].forEach(i=>$(i).addEventListener('input',cas));
+
+/* Demo 5 */
+function lan(){
+  const B0=Math.max(1,v('lb0')),R0=Math.max(1,v('lr0')),b=Math.max(1e-4,v('lbb')),r=Math.max(1e-4,v('lrr'));
+  let B=B0,R=R0,t=0;const dt=0.01,hist=[[0,B,R]];while(B>0.5&&R>0.5&&t<500){const dB=-r*R*dt,dR=-b*B*dt;B+=dB;R+=dR;t+=dt;if(Math.round(t/dt)%20===0)hist.push([t,Math.max(B,0),Math.max(R,0)]);}
+  hist.push([t,Math.max(B,0),Math.max(R,0)]);
+  const need=Math.sqrt(r/b),ratio=B0/R0,blueWins=b*B0*B0>r*R0*R0,surv=blueWins?Math.sqrt(B0*B0-(r/b)*R0*R0):Math.sqrt(R0*R0-(b/r)*B0*B0);
+  $('l1').textContent=f(need,3);$('l2').textContent=f(ratio,3);$('l3').textContent=(blueWins?'Blue':'Red')+' wins, '+f(surv,1)+' left';$('l4').textContent=f(t,1);
+  const margin=Math.abs(b*B0*B0-r*R0*R0)/Math.max(b*B0*B0,r*R0*R0);
+  $('lver').textContent=margin<0.1?'A near-tie: small errors in the estimated kill rates could reverse this outcome. Propagate their uncertainty before using the result.':'Fighting strength is kill rate × numbers²: here Blue '+f(b*B0*B0,1)+' vs Red '+f(r*R0*R0,1)+'.';
+  const s=$('lsvg');s.innerHTML='';const tm=hist[hist.length-1][0]||1,ym=Math.max(B0,R0);
+  const [X,Y]=axes(s,{x0:44,x1:430,y0:225,y1:10,xmin:0,xmax:tm,ymin:0,ymax:ym,xt:niceT(0,tm),yt:niceT(0,ym),xl:'hours'});
+  el('path',{d:path(hist.map(h=>[h[0],h[1]]),X,Y),stroke:css('--a'),'stroke-width':2.2,fill:'none'},s);el('path',{d:path(hist.map(h=>[h[0],h[2]]),X,Y),stroke:css('--b'),'stroke-width':2.2,fill:'none'},s);
+}
+['lb0','lr0','lbb','lrr'].forEach(i=>$(i).addEventListener('input',lan));
+
+drill('drillbox',[
+ ['Mission planning','A model predicts 19 h for a mission at EW level 8, from data covering levels 1–5, and the plan allows 19 h.','<b>Extrapolation without an interval.</b> Level 8 is outside the data, and even inside it a single mission needs the prediction interval (about ±6.7 h here). Plan against the upper bound and test whether the trend really continues.'],
+ ['Metrics','A duration model reports RMSE 2.06 h and MAE 1.54 h and is called "accurate to about 1.5 hours".','<b>Heavy-tailed errors.</b> RMSE well above MAE means a few large misses. Report the largest errors and the signed bias; for logistics, under-prediction is the dangerous direction.'],
+ ['Feature selection','Lasso keeps "radar band" and drops "transmitter power", so the analyst concludes power does not matter.','<b>Unstable selection.</b> With correlated features lasso keeps one almost arbitrarily. Check stability across resamples, or use elastic net; selection is not a causal finding.'],
+ ['Sensor fusion','An IR bearing missing because of cloud is imputed from the model and fed to the Kalman filter with its normal variance.','<b>False confidence.</b> Imputed data are not measurements. Flag them and inflate their variance (or skip the update), or the filter will report uncertainty that is too small.'],
+ ['Casualty estimate','The planning cell sizes medical capacity for the Poisson mean of 4.5 casualties per company-day.','<b>Planning to the mean.</b> The 95th percentile is about 8, and real data are over-dispersed, making the tail heavier still. Size capacity for the tail, with the assumptions stated.'],
+ ['Force ratio','Lanchester coefficients estimated from four simulation points give Blue a 1.20 ratio against a required 1.19, and the brief says "Blue wins".','<b>A near-tie stated as a result.</b> The required ratio comes from two noisy estimates. Bootstrap the coefficients, report the probability that Blue prevails, and test whether the square law fits at all.']]);
+function all(){ols();shrink();kal();cas();lan();}
+all();onTheme(all);
+
+})();
+</script>
+
+</body></html>

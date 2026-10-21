@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unit 4 Revision Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one scrolling study sheet; sticky section index; worksheet-style panels with live calculators. Course palette: navy + Lecture 9 plum. */
+:root{
+  --bg:#F5F7FA; --surface:#FFFFFF; --fg:#16243A; --muted:#5B6B7F; --line:#D6DEE8;
+  --navy:#1B3A5E; --accent:#5E1F6A; --accent-soft:#F1E8F4; --good:#1E7A45; --good-soft:#E4F3EA; --warn:#A6620C; --warn-soft:#FBF0DD;
+  --font-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1621; --surface:#172231; --fg:#E2E8F0; --muted:#98A6B8; --line:#2A3A4E;
+  --navy:#9DBDE0; --accent:#D2A6E2; --accent-soft:#2A1E33; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1621; --surface:#172231; --fg:#E2E8F0; --muted:#98A6B8; --line:#2A3A4E;
+  --navy:#9DBDE0; --accent:#D2A6E2; --accent-soft:#2A1E33; --good:#6CCB92; --good-soft:#15291F; --warn:#F0B25C; --warn-soft:#2E2414; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15.5px;line-height:1.55;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+header.top{display:grid;gap:6px;padding-block:8px 18px;border-bottom:2px solid var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
+.lede{color:var(--muted);max-width:68ch;margin:0}
+nav.idx{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:6px 18px;padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:8px}
+nav.idx a{color:var(--navy);text-decoration:none;font-weight:500;font-size:14px}
+nav.idx a:hover,nav.idx a:focus-visible{color:var(--accent);text-decoration:underline}
+section{padding-block:26px 6px}
+h2{font-size:23px;margin:0 0 4px;color:var(--navy);text-wrap:balance}
+h2 .tag{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-right:10px;vertical-align:2px}
+h3{font-size:16.5px;margin:0;color:var(--fg)}
+.intro{color:var(--muted);max-width:72ch;margin:0 0 14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.steps{display:grid;gap:14px}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:start}
+@media (max-width:760px){.step{grid-template-columns:minmax(0,1fr)}}
+.steps>*,.step>*{min-width:0}
+.steps{grid-template-columns:minmax(0,1fr)}
+.lab{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.04em}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
+input[type=number]{font-family:var(--font-mono);font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%}
+input:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.out{display:grid;gap:8px}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;font-size:14.5px;padding:12px 14px;border-radius:6px;background:var(--accent-soft)}
+.kv dt{color:var(--fg)}
+.kv dd{margin:0;font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500}
+.kv dd.big{font-size:18px;color:var(--accent);font-weight:600}
+.note{font-size:14px;color:var(--fg);margin:0;padding:10px 12px;border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 6px 6px 0}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden;display:flex}
+.bar span{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--muted)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.eq{font-family:var(--font-mono);font-size:13.5px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+/* exam */
+.exam{display:grid;gap:12px}
+.q{display:grid;gap:8px}
+.qhead{display:flex;gap:12px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.qhead h3{flex:1 1 300px;min-width:0;font-weight:500;line-height:1.5}
+.marks{font-family:var(--font-mono);font-size:12.5px;color:var(--muted);white-space:nowrap}
+details{border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px}
+details p{margin:8px 0 0}
+.score{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.score input{width:72px}
+.total{position:sticky;bottom:env(safe-area-inset-bottom,0px);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--navy);color:var(--surface);padding:12px 16px;border-radius:8px;margin-top:14px}
+.total b{font-family:var(--font-mono);font-size:18px}
+.total button{background:var(--surface);color:var(--navy);border:0;border-radius:6px;padding:7px 12px;font:inherit;font-weight:600;cursor:pointer}
+/* bench */
+.bench{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.tool{display:grid;gap:10px;align-content:start}
+.tool .fields{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));margin:0}
+.res{font-family:var(--font-mono);font-size:14px;padding:9px 11px;border-radius:6px;background:var(--good-soft);color:var(--fg);font-variant-numeric:tabular-nums}
+.res b{color:var(--good)}
+.tool .why{font-size:13px;color:var(--muted);margin:0}
+/* connections */
+.threads{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.thread{display:grid;gap:6px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.chain{font-family:var(--font-mono);font-size:12.5px;color:var(--accent);overflow-wrap:anywhere}
+.thread p{margin:0;font-size:14px}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+
+</head><body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Unit 4 &middot; AI &amp; Machine Learning in Warfare &middot; Lecture 9</div>
+  <h1>Revision Studio</h1>
+  <p class="lede">Work the air-defence case with live numbers, sit Practice Exam II and mark yourself, check any formula on the bench, and review how the methods connect. Change any input; every result updates at once.</p>
+  <p class="lede" style="font-size:13.5px">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</header>
+
+<nav class="idx" aria-label="Sections">
+  <a href="#case">Air-defence case</a><a href="#exam">Practice Exam II</a><a href="#bench">Formula bench</a><a href="#threads">How methods connect</a>
+</nav>
+
+<section id="case">
+  <h2><span class="tag">Part 1</span>One air-defence sector, end to end</h2>
+  <p class="intro">The numbers start at the values used in the Lecture 9 reference text. Change them to see how base rates, sensor quality and costs move each decision.</p>
+  <div class="steps">
+    <div class="panel step">
+      <div>
+        <div class="lab">STEP 1 &middot; LECTURE 1 &middot; WHAT DOES AN ALARM MEAN?</div>
+        <h3>Classifier alarms, then ESM confirmation</h3>
+        <div class="fields">
+          <label for="n">Tracks per day<input id="n" type="number" value="2000" min="1" step="100"></label>
+          <label for="h">Hostile tracks per day<input id="h" type="number" value="4" min="0" step="1"></label>
+          <label for="rec">Classifier recall<input id="rec" type="number" value="0.95" min="0" max="1" step="0.01"></label>
+          <label for="fpr">Classifier false-positive rate<input id="fpr" type="number" value="0.01" min="0" max="1" step="0.001"></label>
+          <label for="esmt">ESM detects hostile<input id="esmt" type="number" value="0.8" min="0" max="1" step="0.05"></label>
+          <label for="esmf">ESM false-alarm rate<input id="esmf" type="number" value="0.1" min="0" max="1" step="0.01"></label>
+        </div>
+      </div>
+      <div class="out">
+        <dl class="kv">
+          <dt>Classifier alarms per day (true + false)</dt><dd id="o1a">&mdash;</dd>
+          <dt>Precision of a classifier alarm</dt><dd class="big" id="o1b">&mdash;</dd>
+          <dt>Confirmed alarms per day (true + false)</dt><dd id="o1c">&mdash;</dd>
+          <dt>Precision after ESM confirmation</dt><dd class="big" id="o1d">&mdash;</dd>
+          <dt>Hostiles lost by requiring confirmation</dt><dd id="o1e">&mdash;</dd>
+        </dl>
+        <div class="bar" aria-hidden="true"><span id="b1" style="background:var(--good)"></span><span id="b2" style="background:var(--warn)"></span></div>
+        <div class="legend"><span><i class="sw" style="background:var(--good)"></i>true alarms</span><span><i class="sw" style="background:var(--warn)"></i>false alarms (classifier stage)</span></div>
+        <p class="note" id="n1">&nbsp;</p>
+      </div>
+    </div>
+
+    <div class="panel step">
+      <div>
+        <div class="lab">STEP 2 &middot; LECTURE 3 &middot; WHERE IS IT?</div>
+        <h3>Fuse two range estimates</h3>
+        <div class="fields">
+          <label for="r1">Radar range (km)<input id="r1" type="number" value="52" step="0.5"></label>
+          <label for="v1">Radar variance (km&sup2;)<input id="v1" type="number" value="4" min="0.01" step="0.5"></label>
+          <label for="r2">IR-derived range (km)<input id="r2" type="number" value="49" step="0.5"></label>
+          <label for="v2">IR variance (km&sup2;)<input id="v2" type="number" value="16" min="0.01" step="0.5"></label>
+        </div>
+        <div class="eq" style="margin-top:10px">x&#770; = (x&#8321;/P&#8321; + x&#8322;/P&#8322;) / (1/P&#8321; + 1/P&#8322;)</div>
+      </div>
+      <div class="out">
+        <dl class="kv">
+          <dt>Fused range</dt><dd class="big" id="o2a">&mdash;</dd>
+          <dt>Fused variance (standard deviation)</dt><dd id="o2b">&mdash;</dd>
+          <dt>Weight given to the radar</dt><dd id="o2c">&mdash;</dd>
+        </dl>
+        <p class="note">The fused estimate is always more certain than either input, and leans toward the more precise sensor. This is the scalar Kalman update.</p>
+      </div>
+    </div>
+
+    <div class="panel step">
+      <div>
+        <div class="lab">STEP 3 &middot; LECTURES 1&ndash;2 &middot; WHEN TO CUE AN ENGAGEMENT?</div>
+        <h3>Threshold from the cost of errors</h3>
+        <div class="fields">
+          <label for="cfn">Cost of a missed hostile<input id="cfn" type="number" value="50" min="0" step="1"></label>
+          <label for="cfp">Cost of a false cue<input id="cfp" type="number" value="1" min="0" step="1"></label>
+        </div>
+        <div class="eq" style="margin-top:10px">cue if  p(hostile) &gt; C_FP / (C_FP + C_FN)</div>
+      </div>
+      <div class="out">
+        <dl class="kv"><dt>Cost-optimal probability threshold</dt><dd class="big" id="o3a">&mdash;</dd></dl>
+        <p class="note">The threshold follows from the costs, which are a command judgement. It is meaningful only if the classifier's probabilities are calibrated.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="lab">STEPS 4&ndash;6 &middot; LECTURES 4&ndash;10</div>
+      <h3 style="margin-bottom:6px">Novelty, decision and validation</h3>
+      <p style="margin:0 0 6px"><b>Step 4.</b> A CUSUM on the daily mean radar cross-section of unidentified tracks alarms on day 5. HDBSCAN finds a small dense group with an unfamiliar speed and altitude combination, which goes to analysts, not to the engagement chain.</p>
+      <p style="margin:0 0 6px"><b>Step 5.</b> A wargame-trained advisory agent offers three courses of action, with values and uncertainty from an ensemble of critics. The commander sees the assumptions and the agent's record against varied opponents, and decides. The agent never selects lethal action on its own.</p>
+      <p style="margin:0"><b>Step 6.</b> Evaluate on later data from the deployment environment. Report hostile-class recall with a confidence interval; with a few hostiles a day, that takes months of data. Red-team with novel and deceptive tracks, monitor drift, and document when human-only procedures resume.</p>
+    </div>
+  </div>
+</section>
+
+<section id="exam">
+  <h2><span class="tag">Part 2</span>Practice Exam II</h2>
+  <p class="intro">40 marks. Answer on paper first, then open each model answer and enter the marks you earned. Your marks stay in this browser only.</p>
+  <div class="exam" id="examlist"></div>
+  <div class="total"><span>Your total: <b id="tot">0</b> / 40</span><button type="button" id="clr">Clear my marks</button></div>
+</section>
+
+<section id="bench">
+  <h2><span class="tag">Part 3</span>Formula bench</h2>
+  <p class="intro">Eight formulas examiners ask for most. Change the inputs to check your own working.</p>
+  <div class="bench">
+    <div class="panel tool"><h3>Base rate &rarr; precision (L1)</h3>
+      <div class="fields"><label for="bsens">Sensitivity<input id="bsens" type="number" value="0.99" step="0.01" min="0" max="1"></label><label for="bspec">Specificity<input id="bspec" type="number" value="0.99" step="0.01" min="0" max="1"></label><label for="bprev">Prevalence<input id="bprev" type="number" value="0.001" step="0.001" min="0" max="1"></label></div>
+      <div class="res" id="rb"></div><p class="why">Precision = sp / (sp + (1 &minus; c)(1 &minus; p)).</p></div>
+    <div class="panel tool"><h3>Kalman gain (L3)</h3>
+      <div class="fields"><label for="kp">Prior variance P<input id="kp" type="number" value="9" step="0.5" min="0"></label><label for="kr">Measurement variance R<input id="kr" type="number" value="3" step="0.5" min="0"></label></div>
+      <div class="res" id="rk"></div><p class="why">K = P / (P + R); posterior variance = PR / (P + R).</p></div>
+    <div class="panel tool"><h3>Silhouette (L4)</h3>
+      <div class="fields"><label for="sa">a: own cluster<input id="sa" type="number" value="1.2" step="0.1" min="0"></label><label for="sb">b: nearest other<input id="sb" type="number" value="3.0" step="0.1" min="0"></label></div>
+      <div class="res" id="rs"></div><p class="why">s = (b &minus; a) / max(a, b), from &minus;1 to 1.</p></div>
+    <div class="panel tool"><h3>Isolation Forest score (L5)</h3>
+      <div class="fields"><label for="ih">Mean path length<input id="ih" type="number" value="5" step="0.5" min="0"></label><label for="ipsi">Sub-sample &psi;<input id="ipsi" type="number" value="256" step="1" min="2"></label></div>
+      <div class="res" id="ri"></div><p class="why">s = 2^(&minus;E[h] / c(&psi;)); near 1 means anomaly.</p></div>
+    <div class="panel tool"><h3>Q-learning update (L6)</h3>
+      <div class="fields"><label for="qq">Q(s,a)<input id="qq" type="number" value="2" step="0.5"></label><label for="qr">Reward r<input id="qr" type="number" value="1" step="0.5"></label><label for="qm">max Q(s&prime;,&middot;)<input id="qm" type="number" value="5" step="0.5"></label><label for="qg">&gamma;<input id="qg" type="number" value="0.95" step="0.01" min="0" max="1"></label><label for="qa">&alpha;<input id="qa" type="number" value="0.2" step="0.05" min="0" max="1"></label></div>
+      <div class="res" id="rq"></div><p class="why">Q &larr; Q + &alpha;[r + &gamma; max Q(s&prime;) &minus; Q].</p></div>
+    <div class="panel tool"><h3>PPO clipped term (L7)</h3>
+      <div class="fields"><label for="pr">Ratio r<input id="pr" type="number" value="0.7" step="0.05" min="0"></label><label for="pa">Advantage A<input id="pa" type="number" value="-3" step="0.5"></label><label for="pe">&epsilon;<input id="pe" type="number" value="0.2" step="0.05" min="0"></label></div>
+      <div class="res" id="rp"></div><p class="why">min(rA, clip(r, 1&minus;&epsilon;, 1+&epsilon;)&middot;A).</p></div>
+    <div class="panel tool"><h3>Is the difference real? (L8&ndash;L10)</h3>
+      <div class="fields"><label for="zp1">Rate A<input id="zp1" type="number" value="0.84" step="0.01" min="0" max="1"></label><label for="zp2">Rate B<input id="zp2" type="number" value="0.80" step="0.01" min="0" max="1"></label><label for="zn">n per side<input id="zn" type="number" value="100" step="10" min="2"></label></div>
+      <div class="res" id="rz"></div><p class="why">Two-proportion z-test with unpooled standard error.</p></div>
+    <div class="panel tool"><h3>Wilson interval (L10)</h3>
+      <div class="fields"><label for="wk">Successes k<input id="wk" type="number" value="18" step="1" min="0"></label><label for="wn">Trials n<input id="wn" type="number" value="20" step="1" min="1"></label></div>
+      <div class="res" id="rw"></div><p class="why">Honest 95% interval for small counts; never exceeds 0&ndash;1.</p></div>
+  </div>
+</section>
+
+<section id="threads">
+  <h2><span class="tag">Part 4</span>How the methods connect</h2>
+  <p class="intro">Forty methods, far fewer ideas. Learn these links and an unseen question becomes a familiar one.</p>
+  <div class="threads">
+    <div class="thread"><div class="chain">logistic regression &rarr; neuron &rarr; softmax policy</div><h3>One neuron, three names</h3><p>The cross-entropy gradient (1&#8336; &minus; p)x and the REINFORCE gradient (1&#8336; &minus; &pi;)x&middot;G differ only in what multiplies them: a label or a return.</p></div>
+    <div class="thread"><div class="chain">GMM / EM &rarr; (&sigma; &rarr; 0) &rarr; k-means</div><h3>k-means is hard EM</h3><p>Shrink equal spherical covariances to zero and soft responsibilities become nearest-centroid assignments.</p></div>
+    <div class="thread"><div class="chain">inverse-variance weighting = Kalman = Bayes</div><h3>Combining uncertain sources</h3><p>The same formula fuses sensors, updates POMDP beliefs and pools studies in a meta-analysis.</p></div>
+    <div class="thread"><div class="chain">ridge = Gaussian prior &middot; lasso = Laplace prior</div><h3>Regularisation is a prior</h3><p>Weight decay and the KL penalties of PPO and SAC are the same idea: stay near a reference unless the data insist.</p></div>
+    <div class="thread"><div class="chain">Bellman &rarr; value iteration &rarr; Q-learning &rarr; DQN</div><h3>Five steps from equation to agent</h3><p>Each step trades exactness for scale, and each brings a new failure mode, ending with the deadly triad.</p></div>
+    <div class="thread"><div class="chain">gradient descent on functions = boosting</div><h3>Boosting fits gradients</h3><p>Each new tree fits the negative gradient of the loss; learning rate and early stopping work as they do for weights.</p></div>
+    <div class="thread"><div class="chain">Nadaraya&ndash;Watson &rarr; self-attention</div><h3>Attention is kernel regression</h3><p>A Transformer layer is a learned, data-dependent weighted average of values.</p></div>
+    <div class="thread"><div class="chain">PCA &rarr; linear autoencoder &rarr; anomaly score</div><h3>Reconstruction error</h3><p>Data that the main structure cannot reconstruct are, by definition, unusual: the basis of Lecture 5.</p></div>
+  </div>
+</section>
+
+<footer>AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; Unit 4: Simulation Strategies in Warfare &middot; Lecture 9 revision</footer>
+</div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const v=id=>{const x=parseFloat($(id).value);return isFinite(x)?x:0};
+  const f=(x,d=2)=>isFinite(x)?x.toFixed(d):'—';
+  const pct=x=>isFinite(x)?(100*x).toFixed(1)+'%':'—';
+  function step1(){
+    const N=v('n'),H=Math.min(v('h'),N),tp=H*v('rec'),fp=(N-H)*v('fpr'),tp2=tp*v('esmt'),fp2=fp*v('esmf');
+    const p1=tp/(tp+fp),p2=tp2/(tp2+fp2);
+    $('o1a').textContent=f(tp+fp,1)+'  ('+f(tp,2)+' + '+f(fp,2)+')';
+    $('o1b').textContent=pct(p1);
+    $('o1c').textContent=f(tp2+fp2,2)+'  ('+f(tp2,2)+' + '+f(fp2,2)+')';
+    $('o1d').textContent=pct(p2);
+    $('o1e').textContent=f(tp-tp2,2)+' per day';
+    const tot=tp+fp||1;$('b1').style.width=(100*tp/tot)+'%';$('b2').style.width=(100*fp/tot)+'%';
+    const r=isFinite(p1)&&p1>0?Math.round((1-p1)/p1):0;
+    $('n1').textContent=isFinite(p1)?('About '+(r>=1?r+' of every '+(r+1)+' classifier alarms are false. ':'Most classifier alarms are real. ')+'Confirmation raises precision to '+pct(p2)+' but drops '+f(tp-tp2,2)+' hostiles a day: send unconfirmed alarms for a quick human look rather than discarding them.'):'Enter positive numbers.';
+  }
+  function step2(){
+    const x1=v('r1'),P1=v('v1'),x2=v('r2'),P2=v('v2'),P=1/(1/P1+1/P2),x=P*(x1/P1+x2/P2);
+    $('o2a').textContent=f(x,2)+' km';$('o2b').textContent=f(P,2)+' km²  (σ = '+f(Math.sqrt(P),2)+' km)';$('o2c').textContent=pct((1/P1)/(1/P1+1/P2));
+  }
+  function step3(){const a=v('cfp'),b=v('cfn');$('o3a').textContent=pct(a/(a+b));}
+  function bench(){
+    const s=v('bsens'),c=v('bspec'),p=v('bprev'),ppv=s*p/(s*p+(1-c)*(1-p));$('rb').innerHTML='precision = <b>'+pct(ppv)+'</b>';
+    const P=v('kp'),R=v('kr');$('rk').innerHTML='K = <b>'+f(P/(P+R),3)+'</b> · posterior variance = <b>'+f(P*R/(P+R),3)+'</b>';
+    const a=v('sa'),b=v('sb'),sil=(b-a)/Math.max(a,b);$('rs').innerHTML='s = <b>'+f(sil,3)+'</b> · '+(sil>0.5?'well placed':sil>0.25?'reasonable':sil>0?'borderline':'probably misassigned');
+    const h=v('ih'),psi=Math.max(2,v('ipsi')),H=n=>Math.log(n)+0.5772156649,cn=2*H(psi-1)-2*(psi-1)/psi,sc=Math.pow(2,-h/cn);$('ri').innerHTML='c(ψ) = '+f(cn,2)+' · s = <b>'+f(sc,3)+'</b> · '+(sc>0.6?'likely anomaly':sc>0.5?'suspicious':'ordinary');
+    const q=v('qq'),r=v('qr'),m=v('qm'),g=v('qg'),al=v('qa'),t=r+g*m;$('rq').innerHTML='target = '+f(t,3)+' · new Q = <b>'+f(q+al*(t-q),3)+'</b>';
+    const rr=v('pr'),A=v('pa'),e=v('pe'),cl=Math.min(Math.max(rr,1-e),1+e),u=rr*A,k=cl*A,term=Math.min(u,k);
+    const grad=!(term===k&&cl!==rr);$('rp').innerHTML='rA = '+f(u,3)+' · clipped = '+f(k,3)+' · term = <b>'+f(term,3)+'</b> · '+(grad?'gradient flows':'clipped: no gradient');
+    const p1=v('zp1'),p2=v('zp2'),n=Math.max(2,v('zn')),se=Math.sqrt(p1*(1-p1)/n+p2*(1-p2)/n),z=(p1-p2)/se,pv=2*(1-phi(Math.abs(z)));
+    $('rz').innerHTML='z = <b>'+f(z,2)+'</b> · p = <b>'+f(pv,3)+'</b> · '+(pv<0.05?'significant at 5%':'not demonstrated');
+    const kk=v('wk'),nn=Math.max(1,v('wn')),ph=kk/nn,Z=1.96,den=1+Z*Z/nn,ce=(ph+Z*Z/(2*nn))/den,hw=Z*Math.sqrt(ph*(1-ph)/nn+Z*Z/(4*nn*nn))/den;
+    $('rw').innerHTML='p̂ = '+f(ph,3)+' · 95% interval <b>'+f(ce-hw,3)+' – '+f(ce+hw,3)+'</b>';
+  }
+  function phi(x){const t=1/(1+0.2316419*x),d=0.3989423*Math.exp(-x*x/2);return 1-d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));}
+  function all(){step1();step2();step3();bench();}
+  document.querySelectorAll('input[type=number]').forEach(i=>{if(!i.closest('.score'))i.addEventListener('input',all)});
+
+  const Q=[
+   [6,'A new targeting aid was used in 200 engagements and succeeded in 114; without it, 142 of 200 succeeded. By difficulty: easy 81/90 with the aid versus 136/170 without; hard 33/110 with the aid versus 6/30 without. Is the aid better or worse? Explain with counts.','Overall the aid looks worse: 114/200 = 57% against 142/200 = 71%. Within each stratum it is better: easy 90% versus 80%; hard 30% versus 20%. This is Simpson\'s paradox: the aid was used mostly in hard engagements (110 of its 200) while the comparison group fought mostly easy ones (170 of 200). The aid is better; compare within strata or standardise both groups to the same mix of difficulty.'],
+   [4,'A scalar Kalman filter has prior variance 9 and measurement variance 3. Give the gain and the posterior variance.','K = 9/(9+3) = 0.75; posterior variance = 9×3/12 = 2.25.'],
+   [4,'A point has mean intra-cluster distance 1.2 and mean nearest-other-cluster distance 3.0. Compute its silhouette and interpret.','s = (3.0 − 1.2)/3.0 = 0.60: reasonably well placed in its cluster.'],
+   [4,'An Isolation Forest with ψ = 256 gives a point a mean path length of 5. Compute its score (c = 10.24) and interpret.','s = 2^(−5/10.24) = 0.71: shorter paths than average; likely anomalous and worth review.'],
+   [4,'Q-learning: Q(s,a) = 2, r = 1, max Q(s′,·) = 5, γ = 0.95, α = 0.2. Update Q(s,a).','Q = 2 + 0.2(1 + 0.95×5 − 2) = 2 + 0.2(3.75) = 2.75.'],
+   [4,'PPO with ε = 0.2: ratio 0.7, advantage −3. Compute the clipped objective term and say whether the gradient pushes the ratio further down.','Unclipped 0.7×(−3) = −2.1; clipped 0.8×(−3) = −2.4. PPO takes the minimum, −2.4, the clipped constant, so there is no gradient pushing the ratio below 0.8: the update stops reducing this action\'s probability.'],
+   [6,'A report claims "our MARL team beat the human team, 84% versus 80%, over 100 engagements each". Assess the claim.','Difference 4 points; standard error ≈ √(0.84·0.16/100 + 0.80·0.20/100) = 0.054; z ≈ 0.74, p ≈ 0.46: not demonstrated. Also ask about opponent types, simulation fidelity, and whether the humans had the same information and interface.'],
+   [8,'Propose, with justification, a method for each: (a) grouping 50,000 unlabelled intercepts; (b) predicting fuel use per sortie with intervals; (c) a drone that must hold position in gusts; (d) flagging unusual logins.','(a) Embedded or engineered features, then HDBSCAN or a GMM, validated by stability and analyst review. (b) Gradient boosting or regularised regression with quantile or conformal intervals, evaluated on later sorties. (c) SAC or PPO with domain randomisation inside runtime assurance, or a classical controller with learned gain scheduling. (d) Per-user and peer-group baselines with an Isolation Forest or autoencoder, thresholds set by the analysts\' alert budget.']
+  ];
+  const KEY='u4rev-marks';let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){saved={}}
+  const list=$('examlist');
+  Q.forEach((q,i)=>{
+    const d=document.createElement('div');d.className='panel q';
+    d.innerHTML='<div class="qhead"><h3><b>Q'+(i+1)+'.</b> '+q[1]+'</h3><span class="marks">['+q[0]+' marks]</span></div>'+
+      '<details><summary>Show model answer</summary><p>'+q[2]+'</p></details>'+
+      '<div class="score"><label for="m'+i+'" style="display:flex;gap:8px;align-items:center">My marks<input id="m'+i+'" type="number" min="0" max="'+q[0]+'" step="0.5" value="'+(saved[i]??'')+'"></label><span>of '+q[0]+'</span></div>';
+    list.appendChild(d);
+  });
+  function total(){let t=0;const s={};Q.forEach((q,i)=>{let x=parseFloat($('m'+i).value);if(isFinite(x)){x=Math.max(0,Math.min(q[0],x));t+=x;s[i]=x}});$('tot').textContent=(Math.round(t*2)/2).toString();try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+  Q.forEach((q,i)=>$('m'+i).addEventListener('input',total));
+  $('clr').addEventListener('click',()=>{Q.forEach((q,i)=>$('m'+i).value='');total();});
+  all();total();
+})();
+</script>
+
+</body></html>
