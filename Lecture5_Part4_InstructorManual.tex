@@ -1,0 +1,363 @@
+\documentclass[11pt]{article}
+\usepackage{notes} % place notes.sty in the same folder
+\definecolor{AccN}{HTML}{A93226}
+\fancyhead[L]{\small\color{NavyN}\nouppercase{\leftmark}}\fancyhead[R]{\small\color{GreyN}Instructor Manual --- Lecture 5}
+\usepackage{longtable,multicol,needspace}
+\setlength{\emergencystretch}{2em}
+\newtcolorbox{instr}[1]{nb,colback=AccN!6,colframe=AccN,title={#1}}
+\newtcolorbox{prob}{nb,colback=BluN!5,colframe=BluN,title={Problem statement}}
+\newtcolorbox{soln}{nb,colback=GrnN!5,colframe=GrnN,title={Model solution and marking points}}
+\newtcolorbox{sayit}{nb,colback=white,colframe=NavyN,title={Read aloud to students}}
+\newtcolorbox{live}[1]{nb,colback=AccN!4,colframe=AccN,title={#1}}
+\begin{document}
+\begin{titlepage}\centering\vspace*{2.2cm}
+{\color{AccN}\large\bfseries LECTURE 5\par}\vspace{0.6cm}
+{\color{NavyN}\Huge\bfseries Unsupervised Learning Part 2:\\Anomaly Detection \& Cybersecurity\par}\vspace{0.6cm}
+{\color{AccN}\rule{0.7\textwidth}{1.5pt}}\par\vspace{0.6cm}
+{\LARGE Instructor Manual\par}\vspace{0.4cm}
+{\large\begin{minipage}{0.85\textwidth}\centering Statistical methods \textbullet\ Isolation Forest \textbullet\ One-Class SVM \textbullet\ Autoencoders \textbullet\ Intrusion detection \textbullet\ Insider threat\\Case A: network intrusion (N = 500K packets, 41 features) \textbullet\ Case B: insider threat (500 users, 15 compromised)\end{minipage}\par}\vspace{2cm}
+{\large AK DHAMIJA, Researcher \& Instructor, AI \& Machine Learning\par}\vspace{0.2cm}
+{\normalsize \href{mailto:dhamija.ak@gmail.com}{dhamija.ak@gmail.com} \quad\textbullet\quad 9811453163\par}\vspace{0.3cm}
+{Unit 4: Simulation Strategies in Warfare --- AI \& Machine Learning in Warfare\par}\vfill
+\begin{tcolorbox}[colback=NavyN!4,colframe=NavyN,boxrule=0.6pt,arc=2pt,width=0.9\textwidth]\small
+\textbf{This manual contains:} the 45-minute session plan with timings; a slide-by-slide teaching guide for all 23 slides; key messages, facilitation tips, anticipated questions with model answers, misconceptions and in-class activities; live demonstrations with the interactive studio; consistency notes on the source material; the complete quiz answer key with rationale and scoring rules; and the assignment with marking scheme and full model solutions.
+\end{tcolorbox}
+\end{titlepage}
+\tableofcontents\newpage
+
+
+\needspace{12\baselineskip}\section{Lecture at a Glance}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.3cm}>{\raggedright\arraybackslash}X@{}}\toprule
+
+\textcolor{NavyN}{Lecture}&5 --- Unsupervised Learning Part 2: Anomaly Detection \& Cybersecurity\\
+\textcolor{NavyN}{Duration}&45 minutes: 5 min opening Q\&A, 30 min teaching, 10 min auto-quiz\\
+\textcolor{NavyN}{Slides}&23 (Beamer PDF, 16:9), 11 sections\\
+\textcolor{NavyN}{Prerequisite}&Lecture~4; students should have attempted its quiz and assignment.\\
+\textcolor{NavyN}{Student materials}&\texttt{Lecture5\_Slides\_Beamer.pdf}; \texttt{Lecture5\_Reference\_Text.pdf}; \texttt{Lecture5\_Quiz.html}; \texttt{Lecture5\_Answers\_Assignment.html} (release after the quiz)\\
+\textcolor{NavyN}{Interactive studio}&\texttt{Lecture5\_Anomaly\_Detection\_Lab.html} (live demonstrations in Section~\ref{sec:live})\\
+\textcolor{NavyN}{Assessment}&Auto-quiz: 15 MCQs, 40~s each, $+1/-0.25$. Assignment: 5 problems, 100 marks, plus a 20-mark bonus problem.\\\bottomrule\end{tabularx}\end{center}
+
+\subsection*{Overview}Lecture~5 applies unsupervised learning to \emph{anomaly detection} for defence cybersecurity and operational monitoring. Case~A detects intrusions in 500,000 network packets; Case~B finds 15 compromised accounts among 500,000 log events (insider threat). Methods progress from statistics (z-score, IQR, robust Mahalanobis) through Isolation Forest and one-class SVM to autoencoders, LSTM autoencoders for sequences and graph autoencoders for lateral movement and command-and-control. The lecture ends with a three-tier architecture (Isolation Forest screening, autoencoder confirmation, analyst triage) and the arithmetic of false alarms at scale.
+
+\subsection*{Learning outcomes}By the end of the lecture students should be able to:\begin{enumerate}\item Classify anomalies as point, contextual or collective.\item Apply z-score, IQR and Mahalanobis rules and explain why robust covariance matters.\item Explain Isolation Forest path lengths and anomaly scores.\item Explain one-class SVM ($\nu$) and autoencoder reconstruction error, and set thresholds by false-positive rate.\item Design a tiered detection pipeline and estimate analyst workload from FPR and volume.\end{enumerate}
+
+\subsection*{Syllabus mapping}\begin{itemize}\item Unsupervised learning --- \textbf{anomaly detection in network traffic, sensor data and operational patterns}\item Examples: \textbf{cybersecurity monitoring, intrusion detection}, unusual behaviour (insider threat, lateral movement, new LPI radar emitter)\end{itemize}
+
+\needspace{12\baselineskip}\section{Session Plan (45 Minutes)}
+
+\begin{center}\begin{tikzpicture}[x=0.3444cm,y=1cm]
+\fill[AmbN!40](0,0)rectangle(5,1);\node[font=\scriptsize\bfseries,align=center]at(2.5,0.5){Q\&A\\recap};
+\fill[AccN!25](5.00,0)rectangle(7.50,1);\draw[white,thick](5.00,0)--(5.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(6.25,0.5){\parbox{0.9cm}{\centering \S1}};
+\fill[NavyN!18](7.50,0)rectangle(10.00,1);\draw[white,thick](7.50,0)--(7.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(8.75,0.5){\parbox{0.9cm}{\centering \S2}};
+\fill[AccN!25](10.00,0)rectangle(17.00,1);\draw[white,thick](10.00,0)--(10.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(13.50,0.5){\parbox{0.9cm}{\centering \S3}};
+\fill[NavyN!18](17.00,0)rectangle(19.50,1);\draw[white,thick](17.00,0)--(17.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(18.25,0.5){\parbox{0.9cm}{\centering \S4}};
+\fill[AccN!25](19.50,0)rectangle(22.00,1);\draw[white,thick](19.50,0)--(19.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(20.75,0.5){\parbox{0.9cm}{\centering \S5}};
+\fill[NavyN!18](22.00,0)rectangle(24.50,1);\draw[white,thick](22.00,0)--(22.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(23.25,0.5){\parbox{0.9cm}{\centering \S6}};
+\fill[AccN!25](24.50,0)rectangle(27.00,1);\draw[white,thick](24.50,0)--(24.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(25.75,0.5){\parbox{0.9cm}{\centering \S7}};
+\fill[NavyN!18](27.00,0)rectangle(29.50,1);\draw[white,thick](27.00,0)--(27.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(28.25,0.5){\parbox{0.9cm}{\centering \S8}};
+\fill[AccN!25](29.50,0)rectangle(31.00,1);\draw[white,thick](29.50,0)--(29.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(30.25,0.5){\parbox{0.9cm}{\centering \S9}};
+\fill[NavyN!18](31.00,0)rectangle(32.50,1);\draw[white,thick](31.00,0)--(31.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(31.75,0.5){\parbox{0.9cm}{\centering \S10}};
+\fill[AccN!25](32.50,0)rectangle(35.00,1);\draw[white,thick](32.50,0)--(32.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(33.75,0.5){\parbox{0.9cm}{\centering \S11}};
+\fill[RedN!30](35,0)rectangle(45,1);\node[font=\scriptsize\bfseries,align=center]at(40,0.5){Auto-quiz\\15 Q $\times$ 40 s};
+\draw[NavyN](0,0)rectangle(45,1);
+\foreach \tt in {0,5,10,15,20,25,30,35,40,45}{\draw[NavyN](\tt,0)--(\tt,-0.12);\node[font=\tiny,below]at(\tt,-0.12){\tt};}
+\node[font=\scriptsize,below]at(22.5,-0.45){minutes};
+\end{tikzpicture}\end{center}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.2}\begin{tabularx}{\textwidth}{@{}l l X r@{}}\toprule\textbf{Clock} & \textbf{Slides} & \textbf{Segment} & \textbf{Min}\\\midrule
+
+0:00--5:00 & --- & \textbf{Opening Q\&A and recap} (see prompts below) & 5\\
+
+5:00--7:30 & 2--3 & 1. Why Anomaly Detection (2 slides) & 2.5\\
+
+7:30--10:00 & 4--5 & 2. Statistical Methods (2 slides) & 2.5\\
+
+10:00--17:00 & 6--9 & 3. Isolation Forest (4 slides) & 7\\
+
+17:00--19:30 & 10--11 & 4. One-Class SVM (2 slides) & 2.5\\
+
+19:30--22:00 & 12--13 & 5. Autoencoders (2 slides) & 2.5\\
+
+22:00--24:30 & 14--15 & 6. Case A Results (2 slides) & 2.5\\
+
+24:30--27:00 & 16--17 & 7. Insider Threat (2 slides) & 2.5\\
+
+27:00--29:30 & 18--19 & 8. Graph Anomalies (2 slides) & 2.5\\
+
+29:30--31:00 & 20 & 9. Comparison (1 slide) & 1.5\\
+
+31:00--32:30 & 21 & 10. Across Disciplines (1 slide) & 1.5\\
+
+32:30--35:00 & 22--23 & 11. Summary (2 slides) & 2.5\\
+
+35:00--45:00 & --- & \textbf{Auto-quiz} (instructions 1 min, 15 questions $\times$ 40 s = 10 min of answering; collect scores) & 10\\\bottomrule\end{tabularx}\end{center}
+
+Slide 1 is the title slide and is shown while students settle. The teaching segment covers 22 content slides in 30 minutes, an average pace of 0.7 slides per minute. 
+
+Minute allocations are proportional to slide counts; shift time towards the sections students find hardest.
+
+\begin{instr}{Opening Q\&A prompts (first 5 minutes)}\begin{enumerate}\item From Lecture~4: what did DBSCAN's noise points turn out to be?\item What does a silhouette near zero mean?\item What does the first principal component represent?\end{enumerate}Take two or three answers per prompt; correct misconceptions briefly and note any topic that needs revisiting.\end{instr}
+
+\needspace{12\baselineskip}\section{Slide-by-Slide Teaching Guide}
+
+Each subsection gives the slide range, the suggested time, what to emphasise, and the slide titles in order. Numbers refer to pages of the Beamer PDF.
+
+\needspace{8\baselineskip}\subsection{1. Why Anomaly Detection \normalfont\small\color{GreyN}(slides 2--3, about 2.5 min)}
+
+\textbf{Teaching note.} Why anomaly detection: no labels for zero-day attacks; point, contextual and collective anomalies. Then set up Case~A (network intrusion) and Case~B (insider threat).
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}2 & Anomaly Detection --- Finding the Needle in the Haystack\\
+3 & The Two Case Studies --- Network Intrusion and Insider Threat\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{2. Statistical Methods \normalfont\small\color{GreyN}(slides 4--5, about 2.5 min)}
+
+\textbf{Teaching note.} z-score and IQR fences (note: the lower fence is $-1{,}330$, so a 1.2-byte DoS value is \emph{not} flagged), then Mahalanobis distance with robust (MCD) covariance.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}4 & Statistical Anomaly Detection (I) --- z-score and IQR Fences (Univariate)\\
+5 & Statistical Anomaly Detection (II) --- Mahalanobis Distance (Multivariate)\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{3. Isolation Forest \normalfont\small\color{GreyN}(slides 6--9, about 7 min)}
+
+\textbf{Teaching note.} Isolation by random splits; short paths mean anomalies; sub-sampling $\psi=256$; score $s=2^{-E[h]/c(\psi)}$; zero-day LPI radar example; the three-tier architecture.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}6 & Isolation Forest --- Anomalies Are Easier to Isolate Than Normal Points\\
+7 & Isolation Forest --- Computational Advantages and Path-Length Analysis\\
+8 & Isolation Forest for SIGINT --- Zero-Day Detection of a New LPI Radar\\
+9 & The Recommended 3-Tier Hybrid Detection Architecture\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{4. One-Class SVM \normalfont\small\color{GreyN}(slides 10--11, about 2.5 min)}
+
+\textbf{Teaching note.} One-class SVM boundary and the meaning of $\nu$; Case~A results and limitations.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}10 & One-Class SVM --- A Tight Boundary Around Normal Data\\
+11 & One-Class SVM --- Case A Results and Limitations\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{5. Autoencoders \normalfont\small\color{GreyN}(slides 12--13, about 2.5 min)}
+
+\textbf{Teaching note.} Autoencoders: compress, reconstruct, threshold on error; variants (denoising, variational, LSTM).
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}12 & Autoencoders --- Compress, Reconstruct: High Error = Anomaly\\
+13 & Types of Autoencoder --- and the Case A Result\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{6. Case A Results \normalfont\small\color{GreyN}(slides 14--15, about 2.5 min)}
+
+\textbf{Teaching note.} Head-to-head on 500K packets and per-attack-type performance (R2L hardest, 92.8\% TPR).
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}14 & Network Intrusion Detection --- Case A Head-to-Head on 500K Packets\\
+15 & Autoencoder Performance by Attack Type\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{7. Insider Threat \normalfont\small\color{GreyN}(slides 16--17, about 2.5 min)}
+
+\textbf{Teaching note.} Per-user baselines; LSTM autoencoder results (13 of 15 accounts, 3 false alarms).
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}16 & Insider Threat (Case B) --- 15 Compromised Accounts in 500,000 Logs\\
+17 & Insider Threat --- LSTM Autoencoder Results\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{8. Graph Anomalies \normalfont\small\color{GreyN}(slides 18--19, about 2.5 min)}
+
+\textbf{Teaching note.} Lateral movement as new edges; graph autoencoder for C2 detection.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}18 & Lateral Movement Detection --- Graph-Based Anomalies\\
+19 & Graph Autoencoder for Command-and-Control (C2) Detection\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{9. Comparison \normalfont\small\color{GreyN}(slide 20, about 1.5 min)}
+
+\textbf{Teaching note.} The comparison table from statistical to deep methods: accuracy, cost and explainability.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}20 & Algorithm Comparison --- Statistical $\to$ ML $\to$ Deep Learning\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{10. Across Disciplines \normalfont\small\color{GreyN}(slide 21, about 1.5 min)}
+
+\textbf{Teaching note.} Anomaly detection in medicine (ECG), structural engineering, aviation (flight-data monitoring) and psychology (response-time outliers).
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}21 & Anomaly Detection Across the Disciplines\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{11. Summary \normalfont\small\color{GreyN}(slides 22--23, about 2.5 min)}
+
+\textbf{Teaching note.} Summary and look-ahead to reinforcement learning.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}22 & Lecture 5 Summary --- Anomaly Detection for Defence Cybersecurity\\
+23 & Looking Ahead --- Lecture 6: Reinforcement Learning Part 1 --- Q-Learning \& MDPs\\\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{Key Messages}Students should leave the room able to state these in their own words:\begin{keypoint}\begin{enumerate}\item Anomaly detection learns ``normal'' and flags departures; it can catch the never-seen-before.\item Thresholds are set by acceptable false-positive rate, and false alarms scale with volume: 0.6\% of a million is 6,000 a day.\item Robust statistics matter: anomalies in training data hide themselves.\item Tiered pipelines combine cheap screening with expensive confirmation and human judgement.\item An anomaly is unusual, not necessarily hostile; analysts make the call.\end{enumerate}\end{keypoint}
+
+\needspace{12\baselineskip}\section{Facilitation Tips}\begin{itemize}\item Start with the false-alarm arithmetic slide early if your audience is operational --- it motivates everything else.\item Compute the IQR fences with the class; the negative lower fence is a memorable surprise.\item Ask the class to name a contextual anomaly from their own work (normal at noon, abnormal at 3~a.m.).\end{itemize}
+
+\needspace{12\baselineskip}\section{Anticipated Questions and Model Answers}
+
+\begin{question}{anticipated question}\textbf{Q:} Why not just train a classifier on known attacks?\par\smallskip\textbf{A:} Do both. Classifiers excel on known attacks; anomaly detectors are needed for novel ones. The tiered design uses each where it is strong.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} How often should the normal model be retrained?\par\smallskip\textbf{A:} Whenever normal behaviour drifts (new software, exercises, deployments); monitor the score distribution and retrain on clean recent data.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} Can attackers evade an autoencoder?\par\smallskip\textbf{A:} Yes, by mimicking normal behaviour slowly. Defence in depth, per-user baselines and graph features raise the cost of evasion.\end{question}
+
+\needspace{12\baselineskip}\section{Common Misconceptions}\begin{center}\small\renewcommand{\arraystretch}{1.35}\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}\toprule\textbf{Misconception} & \textbf{Correction}\\\midrule``95\% accuracy is good for intrusion detection.'' & With 0.1\% attacks, predicting ``normal'' gives 99.9\%; use TPR at fixed FPR.\\
+``Anomalies are attacks.'' & Many are benign (backups, exercises); triage is essential.\\
+``Deep models are always better.'' & Isolation Forest is far cheaper and nearly as good for screening.\\\bottomrule\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{In-Class Activities and Discussion Prompts}\label{sec:act}\begin{itemize}\item \textbf{Workload budget:} with 1 million events/day and an analyst capacity of 200 alerts/day, what FPR is affordable? ($2\times10^{-4}$). Discuss what that does to TPR.\item \textbf{Design the tiers:} teams sketch which detector sits where and what each passes on.\end{itemize}
+
+\needspace{12\baselineskip}\section{Run It Live: Studio Demonstrations}\label{sec:live}
+
+Project \texttt{Lecture5\_Anomaly\_Detection\_Lab.html} (it is a single HTML file and runs offline in any browser; every result updates as an input changes). Each demonstration below follows the same rhythm: \textbf{set} the inputs, \textbf{ask} the class to commit to a prediction (a show of hands or a one-word answer), then \textbf{reveal} the result and \textbf{land} the point. The numbers are exactly what the page shows for the settings given; simulations use fixed random seeds, so they repeat every time. The 45-minute plan has little slack: choose the one demonstration marked \emph{first choice} for class, and use the others in a tutorial, a second session, or as homework with the drill cards at the bottom of the page.
+
+\begin{live}{Demo 1: Normal on each sensor, abnormal together (about 2 min, with \S2 Statistical Methods)}\textbf{Set.} Demo~1 defaults: correlation 0.85, reading $z_1=1.8$, $z_2=-1.8$, alarm tail 1 in 1,000.\par\smallskip\textbf{Ask.} ``Neither value is beyond 2 standard deviations. Should this reading raise an alarm?''\par\smallskip\textbf{Reveal.} Largest $|z|$ is 1.80 against a threshold of 3.29, so the z-check passes; Mahalanobis $D^2=$ \textbf{43.2} against 13.8, a tail probability of $4.2\times10^{-10}$. Set the correlation to 0: $D^2=6.5$, an ordinary reading.\par\smallskip\textbf{Land the point.} The anomaly is the \emph{combination}, and it exists only because the channels are correlated. Spoofed or faulty sensors often look like this.\end{live}
+
+\begin{live}{Demo 2: Analysts or a better detector? (about 3 min, with \S6 Case A Results or \S9 Comparison) --- \emph{first choice}}\textbf{Set.} Demo~2 defaults: 1,000,000 sessions a day, 20 attacks, 200 alerts a day of analyst capacity, $d'=3$. The page shows 5.84 of 20 attacks caught (29\%), precision 2.9\%, 33 false alerts per real one.\par\smallskip\textbf{Ask.} ``With the budget for one improvement, would you double the analysts or improve the detector by one unit of $d'$?''\par\smallskip\textbf{Reveal.} Capacity 400: 7.20 caught (36\%), precision falls to 1.8\%. Capacity back to 200 and $d'=4$: \textbf{13.4 caught (67\%)}, precision 6.7\%.\par\smallskip\textbf{Land the point.} At a low base rate, separation buys far more than capacity. Better features or a second-stage model beat a bigger alert queue.\end{live}
+
+\begin{live}{Demo 3: Catch a slow drift (about 3 min, with \S2 Statistical Methods)}\textbf{Set.} Demo~3 with a mean shift of 0.5$\sigma$ (CUSUM $k=0.5$, $h=5$; EWMA $\lambda=0.2$). Read the table's averaged columns.\par\smallskip\textbf{Ask.} ``Which chart notices a half-sigma drift first?''\par\smallskip\textbf{Reveal.} Mean delay: Shewhart \textbf{157.9} samples, CUSUM \textbf{38.2}, EWMA 43.1 (false alarms per 1,000 in-control samples: 2.7, 1.1, 1.6). At a 2.5$\sigma$ shift: 3.5, 3.1 and 2.1.\par\smallskip\textbf{Land the point.} Charts with memory catch small persistent shifts; Shewhart is competitive only for large jumps. Compare false-alarm rates before declaring a winner.\end{live}
+
+\begin{live}{Demo 4: Isolation forests rank, they do not measure (about 1 min, with \S3 Isolation Forest)}\textbf{Set.} Demo~4 defaults: reading 3.5, $\psi=64$, 100 trees. Score 0.727 (a typical reading scores 0.461).\par\smallskip\textbf{Ask.} ``Move the reading to 6. Will the score rise?''\par\smallskip\textbf{Reveal.} No: still \textbf{0.727}, isolated in 3.44 cuts, because trees stop at depth 6.\par\smallskip\textbf{Land the point.} The score orders points by how easy they are to isolate; it is not a distance and saturates for far outliers.\end{live}
+
+\needspace{12\baselineskip}\section{Consistency Notes on the Source Material}These notes record where the original PowerPoint deck contained an inconsistency and how the current slides, reference text, quiz and assignment handle it. Students who have seen the old deck may raise them.\begin{itemize}\item The source deck states that a DoS value of 1.2 bytes lies below the IQR lower fence. The fence is $2{,}840-1.5\times2{,}780=-1{,}330$, so it does not. The new slides, reference text and quiz (Q3) use the correct value.\end{itemize}
+
+\needspace{12\baselineskip}\section{Quiz Administration and Answer Key}
+
+\begin{sayit}``You will now take a 15-question quiz. Each question has four options and exactly one correct answer. You have 40 seconds per question; the quiz advances automatically when time runs out. A correct answer scores $+1$, a wrong answer $-0.25$, and an unanswered question 0. The maximum is 15 and the minimum is $-3.75$. Because of the negative marking, guessing blindly among four options gains nothing on average --- answer when you can eliminate options. Your score and a full review appear at the end.''\end{sayit}
+
+\textbf{Delivery.} Open \texttt{Lecture5\_Quiz.html} on each student device (or project it and collect answers on paper). The page enforces the timer and computes the score with negative marking. Release \texttt{Lecture5\_Answers\_Assignment.html} only after all students have finished.
+
+\subsection*{Answer key}\begin{center}\small\renewcommand{\arraystretch}{1.3}\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}\hline \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{11} & \textbf{12} & \textbf{13} & \textbf{14} & \textbf{15}\\\hline D & C & B & D & C & A & D & C & B & A & B & B & A & C & A\\\hline\end{tabular}\end{center}
+
+\textbf{Interpreting scores.} 12 or more: secure command of the lecture. 9--11.75: good, review missed items. Below 9: revisit the reference text before the assignment. If more than half the class misses a question, revisit that point in the next lecture's opening Q\&A.
+
+\subsection*{Questions, options and rationale}
+
+{\small
+
+\noindent\textbf{Q1.} The main advantage of anomaly detection over supervised classification for cyber defence is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Higher accuracy on known attacks\item[B.] It never raises false alarms\item[C.] It is always faster\item[\textbf{D.}] \textbf{It needs no attack labels, so it can detect zero-day threats}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} It models normal behaviour and flags deviations, including never-seen attacks.\par\medskip
+
+\noindent\textbf{Q2.} 1,000 individually normal packets in 10 ms is an example of a:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Point anomaly\item[B.] Contextual anomaly\item[\textbf{C.}] \textbf{Collective anomaly}~{\color{GrnN}$\checkmark$}\item[D.] Label error\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} The group pattern (e.g. a port scan) is anomalous, not any single record.\par\medskip
+
+\noindent\textbf{Q3.} With Q1 = 2,840, Q3 = 5,620, the IQR lower fence is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] 2,840\item[\textbf{B.}] \textbf{-1,330}~{\color{GrnN}$\checkmark$}\item[C.] 1,330\item[D.] 9,790\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $Q_1-1.5\times2780=-1330$; a DoS value of 1.2 bytes is therefore NOT below the fence.\par\medskip
+
+\noindent\textbf{Q4.} Mahalanobis distance improves on Euclidean distance because it:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Ignores scale\item[B.] Requires labels\item[C.] Uses the median\item[\textbf{D.}] \textbf{Accounts for feature variances and correlations through $\Sigma^{-1}$}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Points that break a correlation can be far in Mahalanobis terms while looking ordinary feature by feature.\par\medskip
+
+\noindent\textbf{Q5.} Why should the covariance for Mahalanobis detection be estimated robustly (e.g. MCD)?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] To speed computation\item[B.] Because data are always Gaussian\item[\textbf{C.}] \textbf{Anomalies in the training data inflate $\Sigma$ and mask themselves}~{\color{GrnN}$\checkmark$}\item[D.] To reduce dimension\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Use the most central 50\% of points.\par\medskip
+
+\noindent\textbf{Q6.} In an Isolation Forest, anomalies have:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Short average path lengths}~{\color{GrnN}$\checkmark$}\item[B.] Long average path lengths\item[C.] Path length equal to the tree height\item[D.] No path\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Few, different points are separated by few random splits.\par\medskip
+
+\noindent\textbf{Q7.} Isolation Forest uses small sub-samples ($\psi=256$) per tree mainly because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Memory is limited\item[B.] It improves recall of normal points\item[C.] Large samples are illegal\item[\textbf{D.}] \textbf{Small samples keep normal points crowded and anomalies isolated, amplifying the contrast (and make it fast)}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Also gives O(log psi) inference.\par\medskip
+
+\noindent\textbf{Q8.} In a one-class SVM, $\nu=0.05$ means:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Accuracy is 95\%\item[B.] The kernel width is 0.05\item[\textbf{C.}] \textbf{5\% of training points may be treated as outliers (upper bound) and at least 5\% are support vectors}~{\color{GrnN}$\checkmark$}\item[D.] 5 clusters\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Set $\nu$ near the acceptable false-positive rate.\par\medskip
+
+\noindent\textbf{Q9.} An autoencoder detects anomalies because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] It is trained on attacks\item[\textbf{B.}] \textbf{Trained on normal data, it reconstructs normal inputs well and unusual inputs poorly (high reconstruction error)}~{\color{GrnN}$\checkmark$}\item[C.] It clusters data\item[D.] It uses labels\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Score = $\|x-\hat x\|^2$; threshold set for a target FPR.\par\medskip
+
+\noindent\textbf{Q10.} The autoencoder threshold $\tau$ should be chosen by:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Fixing an acceptable false-positive rate on validation (normal) data}~{\color{GrnN}$\checkmark$}\item[B.] Maximising test accuracy\item[C.] Using the attack mean\item[D.] Trial on the test set\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Fix the false-alarm budget first; the detection rate follows.\par\medskip
+
+\noindent\textbf{Q11.} Which attack type was hardest for the autoencoder (92.8\% TPR)?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] DoS\item[\textbf{B.}] \textbf{R2L (imitates legitimate logins)}~{\color{GrnN}$\checkmark$}\item[C.] U2R\item[D.] Probe\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Its features look most like normal traffic.\par\medskip
+
+\noindent\textbf{Q12.} Insider-threat detection works better with per-user baselines because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Users are identical\item[\textbf{B.}] \textbf{What is abnormal for one user (e.g. weekend logins) is normal for another}~{\color{GrnN}$\checkmark$}\item[C.] It needs fewer features\item[D.] It avoids LSTMs\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} A 02:17 Saturday login was about 4 s.d. from user X's own pattern.\par\medskip
+
+\noindent\textbf{Q13.} A first-ever connection from a workstation to the domain controller is a signal of:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Possible lateral movement}~{\color{GrnN}$\checkmark$}\item[B.] Normal backup\item[C.] DoS\item[D.] Label noise\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Graph methods compare current edges with a historical baseline.\par\medskip
+
+\noindent\textbf{Q14.} Even at 0.6\% FPR, a network with 1 million packets/day produces about:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] 6 false alerts\item[B.] 600\item[\textbf{C.}] \textbf{6,000}~{\color{GrnN}$\checkmark$}\item[D.] 60,000\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $0.006\times10^6\approx6000$: hence tiered detection and analyst triage.\par\medskip
+
+\noindent\textbf{Q15.} In the recommended 3-tier architecture, Isolation Forest is used for:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Real-time screening of all traffic}~{\color{GrnN}$\checkmark$}\item[B.] Final confirmation\item[C.] Analyst explanation\item[D.] Labelling\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Cheap and fast screening first; autoencoder deep-scan second; analysts third.\par\medskip
+
+}
+
+\needspace{12\baselineskip}\section{Assignment: Marking Scheme and Model Solutions}
+
+\textbf{Instructions.} Five problems, 100 marks, plus a 20-mark bonus problem (Problem 6). Reference: Lecture 5 reference text.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{0.85\textwidth}{@{}l X r@{}}\toprule\textbf{\#} & \textbf{Problem} & \textbf{Marks}\\\midrule1 & Mahalanobis vs Euclidean & 20\\
+2 & Isolation Forest scores --- and a consistency check & 20\\
+3 & Autoencoder thresholds and alert volume & 20\\
+4 & Insider-threat evaluation & 20\\
+5 & Designing the tiered pipeline & 20\\
+6 & Problem 6 (bonus): Tuning an intrusion-alert pipeline & 20\\\midrule & \textbf{Total} & \textbf{100} + 20 bonus\\\bottomrule\end{tabularx}\end{center}
+
+\begin{instr}{General marking guidance}\begin{itemize}
+\item Marks for each part are shown in square brackets in the problem statement.
+\item Award method marks for correct working even when an arithmetic slip carries through; deduct once for the slip, not again for its consequences.
+\item For interpretive parts, full marks need (i) the correct conclusion, (ii) the reason, and (iii) an operational implication or caveat.
+\item Answers that state a number without uncertainty, baseline or caveat where one is required lose a mark per part.
+\item Suggested deadline: one week after the lecture; return marked work before the next quiz on the same topic.
+\end{itemize}\end{instr}
+
+\needspace{8\baselineskip}\subsection{Problem 1: Mahalanobis vs Euclidean \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Normal traffic on two standardised features has $\mu=(0,0)$ and $\Sigma=\begin{pmatrix}4&2\\2&2\end{pmatrix}$.
+
+(a) Compute $\Sigma^{-1}$. [4]\newline (b) Compute Euclidean and Mahalanobis distances of $a=(2,2)$ and $b=(2,-2)$. [10]\newline (c) With a 99\% $\chi^2_2$ threshold of 9.21 on $D_M^2$, which point is flagged and why? [6]\end{prob}
+
+\begin{soln}\textbf{(a)} $\det\Sigma=8-4=4$; $\Sigma^{-1}=\tfrac14\begin{pmatrix}2&-2\\-2&4\end{pmatrix}=\begin{pmatrix}0.5&-0.5\\-0.5&1\end{pmatrix}$.
+
+\textbf{(b)} Both have Euclidean distance $\sqrt8=2.83$. $a$: $\Sigma^{-1}a=(0,1)$, $D_M^2=a\cdot(0,1)=2$, $D_M=\mathbf{1.41}$. $b$: $\Sigma^{-1}b=(2,-3)$, $D_M^2=4+6=10$, $D_M=\mathbf{3.16}$.
+
+\textbf{(c)} $b$ is flagged ($10>9.21$); $a$ is not. The features are positively correlated: $a$ moves along the correlation and is typical, $b$ breaks it. Euclidean distance cannot tell them apart.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 2: Isolation Forest scores --- and a consistency check \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}(a) Compute $c(\psi)$ for $\psi=256$, using $H(i)\approx\ln i+0.5772$. [5]\newline (b) Compute $s$ for average path lengths 2.0, 10.2 and 12.0, and interpret. [9]\newline (c) The lecture reports $s\approx0.41$ for normal HTTP traffic with average path length 6.84 at $\psi=256$. Check this against the formula and comment. [6]\end{prob}
+
+\begin{soln}\textbf{(a)} $H(255)=\ln255+0.5772=6.118$; $c=2(6.118)-2(255)/256=12.237-1.992=\mathbf{10.24}$.
+
+\textbf{(b)} $s=2^{-E[h]/10.24}$: $E[h]=2.0\Rightarrow s=2^{-0.195}=\mathbf{0.87}$ (anomaly); $10.2\Rightarrow\approx\mathbf{0.50}$ (typical); $12.0\Rightarrow2^{-1.17}=\mathbf{0.44}$ (deep, normal).
+
+\textbf{(c)} $2^{-6.84/10.24}=2^{-0.668}=0.63$, not 0.41; reaching 0.41 would require $c\approx5.4$. The reported scores and path lengths are not mutually consistent (perhaps different sub-sample sizes or score definitions). Lesson from Lecture 1: recompute headline numbers from their stated inputs before relying on them; here the ranking (attacks scored far higher than normal) still holds.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 3: Autoencoder thresholds and alert volume \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Normal reconstruction error has mean 0.024 and s.d. 0.018. The network carries 1,000,000 packets/day, 3.6\% attacks.
+
+(a) Assuming Gaussian normal RE, what threshold gives FPR 0.6\%? Compare with the lecture's $\tau=0.087$. [6]\newline (b) With TPR 95.8\% and FPR 0.6\%, compute daily true alerts, false alerts and precision. [8]\newline (c) Why is an empirical percentile of validation RE better than the Gaussian formula? [6]\end{prob}
+
+\begin{soln}\textbf{(a)} $z_{0.994}\approx2.51$; $\tau=0.024+2.51(0.018)=\mathbf{0.069}$. The lecture's 0.087 corresponds to $z=3.5$ under a Gaussian assumption, i.e. a far smaller FPR, unless the true RE distribution has a heavy right tail.
+
+\textbf{(b)} Attacks $=36{,}000$, normal $=964{,}000$. True alerts $=0.958\times36{,}000=34{,}488$; false $=0.006\times964{,}000=5{,}784$; precision $=34{,}488/40{,}272=\mathbf{85.6\%}$.
+
+\textbf{(c)} Reconstruction errors are non-negative and right-skewed, so a Gaussian model misplaces the tail. Taking the 99.4th percentile of RE on held-out normal data sets the FPR directly without distributional assumptions; re-estimate it periodically as normal traffic drifts.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 4: Insider-threat evaluation \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Among 500 users, 15 are compromised. The LSTM autoencoder flags 16 users: 13 compromised and 3 innocent.
+
+(a) Compute recall, precision, FPR and $F_2$. [8]\newline (b) Explain why accuracy is useless here. [4]\newline (c) The two missed accounts belonged to analysts who legitimately work weekends. Propose two features or design changes to catch such cases, with their risks. [8]\end{prob}
+
+\begin{soln}\textbf{(a)} Recall $13/15=\mathbf{0.867}$; precision $13/16=\mathbf{0.8125}$; FPR $3/485=\mathbf{0.62\%}$; $F_2=5(0.8125)(0.867)/(4(0.8125)+0.867)=3.522/4.117=\mathbf{0.855}$.
+
+\textbf{(b)} Flagging nobody would be 97\% accurate at the user level (99.997\% at the event level) while catching no threats.
+
+\textbf{(c)} Examples: (1) data-access combination features (finance + HR + technical files in one session is unusual for anyone) --- risk: false alarms for legitimate cross-functional roles; (2) peer-group baselines (compare with similar roles, not only the user's own history, so a slowly poisoned baseline is still caught) --- risk: needs role metadata; (3) device/location fingerprinting of credential use --- risk: privacy and travel false alarms.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 5: Designing the tiered pipeline \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Tier 1 Isolation Forest (TPR 91.4\%, FPR 1.1\%, 0.002 ms/packet); tier 2 autoencoder applied only to tier-1 alerts (TPR 95.8\%, FPR 0.6\%, 0.04 ms/packet). Traffic: 1,000,000 packets/day, 3.6\% attacks. Assume the tiers' errors are independent.
+
+(a) Compute tier-1 alerts, tier-2 alerts (true and false) and overall TPR. [10]\newline (b) Compare compute time with running the autoencoder on all traffic. [4]\newline (c) Discuss the trade-off and how you would recover missed attacks. [6]\end{prob}
+
+\begin{soln}\textbf{(a)} Tier 1: true $0.914\times36{,}000=32{,}904$; false $0.011\times964{,}000=10{,}604$. Tier 2: true $0.958\times32{,}904=31{,}522$; false $0.006\times10{,}604\approx64$. Overall TPR $=31{,}522/36{,}000=\mathbf{87.6\%}$ with only about \textbf{64 false alerts/day}.
+
+\textbf{(b)} Tier 1: $10^6\times0.002$ ms $=2$ s; tier 2: $43{,}508\times0.04$ ms $=1.7$ s; total about 3.7 s vs 40 s for the autoencoder on everything.
+
+\textbf{(c)} Serial tiers multiply sensitivities (lower overall TPR than the autoencoder alone, 95.8\%) but slash false alarms (64 vs 5,784/day) and compute. Recover misses by lowering the tier-1 threshold (more tier-2 load), periodic full autoencoder sweeps of stored traffic, and analyst-driven threat hunting; feed every confirmed miss back into training.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 6 (bonus): Tuning an intrusion-alert pipeline \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Normal flows on a defence network have mean bytes $\mu_1=500$, mean duration $\mu_2=20$ s, covariance $\Sigma=\begin{pmatrix}10{,}000&240\\240&16\end{pmatrix}$ (correlation 0.6).
+
+(a) Compute the z-scores and the squared Mahalanobis distance of flow A $(700, 32)$ and flow B $(300, 26)$. Which is flagged at the 99.9\% $\chi^2_2$ threshold of 13.82, and why does the answer surprise a univariate analyst? [6]\newline (b) An Isolation Forest ($\psi=256$, $c=10.24$) gives a flow a mean path length of 4.5. Compute its score. [2]\newline (c) The network carries $2\times10^6$ flows a day, of which about 30 are malicious; the analysts can handle 150 alerts a day. Two operating points are available: FPR $10^{-4}$ with TPR 0.62, or FPR $5\times10^{-5}$ with TPR 0.48. For each, compute the daily alerts, attacks caught and precision, and choose. [7]\newline (d) Daily failed-login counts have a normal mean of 40 (s.d. 6). Recent days: 41, 38, 44, 39, 47, 49, 46, 50, 48, 52. Run a CUSUM with $k=3$ and $h=18$ and state when it alarms. [5]\end{prob}
+
+\begin{soln}\textbf{(a)} Flow A: z-scores $(2.0,\;3.0)$, $d^2=\mathbf{9.06}$ --- not flagged. Flow B: z-scores $(-2.0,\;1.5)$, $d^2=\mathbf{15.39}$ --- flagged. Flow A is large in both features, but bytes and duration normally rise together, so the combination is plausible. Flow B is small in bytes yet long in duration, which breaks the correlation --- typical of a slow, low-volume beacon. Univariate thresholds would rank A as the more suspicious; Mahalanobis distance ranks them correctly.
+
+\textbf{(b)} $s=2^{-4.5/10.24}=\mathbf{0.74}$: clearly shorter paths than average, so the flow is worth review.
+
+\textbf{(c)} The capacity limit is FPR $\le150/(2\times10^6)=7.5\times10^{-5}$. At $10^{-4}$: about 200 false + 18.6 true = 219 alerts a day, over capacity; precision 8.5\%. At $5\times10^{-5}$: about 100 false + 14.4 true = 114 alerts; precision 12.6\%; within capacity. Choose $5\times10^{-5}$, but report that it misses about half the attacks, and use the spare capacity (36 alerts) for a second detector with different blind spots.
+
+\textbf{(d)} $S_t=\max(0,S_{t-1}+x_t-43)$: 0, 0, 1, 0, 4, 10, 13, 20 $\Rightarrow$ \textbf{alarm on day 8} ($S\ge18$), about four days after the counts began to rise. No single day exceeded the Shewhart limit $40+3\times6=58$.\end{soln}
+
+\end{document}

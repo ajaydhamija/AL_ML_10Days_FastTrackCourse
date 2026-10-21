@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 1 Quiz — AI & ML Foundations</title>
+<style>
+  :root{
+    --navy:#1B3A5E; --blue:#2869A0; --sky:#5B9BD5; --lblue:#BDD7EE;
+    --orange:#E05218; --green:#1E7A45; --red:#C0392B; --amber:#C98A12;
+    --white:#FFFFFF; --light:#EFF6FB; --dark:#152744; --grey:#6A7A8A;
+    --yellow:#FFF2A0;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+
+  /* INSTRUCTION SLIDE */
+  #intro{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:100vh;padding:30px 20px;text-align:center;
+    background:linear-gradient(160deg,#1B3A5E 0%,#0D2035 100%);
+  }
+  #intro .badge{background:var(--orange);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:18px;}
+  #intro h1{font-size:clamp(22px,5vw,36px);font-weight:800;line-height:1.2;color:var(--white);margin-bottom:10px;}
+  #intro .sub{font-size:clamp(13px,3vw,17px);color:var(--lblue);margin-bottom:30px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;max-width:680px;width:100%;margin:0 auto 30px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:16px;text-align:center;}
+  .info-card .val{font-size:clamp(22px,5vw,32px);font-weight:800;color:var(--orange);}
+  .info-card .lbl{font-size:12px;color:var(--lblue);margin-top:4px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:12px;padding:18px 22px;max-width:620px;width:100%;margin:0 auto 28px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:14px;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:13.5px;color:#D0E8F5;margin-bottom:7px;list-style:none;padding-left:20px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:var(--orange);}
+  .btn-start{background:var(--orange);color:#fff;border:none;padding:14px 48px;border-radius:30px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:0.5px;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 20px rgba(224,82,24,0.4);}
+  .btn-start:hover{transform:scale(1.04);box-shadow:0 6px 24px rgba(224,82,24,0.55);}
+  .footer-info{margin-top:24px;font-size:11.5px;color:var(--grey);}
+
+  /* QUIZ SLIDE */
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--orange);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);}
+  .qheader .timer-wrap{display:flex;align-items:center;gap:8px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:var(--orange);stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+
+  .qbody{flex:1;display:flex;flex-direction:column;padding:24px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .qtext{font-size:clamp(16px,3vw,20px);font-weight:700;color:var(--dark);line-height:1.4;margin-bottom:22px;padding:18px 20px;background:#fff;border-left:5px solid var(--blue);border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+  .options{display:grid;gap:12px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:14px 18px;cursor:default;display:flex;align-items:flex-start;gap:12px;transition:border-color .2s,background .2s;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
+  .opt-key{min-width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;}
+  .opt-text{font-size:14px;color:var(--dark);line-height:1.4;padding-top:5px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;}
+  .opt.correct .opt-key{background:var(--green);}
+  .opt.wrong{border-color:var(--red);background:#FDE8E8;}
+  .opt.wrong .opt-key{background:var(--red);}
+
+  .qfooter{background:var(--navy);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 20px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--orange);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+
+  /* END SLIDE */
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:30px 20px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#0D2035 100%);}
+  #end h2{font-size:clamp(20px,5vw,32px);font-weight:800;margin-bottom:8px;}
+  #end .sub{font-size:15px;color:var(--lblue);margin-bottom:28px;}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid var(--orange);border-radius:16px;padding:24px 40px;margin-bottom:24px;}
+  .score-box .score-val{font-size:54px;font-weight:800;color:var(--orange);}
+  .score-box .score-max{font-size:18px;color:var(--lblue);}
+  .score-box .score-grade{font-size:20px;color:var(--yellow);margin-top:8px;font-weight:700;}
+  .btn-restart{background:var(--blue);color:#fff;border:none;padding:12px 36px;border-radius:24px;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;}
+
+  @media(max-width:600px){
+    .options{grid-template-columns:1fr;}
+    .info-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ INSTRUCTION SLIDE ═══ -->
+<div id="intro">
+  <div class="badge">LECTURE 1 QUIZ</div>
+  <h1>AI &amp; ML Foundations<br>Self-Assessment Quiz</h1>
+  <p class="sub">Simulation Strategies in Warfare — Unit 4</p>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct Answer</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong Answer</div></div>
+  </div>
+  <div class="rules">
+    <h3>Instructions</h3>
+    <ul>
+      <li>Each question has <strong>ONE</strong> correct answer and three meaningful distractors</li>
+      <li>Each question auto-advances after <strong>40 seconds</strong> — think carefully!</li>
+      <li>Correct: <strong>+1 mark</strong> &nbsp;|&nbsp; Incorrect: <strong>−0.25 marks</strong> &nbsp;|&nbsp; Skipped: <strong>0</strong></li>
+      <li>Maximum score: <strong>15 marks</strong></li>
+      <li>Do NOT guess randomly — negative marking applies</li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+
+<!-- ═══ QUIZ SLIDE ═══ -->
+<div id="quiz">
+  <div class="qheader">
+    <div>
+      <div class="qtag">LECTURE 1 QUIZ</div>
+      <div class="qcourse" style="margin-top:4px;">AI & ML in Warfare</div>
+    </div>
+    <div class="timer-wrap">
+      <div class="timer-circle">
+        <svg width="48" height="48" viewBox="0 0 48 48">
+          <circle class="bg" cx="24" cy="24" r="20"/>
+          <circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/>
+        </svg>
+        <div class="timer-text" id="timerNum">40</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+
+<!-- ═══ END SLIDE ═══ -->
+<div id="end">
+  <h2>Quiz Complete!</h2>
+  <p class="sub">Lecture 1 — AI &amp; ML Foundations</p>
+  <div class="score-box">
+    <div class="score-val" id="finalScore">0</div>
+    <div class="score-max">out of 15 marks</div>
+    <div class="score-grade" id="finalGrade"></div>
+  </div>
+  <p style="color:var(--lblue);font-size:14px;">Check your answers and the assignment in<br><strong>Lecture 1 — Part 3</strong></p>
+  <button class="btn-restart" onclick="location.reload()">↺ Restart Quiz</button>
+  <p style="margin-top:18px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+
+<script>
+// ═══ QUESTION BANK ═══
+const Qs = [
+  {
+    q: "Which of the following BEST describes the fundamental distinction between Supervised Learning and Unsupervised Learning?",
+    opts: [
+      "Supervised learning uses neural networks while unsupervised uses decision trees",
+      "Supervised learning requires labelled training data to learn an input-output mapping, while unsupervised learning discovers structure in unlabelled data",
+      "Supervised learning works only for classification while unsupervised works only for regression",
+      "Supervised learning requires a GPU while unsupervised learning can run on CPU only"
+    ],
+    ans: 1,
+    exp: "Supervised learning learns from (x, y) labelled pairs; unsupervised learning finds patterns in {x} alone without any labels."
+  },
+  {
+    q: "In the Bellman Optimality Equation for Q-Learning, the discount factor γ ∈ [0,1] plays what role in a wargaming RL agent?",
+    opts: [
+      "It controls the learning rate of gradient descent in the neural network",
+      "It determines how many actions the agent can take per timestep",
+      "It balances the weight given to immediate rewards vs future cumulative rewards — γ≈1 means the agent values long-term strategy",
+      "It sets the exploration probability in the ε-greedy action selection policy"
+    ],
+    ans: 2,
+    exp: "γ discounts future rewards: G_t = Σ γ^k R_{t+k+1}. γ≈1: values all future rewards equally (long-term planner); γ≈0: myopic (only immediate reward)."
+  },
+  {
+    q: "Abraham Wald's WWII aircraft armour analysis demonstrated which data pitfall that is directly relevant to training AI models for wargame simulation?",
+    opts: [
+      "Label noise — the damage locations were inaccurately recorded by ground crews",
+      "Overfitting — the armour model was trained on too few aircraft types",
+      "Survivorship bias — analysts only studied returning aircraft, systematically excluding the information from destroyed ones",
+      "Distribution shift — the training aircraft were from a different theatre than the deployment theatre"
+    ],
+    ans: 2,
+    exp: "Survivorship bias: only surviving B-17s were available for analysis. The fatal hits (engines, cockpit) killed aircraft that never returned, making those vulnerabilities invisible."
+  },
+  {
+    q: "A radar threat classifier achieves 97.2% overall accuracy on a test set of 2,500 samples. The confusion matrix shows 3 Enemy Bombers were classified as 'Friendly'. Why is overall accuracy an INSUFFICIENT metric for this defence application?",
+    opts: [
+      "97.2% accuracy implies the model has overfit the training data",
+      "The test set of 2,500 samples is too small to compute meaningful accuracy",
+      "Overall accuracy weights all errors equally, but a false negative on the threat class (missed bomber) has catastrophically higher operational cost than a false positive",
+      "The CNN used for this task cannot be deployed in real-time IADS systems due to 2.1ms inference time"
+    ],
+    ans: 2,
+    exp: "In asymmetric cost scenarios (defence, medical), accuracy is misleading. Recall on the threat class is critical — a missed enemy bomber (FN) has vastly different consequences from misidentifying a civilian aircraft (FP)."
+  },
+  {
+    q: "In the K-Means clustering of OPFOR force movements (N=4,800 trajectories), the Elbow Method identified k=4 as optimal with a Silhouette Score of 0.683. What does this score tell a military analyst?",
+    opts: [
+      "The 4 clusters are perfectly separated with no overlap between manoeuvre types",
+      "68.3% of enemy force movements were correctly classified by the algorithm",
+      "The clusters have moderate to good internal cohesion and separation, though some overlap exists (particularly between ASSAULT and TRANSIT patterns)",
+      "The model needs 68.3% more training data before it can be deployed operationally"
+    ],
+    ans: 2,
+    exp: "Silhouette score s = (b-a)/max(a,b) ranges from -1 to +1. Score 0.683 indicates reasonably good cluster structure (>0.5 = reasonable, >0.7 = strong) with some overlap between adjacent movement types."
+  },
+  {
+    q: "Which architecture is MOST suitable for classifying enemy movements from a continuous time-series of sensor readings (GPS tracks, speed, heading changes) over a 30-minute window?",
+    opts: [
+      "Convolutional Neural Network (CNN) applied to the raw time-series as a 1D signal",
+      "Recurrent Neural Network (LSTM) which processes sequential dependencies and captures temporal patterns in movement trajectories",
+      "Generative Adversarial Network (GAN) trained to generate synthetic enemy movement patterns",
+      "Principal Component Analysis (PCA) followed by a Gaussian Mixture Model (GMM)"
+    ],
+    ans: 1,
+    exp: "LSTM/RNN is designed for sequential data with temporal dependencies. While 1D-CNN can work on time series, LSTM explicitly models the hidden state across time — ideal for trajectory analysis where recent history informs current classification."
+  },
+  {
+    q: "Retrieval Augmented Generation (RAG) achieved 94.6% factual accuracy vs 73.2% for a bare LLM on defence intelligence queries. The PRIMARY mechanism behind this improvement is:",
+    opts: [
+      "RAG uses a larger language model with more parameters than the bare LLM",
+      "RAG fine-tunes the LLM on classified defence documents during the retrieval step",
+      "RAG retrieves relevant verified document chunks and injects them into the prompt, grounding generation in factual source material rather than parametric memory alone",
+      "RAG replaces the transformer architecture with a retrieval-only system that eliminates hallucination entirely"
+    ],
+    ans: 2,
+    exp: "RAG augments the LLM prompt with retrieved context from a verified knowledge base. The LLM generates answers conditioned on both the query and retrieved documents, reducing reliance on potentially wrong parametric memory."
+  },
+  {
+    q: "Simpson's Paradox was demonstrated where a drug showed superiority in EVERY subgroup, yet appeared equally effective in the combined analysis. In the context of wargame performance data, which scenario represents the SAME paradox?",
+    opts: [
+      "A Blue Force AI agent wins 91% of exercises in simulation but only 58% in field exercises",
+      "A counter-UAV system performs better on high-altitude targets (92%) and low-altitude targets (84%) separately, but when all targets are combined, appears to perform at 88% — lower than expected",
+      "Blue Force units with AI decision support outperform in urban terrain (87%) AND open terrain (79%), but when data is aggregated across terrains, AI-supported units appear to perform at the same level as non-AI units (81% each) due to non-AI units being over-represented in the easier terrain category",
+      "An anomaly detection model identifies 95% of cyber intrusions in the training set but only 67% in the test set due to overfitting"
+    ],
+    ans: 2,
+    exp: "Simpson's Paradox occurs when a confounder (here: terrain difficulty distribution) reverses the observed direction of effect upon aggregation. Non-AI units being over-represented in easier terrain inflates their apparent performance in the combined dataset."
+  },
+  {
+    q: "The Mine Detection System trained on Afghan terrain achieved 97.3% training accuracy and 94.1% test accuracy on Afghan soil, but only 58.7% accuracy when deployed in Iraqi terrain. This gap of 35.4% PRIMARILY illustrates:",
+    opts: [
+      "Label noise — the Afghan training samples had incorrectly labelled mine locations",
+      "Selection bias — the Afghan training dataset was not representative of global mine types",
+      "Covariate (distribution) shift — the model's input feature distribution differs between training (Afghan soil) and deployment (Iraqi soil) environments, causing learned features to be non-generalisable",
+      "Underfitting — the 50-layer ResNet model was too simple to learn the mine detection task correctly"
+    ],
+    ans: 2,
+    exp: "Covariate shift: P_train(x) ≠ P_deploy(x). The model learned soil-specific features of Afghan terrain. When inputs differ (Iraqi soil signatures), learned representations fail. This is NOT underfitting — training accuracy was 97.3%."
+  },
+  {
+    q: "A wargame exercise found that 'catering quality survey score' correlated with exercise win rate at r=0.71. After statistically controlling for unit budget, the partial correlation fell to r=0.09 (p=0.42). This analysis reveals:",
+    opts: [
+      "Catering quality mildly improves combat effectiveness through improved soldier morale and nutrition",
+      "The original correlation was spurious — unit budget is a confounding variable that causes BOTH better catering AND better combat performance",
+      "The statistical significance threshold of p=0.42 indicates that the original correlation of r=0.71 was statistically significant",
+      "Partial correlation analysis is inappropriate here because catering and combat outcomes share the same measurement scale"
+    ],
+    ans: 1,
+    exp: "Spurious correlation: Unit budget → (better catering) AND (better readiness/equipment/training) → winning. When budget is controlled, catering has no independent effect on outcomes (p=0.42 >> 0.05 — not significant)."
+  },
+  {
+    q: "Self-supervised learning achieves 93.7% accuracy on threat classification with only 1,000 labelled samples, vs 79.2% from the same architecture trained from scratch on those 1,000 labels. The CORE reason for this performance gain is:",
+    opts: [
+      "Self-supervised pre-training uses a much larger model with more parameters than the from-scratch model",
+      "The 1,000 labelled samples are augmented to 500,000 samples during SSL pre-training",
+      "SSL pre-training on 500,000 unlabelled signals learns rich feature representations through surrogate tasks (e.g., masked prediction), which transfer effectively to the downstream labelled task",
+      "Self-supervised learning incorporates the labelled data into the pre-training phase, giving it an unfair advantage in the comparison"
+    ],
+    ans: 2,
+    exp: "SSL (SimCLR, MAE, BERT-style) learns general, transferable representations from unlabelled data through pretext tasks. Fine-tuning then requires fewer labelled examples because the features are already semantically rich."
+  },
+  {
+    q: "In a DQN wargame agent's Q-Learning update: Q(s,a) ← Q(s,a) + α[r + γ max_{a'} Q(s',a') − Q(s,a)], the term [r + γ max_{a'} Q(s',a') − Q(s,a)] is called the TD error. When this term is LARGE AND POSITIVE, it means:",
+    opts: [
+      "The agent received a large negative reward (penalty) and is adjusting its strategy away from this action",
+      "The current Q-value underestimates the true value of this action — the agent performed better than expected and must increase the Q-value for (s,a)",
+      "The discount factor γ is set too high, causing unstable training that should be reduced",
+      "The maximum Q-value in the next state Q(s',a') is zero, indicating a terminal state was reached"
+    ],
+    ans: 1,
+    exp: "Large positive TD error → [r + γ max Q(s',a')] >> Q(s,a). The actual return exceeded the agent's prediction → the Q-value is an underestimate → update increases Q(s,a) to better reflect the true value of taking action a in state s."
+  },
+  {
+    q: "When training a label noise impact study shows that 30% noise rate drops accuracy from 97.2% to 61.7%, an adversary could exploit this via 'data poisoning'. In a defence AI context, the MOST dangerous form of targeted data poisoning is:",
+    opts: [
+      "Flooding the training dataset with duplicate samples to slow down training",
+      "Deliberately injecting mislabelled samples to cause a specific, controlled misclassification at inference time — e.g., causing a specific enemy aircraft signature to always be classified as 'Friendly'",
+      "Reducing the total number of training samples below the statistical minimum required for robust generalisation",
+      "Adding Gaussian noise to the feature values of all training samples to degrade overall accuracy uniformly"
+    ],
+    ans: 1,
+    exp: "Targeted poisoning (backdoor attack): injecting a small number of specifically crafted mislabelled samples to create a 'backdoor' that triggers specific misclassifications on demand. At 3% poisoning rate, 94% of target-class samples can be flipped."
+  },
+  {
+    q: "The Transformer architecture's core innovation — multi-head self-attention — enables which capability that makes it superior to RNNs for long intelligence reports?",
+    opts: [
+      "Transformers can process multiple modalities (text, images, audio) simultaneously while RNNs are limited to text",
+      "Transformers use larger training datasets than RNNs, giving them intrinsically better knowledge",
+      "Self-attention allows direct computation of relationships between ANY two positions in a sequence regardless of distance, resolving the vanishing gradient problem that limits RNNs on long documents",
+      "Transformers require no training data and can perform zero-shot reasoning on classified materials without fine-tuning"
+    ],
+    ans: 2,
+    exp: "Self-attention computes Attention(Q,K,V) = softmax(QK^T/√d_k)·V — every token attends to every other token in O(n²) operations. RNNs process sequentially and suffer from vanishing gradients over long sequences, causing forgetting of early context."
+  },
+  {
+    q: "An AI-enabled Computer Generated Force (CGF) in a wargame achieves a 91% win rate against novice human opponents in simulation, but only 58% effectiveness when evaluated in a field exercise. Which combination of issues MOST likely explains this gap?",
+    opts: [
+      "The CGF model was overfitted to the simulation physics and had a higher learning rate than recommended",
+      "The evaluation metric changed between simulation (win rate) and field exercise (effectiveness score)",
+      "Simulation-to-reality gap: the model exploited unrealistic simulation physics; combined with distribution shift (fog-of-war, adversarial adaptation, real terrain friction not modelled in training)",
+      "The CGF used Q-Learning in simulation but should have used Policy Gradient methods for the field exercise environment"
+    ],
+    ans: 2,
+    exp: "Sim-to-real gap is the dominant challenge for RL agents trained in simulation. Unrealistic physics exploitation, unmodelled friction/fog-of-war, and adversary adaptation create systematic covariate shift between training and deployment environments."
+  }
+];
+
+// ═══ QUIZ STATE ═══
+let currentQ = 0, score = 0, timer = null, answered = false;
+const TOTAL_TIME = 40;
+const DASH = 2 * Math.PI * 20; // circumference of r=20 circle ≈ 125.66
+
+function $(id){ return document.getElementById(id); }
+
+function startQuiz(){
+  $('intro').style.display = 'none';
+  $('quiz').style.display = 'flex';
+  loadQuestion();
+}
+
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered = false;
+  const q = Qs[currentQ];
+  $('qnum').textContent = `Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('progressFill').style.width = `${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent = `Score: ${score.toFixed(2)}`;
+
+  const optDiv = $('options');
+  optDiv.innerHTML = '';
+  const keys = ['A','B','C','D'];
+  q.opts.forEach((opt,i)=>{
+    const div = document.createElement('div');
+    div.className = 'opt';
+    div.id = `opt${i}`;
+    div.innerHTML = `<div class="opt-key">${keys[i]}</div><div class="opt-text">${opt}</div>`;
+    optDiv.appendChild(div);
+  });
+
+  startTimer();
+}
+
+function startTimer(){
+  let remaining = TOTAL_TIME;
+  const circle = $('timerCircle');
+  const numEl = $('timerNum');
+
+  function tick(){
+    remaining--;
+    numEl.textContent = remaining;
+    // Update circle stroke
+    const offset = DASH * (1 - remaining/TOTAL_TIME);
+    circle.style.strokeDashoffset = offset;
+    // Colour warning
+    if(remaining <= 10) circle.style.stroke = '#E05218';
+    else if(remaining <= 20) circle.style.stroke = '#C98A12';
+    else circle.style.stroke = '#E05218';
+    // Reset to orange
+    if(remaining > 20) circle.style.stroke = '#BDD7EE';
+    else if(remaining > 10) circle.style.stroke = '#C98A12';
+    else circle.style.stroke = '#E05218';
+
+    if(remaining <= 0){ clearInterval(timer); revealAnswer(-1); }
+  }
+  circle.style.stroke = '#BDD7EE';
+  circle.style.strokeDashoffset = 0;
+  numEl.textContent = TOTAL_TIME;
+  timer = setInterval(tick, 1000);
+}
+
+function revealAnswer(chosen){
+  if(answered) return;
+  answered = true;
+  clearInterval(timer);
+  const q = Qs[currentQ];
+  // Score
+  if(chosen === q.ans){ score += 1; }
+  else if(chosen >= 0){ score -= 0.25; }
+  // Highlight
+  q.opts.forEach((_,i)=>{
+    const el = $(`opt${i}`);
+    if(i === q.ans) el.classList.add('correct');
+    else if(i === chosen && chosen !== q.ans) el.classList.add('wrong');
+  });
+  // Auto-advance after 2.5s
+  setTimeout(advance, 2500);
+}
+
+function advance(){
+  currentQ++;
+  if(currentQ >= Qs.length){ showEnd(); return; }
+  loadQuestion();
+}
+
+function showEnd(){
+  $('quiz').style.display = 'none';
+  $('end').style.display = 'flex';
+  const s = parseFloat(score.toFixed(2));
+  $('finalScore').textContent = s;
+  let grade = '';
+  if(s >= 12) grade = '🏆 Outstanding (≥12/15)';
+  else if(s >= 9) grade = '⭐ Proficient (9–11/15)';
+  else if(s >= 6) grade = '📚 Developing (6–8/15)';
+  else grade = '🔄 Needs Review (<6/15)';
+  $('finalGrade').textContent = grade;
+}
+
+// Set date
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

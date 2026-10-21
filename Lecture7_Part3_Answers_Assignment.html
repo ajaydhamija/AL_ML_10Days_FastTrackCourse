@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 7 — Part 3: Answers & Assignment</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--fg:#1B7A5E;--fg2:#2AA87E;--lblue:#BDD7EE;
+    --green:#1E7A45;--red:#C0392B;--amber:#C98A12;
+    --light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--lgrey:#E0EBF5;
+    --yellow:#FFF3B0;--white:#FFFFFF;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  .top-bar{background:var(--navy);color:#fff;padding:13px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--fg);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .top-bar h1{font-size:16px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  .container{max-width:1000px;margin:0 auto;padding:22px 16px;}
+  .section-head{background:var(--navy);color:#fff;padding:11px 17px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:9px;}
+  .section-head .badge{background:var(--fg);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+  .section-head h2{font-size:14px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:16px;margin-bottom:22px;}
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:10px;}
+  .ans-card .qn{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--fg);}
+  .ans-card .key{font-size:10.5px;color:var(--dark);}
+  .q-item{margin-bottom:14px;border-left:4px solid var(--fg);padding-left:12px;}
+  .q-item .qtag{display:inline-block;background:var(--fg);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:4px;}
+  .q-item .qtext{font-weight:700;font-size:13px;color:var(--dark);margin-bottom:6px;}
+  .q-item .ans-line{font-size:13px;color:var(--fg);font-weight:700;margin-bottom:3px;}
+  .q-item .exp{font-size:12px;color:var(--grey);background:var(--light);padding:7px 10px;border-radius:6px;}
+  .assign-intro{background:var(--yellow);border:1px solid var(--amber);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;}
+  .q-box{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+  .q-box .qnum{font-size:11px;font-weight:700;color:var(--fg);text-transform:uppercase;margin-bottom:4px;}
+  .q-box .qtxt{font-size:13px;font-weight:600;color:var(--dark);}
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--fg2);padding:7px 10px;background:var(--lgrey);border-radius:6px;list-style:none;margin-top:8px;}
+  details summary::before{content:"▶ ";color:var(--fg);}
+  details[open] summary::before{content:"▼ ";}
+  details .sol{background:#EDFAF4;border:1px solid #A0D8C0;border-radius:0 0 6px 6px;padding:11px 13px;font-size:12.5px;color:var(--dark);}
+  details .sol .formula{background:#fff;border:1.5px solid var(--fg);border-radius:6px;padding:9px;font-family:monospace;font-size:12px;margin:7px 0;white-space:pre-wrap;}
+  details .sol .key-finding{background:var(--yellow);border:1px solid var(--amber);border-radius:6px;padding:8px 12px;margin-top:8px;font-weight:700;font-size:12.5px;}
+  .mark-scheme{background:#fff;border:1px solid var(--lgrey);border-radius:8px;overflow:hidden;margin-top:12px;}
+  .mark-scheme table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .mark-scheme th{background:var(--fg);color:#fff;padding:8px 11px;text-align:left;}
+  .mark-scheme td{padding:7px 11px;border-bottom:1px solid var(--lgrey);}
+  .mark-scheme tr:last-child td{border-bottom:none;}
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:12px;font-size:11px;margin-top:8px;}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — ANSWERS & ASSIGNMENT</div>
+    <h1>Lecture 7: Policy Gradient Methods — Answers & Assignment</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);"><strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></div>
+</div>
+
+<div class="container">
+
+<div class="section-head"><div class="badge">A</div><h2>Quiz Answer Key</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="qn">Q1</div><div class="ans">A</div><div class="key">argmax over continuous space infeasible</div></div>
+    <div class="ans-card"><div class="qn">Q2</div><div class="ans">B</div><div class="key">G_t mixes all future random rewards</div></div>
+    <div class="ans-card"><div class="qn">Q3</div><div class="ans">A</div><div class="key">Score function identity: E[∇ log π]=0</div></div>
+    <div class="ans-card"><div class="qn">Q4</div><div class="ans">A</div><div class="key">Bootstrap: 1 reward vs T stochastic; V_φ bias</div></div>
+    <div class="ans-card"><div class="qn">Q5</div><div class="ans">B</div><div class="key">Parallel workers: independent trajectories</div></div>
+    <div class="ans-card"><div class="qn">Q6</div><div class="ans">A</div><div class="key">r_t=0.533; min(-1.867,-2.8)=-1.867</div></div>
+    <div class="ans-card"><div class="qn">Q7</div><div class="ans">B</div><div class="key">High entropy = multi-hypothesis coverage</div></div>
+    <div class="ans-card"><div class="qn">Q8</div><div class="ans">B</div><div class="key">Reparameterisation: a=μ+σε deterministic</div></div>
+    <div class="ans-card"><div class="qn">Q9</div><div class="ans">A</div><div class="key">Early entropy collapse → local optima</div></div>
+    <div class="ans-card"><div class="qn">Q10</div><div class="ans">B</div><div class="key">ε=0.8 reintroduces large-update instability</div></div>
+    <div class="ans-card"><div class="qn">Q11</div><div class="ans">B</div><div class="key">DR trains on family of MDPs covering real world</div></div>
+    <div class="ans-card"><div class="qn">Q12</div><div class="ans">B</div><div class="key">A2C: TD bootstrap vs REINFORCE Monte Carlo</div></div>
+    <div class="ans-card"><div class="qn">Q13</div><div class="ans">B</div><div class="key">Without −α log π: policy collapses to mode of Q</div></div>
+    <div class="ans-card"><div class="qn">Q14</div><div class="ans">B</div><div class="key">Failure modes + adversarial robustness</div></div>
+    <div class="ans-card"><div class="qn">Q15</div><div class="ans">A</div><div class="key">On-policy: fresh data vs SAC stale replay</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--grey);">Scoring: +1 correct | −0.25 incorrect | 0 skipped | Maximum: 15 marks</p>
+</div>
+
+<div class="section-head"><div class="badge">B</div><h2>Selected Explanations</h2></div>
+<div class="section-body">
+  <div class="q-item"><div class="qtag">Q3</div><div class="qtext">Why does subtracting ANY baseline b(s) not bias the policy gradient?</div>
+  <div class="ans-line">✅ A — Score function identity: E_a[∇_θ log π_θ(a|s)] = 0 for any normalised distribution</div>
+  <div class="exp">Proof: E_a[∇ log π] = Σ_a π(a|s) × (∇π(a|s)/π(a|s)) = Σ_a ∇π(a|s) = ∇(Σ_a π(a|s)) = ∇1 = 0. Therefore E[b(s)·∇ log π] = b(s)·E[∇ log π] = b(s)·0 = 0 for ANY b(s) not depending on a. This profound result means we have a FREE degree of freedom: we can choose b(s) purely to minimise variance without introducing any bias. The optimal choice is b(s) = V^π(s), which gives the advantage function A(s,a) = Q(s,a) - V(s).</div></div>
+
+  <div class="q-item"><div class="qtag">Q6</div><div class="qtext">PPO clipping computation: r_t=0.533, Â=-3.5</div>
+  <div class="ans-line">✅ A — r_t=π_new/π_old=0.533; clip(0.533,0.8,1.2)=0.8; min(−1.867,−2.8)=−1.867</div>
+  <div class="exp">The min for Â<0 selects the LESS negative value — -1.867 > -2.8. This means PPO limits how aggressively it penalises bad actions: even though the policy already decreased this action's probability (r_t=0.533, well below 1), PPO won't force it down further toward the clip boundary. Preventing over-penalisation is as important as preventing over-promotion — both directions of instability are clipped.</div></div>
+
+  <div class="q-item"><div class="qtag">Q8</div><div class="qtext">Why is reparameterisation necessary for SAC's actor loss?</div>
+  <div class="ans-line">✅ B — Sampling a~N(μ,σ²) is non-differentiable; a=μ+σε with fixed ε is deterministic in θ</div>
+  <div class="exp">PyTorch autograd requires the forward computation to be a deterministic function of parameters. The sampling node a~N(μ_θ,σ_θ²) is stochastic — there is no derivative ∂(random draw)/∂μ in the traditional sense. Reparameterisation converts to a=μ_θ+σ_θ·ε: ε is drawn from N(0,1) once and treated as a constant input (no gradient). Now ∂a/∂θ = ∂μ_θ/∂θ + ε·∂σ_θ/∂θ — standard chain rule. This is the same trick that makes VAE training work, and it's essential for SAC, TD3, and DDPG actors.</div></div>
+</div>
+
+<div class="section-head"><div class="badge">C</div><h2>Assignment 7 — Policy Gradient Methods for Autonomous Drone Control</h2></div>
+<div class="section-body">
+  <div class="assign-intro"><strong>📋 Instructions:</strong> Show full working. Total: <strong>40 marks</strong> | ~90 minutes.</div>
+
+  <!-- Q1 -->
+  <div class="q-box">
+    <div class="qnum">Q1 — REINFORCE Gradient Computation [10 Marks]</div>
+    <div class="qtxt">A drone navigation episode has T=4 steps. Actions taken: a₀=LEFT, a₁=FORWARD, a₂=FORWARD, a₃=LAND. Rewards: r₁=0, r₂=+5, r₃=+5, r₄=+10. γ=0.9.<br><br>
+    The policy is a softmax over 4 actions: π_θ(a|s). At each timestep:<br>
+    π_θ(LEFT|s₀)=0.30,  π_θ(FORWARD|s₁)=0.45,  π_θ(FORWARD|s₂)=0.50,  π_θ(LAND|s₃)=0.70<br><br>
+    (a) Compute the return G_t for t=0, 1, 2, 3. [3 marks]<br>
+    (b) Compute the REINFORCE gradient estimate (1/T) Σ_t G_t · ∇_θ log π_θ(aₜ|sₜ). Express as a sum of weighted log-gradients. [3 marks]<br>
+    (c) With baseline b(s) = 7.0 for all states, compute the advantage-weighted gradient. Compare to the unweighted result and explain why the baseline reduces variance. [4 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Returns G_t (discounted sum from t to T-1):</strong></p>
+      <div class="formula-display">$$
+G_t = Σ_{k=t}^{T-1} γ^{k-t} r_{k+1}
+
+G₀ = r₁ + γr₂ + γ²r₃ + γ³r₄
+   = 0 + 0.9×5 + 0.81×5 + 0.729×10
+   = 0 + 4.5 + 4.05 + 7.29 = 15.84
+
+G₁ = r₂ + γr₃ + γ²r₄
+   = 5 + 0.9×5 + 0.81×10
+   = 5 + 4.5 + 8.1 = 17.6
+
+G₂ = r₃ + γr₄
+   = 5 + 0.9×10 = 5 + 9.0 = 14.0
+
+G₃ = r₄ = 10.0
+$$</div>
+      <p style="margin-top:8px"><strong>(b) REINFORCE gradient estimate:</strong></p>
+      <div class="formula-display">$$
+log π_θ(aₜ|sₜ): log(0.30) = -1.204, log(0.45) = -0.799, log(0.50) = -0.693, log(0.70) = -0.357
+
+REINFORCE gradient (proportional to, dropping the ∇_θ operator):
+  $\nabla J\approx\frac{1}{T}\sum_t G_t\nabla_\theta\log\pi_\theta(a_t|s_t)$
+     = (1/4) × [G₀·∇ log π(LEFT|s₀) + G₁·∇ log π(FWD|s₁)
+               + G₂·∇ log π(FWD|s₂) + G₃·∇ log π(LAND|s₃)]
+     = (1/4) × [15.84·∇ log(0.30) + 17.6·∇ log(0.45)
+               + 14.0·∇ log(0.50) + 10.0·∇ log(0.70)]
+
+In terms of scalar weight per log-gradient term (contribution magnitude):
+  t=0: weight = 15.84/4 = 3.96  (increase P(LEFT|s₀) by 3.96 units)
+  t=1: weight = 17.6/4  = 4.40  (increase P(FWD|s₁)  by 4.40 units)
+  t=2: weight = 14.0/4  = 3.50  (increase P(FWD|s₂)  by 3.50 units)
+  t=3: weight = 10.0/4  = 2.50  (increase P(LAND|s₃) by 2.50 units)
+
+All G_t > 0 → all actions get their probabilities INCREASED — even if some
+were suboptimal! This is the credit assignment problem illustrated.
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Baseline b=7.0 subtracted:</strong></p>
+      <div class="formula">Advantage = G_t − b(s):
+  A₀ = 15.84 − 7.0 =  +8.84  (LEFT better than average)
+  A₁ = 17.6  − 7.0 = +10.6   (FORWARD much better)
+  A₂ = 14.0  − 7.0 =  +7.0   (FORWARD better than average)
+  A₃ = 10.0  − 7.0 =  +3.0   (LAND better than average)
+
+Advantage-weighted gradient (scalar weights):
+  t=0: weight = 8.84/4  = 2.21  (vs 3.96 without baseline — REDUCED)
+  t=1: weight = 10.6/4  = 2.65  (vs 4.40 — REDUCED)
+  t=2: weight = 7.0/4   = 1.75  (vs 3.50 — HALVED)
+  t=3: weight = 3.0/4   = 0.75  (vs 2.50 — greatly reduced)
+
+WHY VARIANCE REDUCED:
+  Without baseline: G_t ∈ {10.0, 14.0, 15.84, 17.6} — range = 7.6
+  With baseline:   A_t ∈ {3.0,  7.0,   8.84,  10.6} — range = 7.6
+
+  The ABSOLUTE range is the same! But the KEY is the RELATIVE variance:
+  With baseline: all weights are centred around 0 (some could be negative
+    if an action had G_t < b). The magnitudes are SMALLER → smaller gradient
+    steps → lower variance in the parameter update direction.
+  
+  In general, with many episodes: G_t varies around its mean E[G_t] ≈ b(s).
+  A_t = G_t - b(s) has variance Var(G_t) - 2Cov(G_t,b) + Var(b).
+  Since b(s) is deterministic: Var(b)=0, Cov(G_t,b)=0.
+  But the ABSOLUTE MAGNITUDE |A_t| < |G_t| when b ≈ E[G_t].
+  
+  OPTIMAL baseline: b*(s) = E[G_t²·||∇ log π||²] / E[||∇ log π||²]
+    ≈ V^π(s) in practice — minimises gradient update variance.</div>
+      <div class="key-finding">Mark Scheme: (a) 3 marks (1 per G₀, G₁, G₂; G₃ included). (b) 3 marks (log-prob computation 1, four weighted terms 2). (c) 4 marks (advantage values 2, comparison 1, variance explanation 1).</div>
+    </div></details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-box">
+    <div class="qnum">Q2 — PPO Clipping: Two Episodes Worked Example [10 Marks]</div>
+    <div class="qtxt">An actor-critic agent uses PPO with ε=0.2, γ=0.95, α=0.001. The critic estimates V_φ(s).<br><br>
+    Episode batch (3 transitions):<br>
+    Trans 1: s₁, a=THRUST_HIGH, r=+8, s₂, V_φ(s₁)=6.2, V_φ(s₂)=7.8, π_old(a|s₁)=0.25, π_new(a|s₁)=0.31<br>
+    Trans 2: s₂, a=THRUST_LOW, r=−3, s₃, V_φ(s₂)=7.8, V_φ(s₃)=5.1, π_old(a|s₂)=0.40, π_new(a|s₂)=0.28<br>
+    Trans 3: s₃, a=HOVER, r=+2, s₄ (terminal), V_φ(s₃)=5.1, V_φ(s₄)=0, π_old(a|s₃)=0.20, π_new(a|s₃)=0.38<br><br>
+    (a) Compute the TD advantage Â_t = r_t + γV_φ(s_{t+1}) − V_φ(sₜ) for each transition. [3 marks]<br>
+    (b) Compute the probability ratio r_t = π_new/π_old for each transition. [2 marks]<br>
+    (c) Compute L_CLIP for each transition. Show which transitions are clipped and which are not. [5 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) TD Advantages:</strong></p>
+      <div class="formula-display">$$
+Â_t = r_t + γ V_φ(s_{t+1}) − V_φ(s_t)
+
+Trans 1: Â₁ = 8 + 0.95×7.8 − 6.2 = 8 + 7.41 − 6.2 = +9.21  (good action!)
+Trans 2: Â₂ = −3 + 0.95×5.1 − 7.8 = −3 + 4.845 − 7.8 = −5.955  (bad action)
+Trans 3: Â₃ = 2 + 0.95×0 − 5.1 = 2 + 0 − 5.1 = −3.1  (below-average action)
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Probability Ratios r_t = π_new/π_old:</strong></p>
+      <div class="formula-display">$$
+Trans 1: r₁ = π_new(THRUST_HIGH|s₁) / π_old = 0.31/0.25 = 1.240
+Trans 2: r₂ = π_new(THRUST_LOW|s₂)  / π_old = 0.28/0.40 = 0.700
+Trans 3: r₃ = π_new(HOVER|s₃)       / π_old = 0.38/0.20 = 1.900
+$$</div>
+      <p style="margin-top:8px"><strong>(c) L_CLIP for each transition (ε=0.2, so clip range [0.8, 1.2]):</strong></p>
+      <div class="formula">L_CLIP_t = min(r_t × Â_t, clip(r_t, 1-ε, 1+ε) × Â_t)
+         = min(r_t × Â_t, clip(r_t, 0.8, 1.2) × Â_t)
+
+TRANS 1: Â₁ = +9.21 (good action), r₁ = 1.240
+  Â₁ > 0: policy INCREASING probability of good action (r₁ > 1)
+  clip(1.240, 0.8, 1.2) = 1.2  (clipped! 1.240 > 1.2)
+  Unclipped: 1.240 × 9.21 = 11.42
+  Clipped:   1.200 × 9.21 = 11.05
+  min(11.42, 11.05) = 11.05  ← CLIPPED
+  Reason: PPO limits how much probability can increase per step (max 20%)
+  The action was already made more likely than PPO allows → cap at 1.2×
+
+TRANS 2: Â₂ = −5.955 (bad action), r₂ = 0.700
+  Â₂ < 0: policy DECREASING probability of bad action (r₂ < 1)
+  clip(0.700, 0.8, 1.2) = 0.8  (clipped! 0.700 < 0.8)
+  Unclipped: 0.700 × (−5.955) = −4.169
+  Clipped:   0.800 × (−5.955) = −4.764
+  min(−4.169, −4.764) = −4.169  ← CLIPPED (less negative = higher)
+  Reason: PPO prevents probability from decreasing too fast (>20% reduction)
+  Even for a bad action, cannot decrease probability by >20% per update
+
+TRANS 3: Â₃ = −3.1 (below-average), r₃ = 1.900
+  Â₃ < 0: bad action BUT policy is INCREASING its probability (r₃ = 1.9!)
+  This is dangerous: policy wants to make a BAD action MORE likely
+  clip(1.900, 0.8, 1.2) = 1.2  (clipped at upper bound)
+  Unclipped: 1.900 × (−3.1) = −5.89
+  Clipped:   1.200 × (−3.1) = −3.72
+  min(−5.89, −3.72) = −5.89  ← NOT CLIPPED (unclipped is more negative)
+  Note: When Â < 0 and r > 1+ε: unclipped MORE NEGATIVE (more penalty)
+  → PPO does NOT clip this case! It fully penalises making bad actions likely.
+
+SUMMARY TABLE:
+  Trans 1: L_CLIP = +11.05  (clipped — good action, capped increase)
+  Trans 2: L_CLIP = −4.169  (clipped — bad action, capped decrease)
+  Trans 3: L_CLIP = −5.89   (NOT clipped — dangerous increase of bad action)
+
+Mean batch L_CLIP = (11.05 − 4.169 − 5.89) / 3 = 0.991/3 = 0.330
+This is the actor loss (maximised → gradient ascent).</div>
+      <div class="key-finding">Mark Scheme: (a) 3 marks (1 per Â). (b) 2 marks. (c) 5 marks: clip determination (1.5 per transition × 3 = 4.5, round to 5 based on explanation quality). Key insight: Trans 3 is NOT clipped for the dangerous case — PPO allows full penalty for making bad actions MORE probable than old policy.</div>
+    </div></details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-box">
+    <div class="qnum">Q3 — Gaussian Policy & Continuous Control [10 Marks]</div>
+    <div class="qtxt">A PPO drone controller outputs: μ_θ(s) = [30.0, 15.0, −5.0] N (thrust xyz), σ_θ(s) = [8.0, 6.0, 4.0] N.<br><br>
+    (a) The action a = [25.0, 18.0, −3.0] N is sampled. Compute log π_θ(a|s) (the log-probability of this action). [4 marks]<br>
+    (b) Given the PPO advantage Â = +4.2 for this action, compute the policy gradient term G_t · ∇_θ log π_θ(a|s). Express the gradient qualitatively: does it increase or decrease μ and σ for each dimension? [3 marks]<br>
+    (c) The drones need actions bounded to [-100N, +100N]. A squashing function a_bounded = 100·tanh(a_raw) is applied. Explain why the log-probability must be corrected by a Jacobian term, and write the corrected log-probability. [3 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) log π_θ(a|s) for diagonal Gaussian:</strong></p>
+      <div class="formula-display">$$
+log π_θ(a|s) = Σᵢ [−½((aᵢ−μᵢ)/σᵢ)² − log σᵢ − ½ log(2π)]
+
+For each dimension i=1,2,3:
+  Component 1: a₁=25.0, μ₁=30.0, σ₁=8.0
+    z₁ = (25.0−30.0)/8.0 = −5.0/8.0 = −0.625
+    Term₁ = −½(−0.625)² − log(8.0) − ½ log(2π)
+          = −½(0.391) − 2.079 − ½(1.838)
+          = −0.195 − 2.079 − 0.919 = −3.193
+
+  Component 2: a₂=18.0, μ₂=15.0, σ₂=6.0
+    z₂ = (18.0−15.0)/6.0 = 3.0/6.0 = 0.500
+    Term₂ = −½(0.500)² − log(6.0) − ½ log(2π)
+          = −½(0.250) − 1.792 − 0.919
+          = −0.125 − 1.792 − 0.919 = −2.836
+
+  Component 3: a₃=−3.0, μ₃=−5.0, σ₃=4.0
+    z₃ = (−3.0−(−5.0))/4.0 = 2.0/4.0 = 0.500
+    Term₃ = −½(0.500)² − log(4.0) − ½ log(2π)
+          = −0.125 − 1.386 − 0.919 = −2.430
+
+log π_θ(a|s) = Term₁ + Term₂ + Term₃
+             = −3.193 − 2.836 − 2.430 = −8.459
+
+(This is negative, as expected for a log-probability in ℝ³)
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Policy gradient direction with Â=+4.2:</strong></p>
+      <div class="formula-display">$$
+The policy gradient update is: Δθ ∝ Â · ∇_θ log π_θ(a|s)
+Since Â = +4.2 > 0, we want to INCREASE log π (make a more likely).
+
+∂ log π/∂μᵢ = (aᵢ − μᵢ)/σᵢ²
+
+Dim 1: (25.0−30.0)/8² = −5/64 = −0.078
+  Update μ₁ ← μ₁ + α·4.2·(−0.078): μ₁ DECREASES (toward 25.0)
+
+Dim 2: (18.0−15.0)/6² = 3/36 = +0.083
+  Update μ₂ ← μ₂ + α·4.2·0.083: μ₂ INCREASES (toward 18.0)
+
+Dim 3: (−3.0−(−5.0))/4² = 2/16 = +0.125
+  Update μ₃ ← μ₃ + α·4.2·0.125: μ₃ INCREASES (toward −3.0)
+
+For σᵢ: ∂ log π/∂ log σᵢ = (aᵢ−μᵢ)²/σᵢ² − 1
+
+Dim 1: (−0.625)² − 1 = 0.391 − 1 = −0.609 → σ₁ DECREASES (narrow)
+Dim 2: (0.500)²  − 1 = 0.250 − 1 = −0.750 → σ₂ DECREASES (narrow)
+Dim 3: (0.500)²  − 1 = 0.250 − 1 = −0.750 → σ₃ DECREASES (narrow)
+
+INTERPRETATION: All μᵢ shift toward the sampled action a
+(which was good: Â=+4.2). All σᵢ decrease — the policy
+narrows its distribution around this action (less exploration).
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Jacobian correction for bounded actions:</strong></p>
+      <div class="formula-display">$$
+WHY CORRECTION NEEDED:
+  a_raw ~ N(μ,σ²) in ℝ
+  a_bounded = 100·tanh(a_raw) ∈ (−100, +100)
+
+  This is a CHANGE OF VARIABLES. The probability density changes:
+  p(a_bounded) = p(a_raw) · |∂a_raw/∂a_bounded|
+               = p(a_raw) / |∂a_bounded/∂a_raw|
+
+  ∂a_bounded/∂a_raw = 100·(1 − tanh²(a_raw)) = 100·sech²(a_raw)
+
+CORRECTED LOG-PROBABILITY:
+  log π_θ(a_bounded|s) = log π_θ(a_raw|s) − Σᵢ log|∂(a_bounded)ᵢ/∂(a_raw)ᵢ|
+                       = log π_θ(a_raw|s) − Σᵢ [log(100) + log(1−tanh²(a_raw_i))]
+                       = log π_θ(a_raw|s) − Σᵢ [log(100) + log(sech²(a_raw_i))]
+
+WITHOUT this correction: the log-probability formula counts density
+in the UNBOUNDED space. Near the bounds (|a_bounded| → 100),
+sech²→0, so |∂a_bounded/∂a_raw|→0: the bounded density is HIGHER
+than the raw density (compression at the tails). Ignoring this
+overestimates entropy near the action bounds, causing the policy
+to under-explore the extreme thrust regions needed for aggressive
+manoeuvres.
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 4 marks (1 per dimension 3, sum 1). (b) 3 marks (∂ log π/∂μ direction 1.5, σ direction 1, interpretation 0.5). (c) 3 marks (why correction 1, Jacobian term 1, formula 1).</div>
+    </div></details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-box">
+    <div class="qnum">Q4 — SAC & Operational Design [10 Marks]</div>
+    <div class="qtxt">(a) SAC maintains TWO Q-networks Q_{φ1} and Q_{φ2} and takes their minimum for the TD target. Show with a simple numerical example why taking the MINIMUM reduces overestimation bias (use any plausible Q-value scenario with two noisy estimates). [4 marks]<br><br>
+    (b) The SAC temperature α controls the entropy weight. Derive the optimal policy π*(a|s) that maximises the SAC objective E_a[Q(s,a) − α log π(a|s)] with respect to π. Show it has a Boltzmann/softmax form. [3 marks]<br><br>
+    (c) A defence team is choosing between PPO and SAC for an air-to-ground targeting system that selects aiming angles in continuous space. The system must: (i) achieve >90% target accuracy, (ii) be explainable to a Judge Advocate General (JAG) officer, (iii) adapt to novel target types not seen during training. Recommend a method, justify, and identify what supplementary systems are needed for JAG compliance. [3 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Minimum Q-network reduces overestimation:</strong></p>
+      <div class="formula">SCENARIO: True Q*(s,a) = 10.0
+
+Q-network 1 (noisy estimate): Q_φ1(s,a) = 10.0 + ε₁ where ε₁~N(0,4²)
+Q-network 2 (noisy estimate): Q_φ2(s,a) = 10.0 + ε₂ where ε₂~N(0,4²), independent
+
+SPECIFIC EXAMPLE:
+  ε₁ = +3.5 → Q_φ1 = 13.5 (overestimate)
+  ε₂ = +1.2 → Q_φ2 = 11.2 (overestimate)
+
+Standard single-Q: target = Q_φ1 = 13.5 (error: +3.5)
+Minimum Q-twin:    target = min(13.5, 11.2) = 11.2 (error: +1.2)
+
+Both are overestimates here, but min gives LESS overestimation.
+
+E[max(Q_φ1, Q_φ2)] = E[Q*] + E[max(ε₁,ε₂)] > Q* (max of noise > 0)
+E[min(Q_φ1, Q_φ2)] = E[Q*] + E[min(ε₁,ε₂)] < E[max] (min of noise < max)
+
+For zero-mean noise: E[min(ε₁,ε₂)] is negative on average,
+so E[min(Q_φ1,Q_φ2)] tends to UNDERESTIMATE slightly.
+This is intentional: underestimation is less harmful to policy
+convergence than overestimation (overestimation → policy exploits
+wrong actions → catastrophic performance). Conservative (min)
+estimates lead to more cautious, stable learning.</div>
+      <p style="margin-top:8px"><strong>(b) Optimal SAC policy derivation:</strong></p>
+      <div class="formula-display">$$
+Maximise over π(a|s): J(π) = E_a~π[Q(s,a)] + α H(π(·|s))
+  = Σ_a π(a|s) Q(s,a) − α Σ_a π(a|s) log π(a|s)
+
+Subject to constraint: Σ_a π(a|s) = 1
+
+Lagrangian: L(π,λ) = Σ_a π Q(s,a) − α Σ_a π log π − λ(Σ_a π − 1)
+
+First-order condition (∂L/∂π(a|s) = 0):
+  Q(s,a) − α(log π(a|s) + 1) − λ = 0
+  α log π*(a|s) = Q(s,a) − α − λ
+  log π*(a|s) = Q(s,a)/α − 1 − λ/α
+  π*(a|s) = exp(Q(s,a)/α) × exp(−1−λ/α)
+  = C × exp(Q(s,a)/α)  where C = exp(−1−λ/α)
+
+Normalisation (Σ_a π*(a|s) = 1):
+  C = 1 / Σ_a exp(Q(s,a)/α)
+
+Therefore: π*(a|s) = exp(Q*(s,a)/α) / Σ_{a'} exp(Q*(s,a')/α)
+
+This is the BOLTZMANN (softmax) distribution over Q-values!
+  α → 0: π*(a|s) → argmax (deterministic, exploit only)
+  α → ∞: π*(a|s) → uniform (maximum entropy, explore only)
+SAC automatically balances exploration vs exploitation via α!
+$$</div>
+      <p style="margin-top:8px"><strong>(c) PPO vs SAC for JAG-compliant targeting system:</strong></p>
+      <div class="formula-display">$$
+RECOMMENDATION: PPO with SHAP-based explainability layer
+
+JUSTIFICATION:
+  Performance: Both PPO (94%) and SAC (96%) exceed 90% target. PPO chosen.
+  
+  Explainability for JAG: SAC's stochastic policy deliberately maintains
+    multiple plausible aiming solutions — hard to explain to a JAG why
+    a RANDOM sample from a distribution was used for a lethal action.
+    PPO can be configured with near-deterministic low-entropy policy
+    post-training (anneal ε in entropy bonus to near zero), giving a
+    clear decision: "Given sensor state X, optimal aim = Y degrees."
+    
+  Novel targets: PPO at 94% with Domain Randomisation (vary target
+    signatures, viewing angles, occlusion) handles novel types better
+    than SAC in low-data regimes (on-policy: always fresh relevant data).
+
+SUPPLEMENTARY SYSTEMS FOR JAG COMPLIANCE:
+  ① SHAP value explainer on the Q-network (or critic V_φ):
+     "System selected angle 42.3° because: target heat signature
+     contributed +6.8 to Q-value, minimum civilian collateral
+     distance contributed +4.1, confidence in target ID contributed
+     +3.9 — total Q=18.7 vs 2nd-best option Q=14.2"
+  ② Confidence threshold: only engage when policy certainty exceeds
+     threshold (low σ from Gaussian policy) — ambiguous states
+     escalate to human operator
+  ③ Target identification verification layer (separate classifier)
+     before RL controller receives engagement authorisation
+  ④ Black box flight recorder of full state-action sequence for
+     post-engagement accountability review
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 4 marks (numerical example 2, E[min] < E[max] explanation 2). (b) 3 marks (Lagrangian setup 1, KKT conditions 1, softmax form + α interpretation 1). (c) 3 marks (recommendation + justification 1.5, JAG supplementary systems 1.5).</div>
+    </div></details>
+  </div>
+
+  <div class="mark-scheme">
+    <table>
+      <tr><th>Question</th><th>Topic</th><th>Marks</th><th>Difficulty</th></tr>
+      <tr><td>Q1</td><td>REINFORCE gradient — G_t computation, weighted log-gradients, baseline effect</td><td>10</td><td>Medium</td></tr>
+      <tr><td>Q2</td><td>PPO clipping — TD advantages, probability ratios, L_CLIP for 3 transitions</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q3</td><td>Gaussian policy — log π computation, gradient direction, Jacobian correction</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q4</td><td>SAC dual Q-networks, Boltzmann optimal policy derivation, JAG deployment design</td><td>10</td><td>Hard</td></tr>
+      <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>40</strong></td><td></td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4 &nbsp;|&nbsp;
+  Lecture 7, Part 3: Answers & Assignment
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

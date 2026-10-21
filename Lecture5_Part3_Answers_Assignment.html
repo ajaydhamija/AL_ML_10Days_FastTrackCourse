@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 5 — Part 3: Answers & Assignment</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--crim:#A93226;--red2:#C0392B;--lblue:#BDD7EE;
+    --green:#1E7A45;--orange:#E05218;--amber:#C98A12;
+    --light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--lgrey:#E0EBF5;
+    --yellow:#FFF3B0;--white:#FFFFFF;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  .top-bar{background:var(--navy);color:#fff;padding:13px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--crim);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .top-bar h1{font-size:16px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  .container{max-width:1000px;margin:0 auto;padding:22px 16px;}
+  .section-head{background:var(--navy);color:#fff;padding:11px 17px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:9px;}
+  .section-head .badge{background:var(--crim);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+  .section-head h2{font-size:14px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:16px;margin-bottom:22px;}
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:10px;}
+  .ans-card .qn{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--crim);}
+  .ans-card .key{font-size:10.5px;color:var(--dark);}
+  .q-item{margin-bottom:14px;border-left:4px solid var(--crim);padding-left:12px;}
+  .q-item .qtag{display:inline-block;background:var(--crim);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:4px;}
+  .q-item .qtext{font-weight:700;font-size:13px;color:var(--dark);margin-bottom:6px;}
+  .q-item .ans-line{font-size:13px;color:var(--crim);font-weight:700;margin-bottom:3px;}
+  .q-item .exp{font-size:12px;color:var(--grey);background:var(--light);padding:7px 10px;border-radius:6px;}
+  .assign-intro{background:var(--yellow);border:1px solid var(--amber);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;}
+  .q-box{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+  .q-box .qnum{font-size:11px;font-weight:700;color:var(--crim);text-transform:uppercase;margin-bottom:4px;}
+  .q-box .qtxt{font-size:13px;font-weight:600;color:var(--dark);}
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--red2);padding:7px 10px;background:var(--lgrey);border-radius:6px;list-style:none;margin-top:8px;}
+  details summary::before{content:"▶ ";color:var(--crim);}
+  details[open] summary::before{content:"▼ ";}
+  details .sol{background:#FFF5F5;border:1px solid #E8AAAA;border-radius:0 0 6px 6px;padding:11px 13px;font-size:12.5px;color:var(--dark);}
+  details .sol .formula{background:#fff;border:1.5px solid var(--crim);border-radius:6px;padding:9px;font-family:monospace;font-size:12px;margin:7px 0;white-space:pre-wrap;}
+  details .sol .key-finding{background:var(--yellow);border:1px solid var(--amber);border-radius:6px;padding:8px 12px;margin-top:8px;font-weight:700;font-size:12.5px;}
+  .mark-scheme{background:#fff;border:1px solid var(--lgrey);border-radius:8px;overflow:hidden;margin-top:12px;}
+  .mark-scheme table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .mark-scheme th{background:var(--crim);color:#fff;padding:8px 11px;text-align:left;}
+  .mark-scheme td{padding:7px 11px;border-bottom:1px solid var(--lgrey);}
+  .mark-scheme tr:last-child td{border-bottom:none;}
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:12px;font-size:11px;margin-top:8px;}
+  @media(max-width:600px){.ans-grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — ANSWERS & ASSIGNMENT</div>
+    <h1>Lecture 5: Anomaly Detection & Cybersecurity — Answers & Assignment</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);"><strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></div>
+</div>
+
+<div class="container">
+
+<div class="section-head"><div class="badge">A</div><h2>Quiz Answer Key</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="qn">Q1</div><div class="ans">B</div><div class="key">Collective anomaly / Z-score blind spot</div></div>
+    <div class="ans-card"><div class="qn">Q2</div><div class="ans">B</div><div class="key">Σ⁻¹ normalises + decorrelates features</div></div>
+    <div class="ans-card"><div class="qn">Q3</div><div class="ans">B</div><div class="key">Dense = many splits; sparse = few splits</div></div>
+    <div class="ans-card"><div class="qn">Q4</div><div class="ans">B</div><div class="key">s=0.88 high anomaly; s→1 as E[h]→0</div></div>
+    <div class="ans-card"><div class="qn">Q5</div><div class="ans">B</div><div class="key">ν=0.001 → too tight → high FPR</div></div>
+    <div class="ans-card"><div class="qn">Q6</div><div class="ans">B</div><div class="key">0.6% normal exceed τ; AE learns normal manifold</div></div>
+    <div class="ans-card"><div class="qn">Q7</div><div class="ans">B</div><div class="key">Temporal insufficient; need multi-modal</div></div>
+    <div class="ans-card"><div class="qn">Q8</div><div class="ans">B</div><div class="key">Tier-1 recall-first; tier-2 precision</div></div>
+    <div class="ans-card"><div class="qn">Q9</div><div class="ans">B</div><div class="key">Z-score normalisation essential</div></div>
+    <div class="ans-card"><div class="qn">Q10</div><div class="ans">B</div><div class="key">Standard Σ contaminated by anomalies</div></div>
+    <div class="ans-card"><div class="qn">Q11</div><div class="ans">C</div><div class="key">Time-of-day + auth type; DGA evades</div></div>
+    <div class="ans-card"><div class="qn">Q12</div><div class="ans">B</div><div class="key">Per-feature RE_j + SHAP values</div></div>
+    <div class="ans-card"><div class="qn">Q13</div><div class="ans">B</div><div class="key">Z=-3.96; rolling baseline to reduce FP</div></div>
+    <div class="ans-card"><div class="qn">Q14</div><div class="ans">A</div><div class="key">IF 20s/day; AE 400s/day; both feasible</div></div>
+    <div class="ans-card"><div class="qn">Q15</div><div class="ans">B</div><div class="key">AE learns normal; RF learns known attacks</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--grey);">Scoring: +1 correct | −0.25 incorrect | 0 skipped | Maximum: 15 marks</p>
+</div>
+
+<div class="section-head"><div class="badge">B</div><h2>Selected Explanations</h2></div>
+<div class="section-body">
+  <div class="q-item"><div class="qtag">Q3</div><div class="qtext">Why do anomalies have shorter path lengths in Isolation Forest?</div>
+  <div class="ans-line">✅ B — Dense normal points need many splits; sparse anomalies are isolated in 1–2 cuts</div>
+  <div class="exp">The geometric insight: a DoS packet with src_bytes=1.2 (vs normal 3,000–8,000) sits far from the dense normal cluster. Any random split on the src_bytes feature immediately puts it alone on one side. Normal packets have thousands of similar neighbours; a random split through the cluster divides neighbours but leaves the target still surrounded by many similar points — requiring many more splits. This density difference is the core mechanism, not any preference for "extreme values."</div></div>
+
+  <div class="q-item"><div class="qtag">Q5</div><div class="qtext">Why does ν=0.001 (very tight OCSVM boundary) cause poor anomaly detection?</div>
+  <div class="ans-line">✅ B — Near-zero training violations forces ultra-tight boundary; normal traffic variation exceeds it → high FPR</div>
+  <div class="exp">OCSVM with ν=0.001 allows only 0.1% of 482K normal training packets to lie outside the boundary — just 482 packets. Real network traffic has natural variation (backup jobs, large file transfers, bursts during patch cycles). These legitimate extreme-but-normal packets cannot be included inside the boundary, forcing it so tight that ordinary traffic exceeds it during testing. ν should approximate the expected contamination rate — for Case A where we expect ~3.6% anomalies, ν≈0.03–0.05 is sensible.</div></div>
+
+  <div class="q-item"><div class="qtag">Q14</div><div class="qtext">Daily inference times for IF and AE on 10M packets/day</div>
+  <div class="ans-line">✅ A — IF: 20 seconds/day; AE: 400 seconds/day; both feasible; AE worth it for 4.4% TPR gain</div>
+  <div class="exp">IF: 10M × 0.000002s = 20s/day (trivially real-time). AE: 10M × 0.00004s = 400s ≈ 6.7 min/day (comfortably feasible). The calculation is straightforward: both methods are fast enough for 10M/day screening. The 3-tier architecture makes this moot: IF screens all 10M packets in 20s; only flagged packets (say 1.1% = 110K) go to the AE → AE processes 110K × 0.04ms = 4.4 seconds. Total compute: 24.4 seconds/day for the full 3-tier pipeline on 10M packets.</div></div>
+
+  <div class="q-item"><div class="qtag">Q15</div><div class="qtext">Why Autoencoder detects zero-day APT while supervised RF fails</div>
+  <div class="ans-line">✅ B — RF learned discriminant between known attack classes; novel APT falls into 'normal' side of boundary</div>
+  <div class="exp">This is the fundamental epistemological difference: supervised methods learn "what attacks look like" (closed-world assumption). Novel attacks outside the training class distribution get classified as the nearest known class or as "normal." Anomaly detection learns "what normal looks like" (open-world assumption) — anything sufficiently different is flagged regardless of whether it matches a known attack signature. This is why real-world CERT deployments use BOTH: supervised IDS for known attack pattern matching + anomaly detection for zero-day coverage.</div></div>
+</div>
+
+<div class="section-head"><div class="badge">C</div><h2>Assignment 5 — Anomaly Detection for Defence Cybersecurity</h2></div>
+<div class="section-body">
+  <div class="assign-intro"><strong>📋 Instructions:</strong> Show full working. Total: <strong>40 marks</strong> | ~90 minutes. Attempt before revealing!</div>
+
+  <!-- Q1 -->
+  <div class="q-box">
+    <div class="qnum">Q1 — Isolation Forest Path Length [8 Marks]</div>
+    <div class="qtxt">An Isolation Forest uses B=1 tree (for manual computation). The sub-sample is ψ=8 points. Five points are in a dense cluster near the origin: N1=(0.1,0.2), N2=(0.3,0.1), N3=(0.2,0.3), N4=(0.1,0.1), N5=(0.2,0.2). Three outliers: O1=(8.0,0.1), O2=(0.1,9.0), O3=(7.5,8.5).<br><br>
+    (a) The first random split chosen is: feature x₁, value q=4.0. Which points go left (x₁ < 4) and right (x₁ ≥ 4)? [2 marks]<br>
+    (b) The right branch now contains 3 points {O1, O3, O2 if applicable}. The next split is: feature x₂, value q=5.0. How does this further partition the right branch? [2 marks]<br>
+    (c) After the x₂ split, O1=(8.0,0.1) is isolated (alone in its partition). What is h(O1) = path length at this point? [1 mark]<br>
+    (d) In the left branch containing {N1–N5, O2}, a split on x₂ at q=5.0 separates O2. O2 is now isolated at depth 2. What is h(O2)? [1 mark]<br>
+    (e) The 5 normal points {N1–N5} remain together after both splits. Using the normalisation c(ψ)=2H(ψ−1)−2(ψ−1)/ψ ≈ 3.46 for ψ=8, and assuming the normal points require average 5.2 more splits to isolate (total E[h]=7.2 from root), compute the anomaly scores s(O1) and s(N1) using $s(x,\psi)=2^{-E[h(x)]/c(\psi)}$. [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) First split: x₁ < 4.0 (left) vs x₁ ≥ 4.0 (right):</strong></p>
+      <div class="formula">Left branch (x₁ < 4.0): N1(0.1), N2(0.3), N3(0.2), N4(0.1), N5(0.2), O2(0.1) → 6 points
+Right branch (x₁ ≥ 4.0): O1(8.0), O3(7.5) → 2 points
+(O2 has x₁=0.1 < 4.0 → goes LEFT)</div>
+      <p style="margin-top:8px"><strong>(b) Second split on right branch: x₂ < 5.0 vs x₂ ≥ 5.0:</strong></p>
+      <div class="formula">Right branch had: O1=(8.0, 0.1) and O3=(7.5, 8.5)
+Split x₂ at 5.0:
+  Left sub-branch (x₂ < 5.0): O1=(8.0, 0.1) → 1 point
+  Right sub-branch (x₂ ≥ 5.0): O3=(7.5, 8.5) → 1 point
+Both O1 and O3 are now ISOLATED (each alone in their partition)</div>
+      <p style="margin-top:8px"><strong>(c) Path length h(O1):</strong></p>
+      <div class="formula-display">$$
+O1 path: Root → x₁ split (depth 1) → x₂ split (depth 2) → ISOLATED
+h(O1) = 2 (isolated at depth 2, after 2 splits from root)
+$$</div>
+      <p style="margin-top:8px"><strong>(d) Path length h(O2):</strong></p>
+      <div class="formula">O2=(0.1, 9.0) went LEFT at first split (x₁=0.1 < 4.0)
+Left branch: {N1,N2,N3,N4,N5,O2} — 6 points
+Second split on x₂ at 5.0:
+  x₂ < 5.0: {N1(0.2),N2(0.1),N3(0.3),N4(0.1),N5(0.2)} → 5 points
+  x₂ ≥ 5.0: {O2(0.1,9.0)} → ISOLATED at depth 2
+
+h(O2) = 2 (isolated at depth 2)</div>
+      <p style="margin-top:8px"><strong>(e) Anomaly scores:</strong></p>
+      <div class="formula">c(ψ=8) ≈ 3.46  (given)
+
+For O1: E[h(O1)] = 2 (isolated in 2 splits)
+  s(O1) = 2^{−2/3.46} = 2^{−0.578} = 1/2^{0.578}
+  2^{0.578}: 2^{0.5}=1.414, 2^{0.578}≈1.494
+  s(O1) = 1/1.494 = 0.669  → ANOMALY (s > 0.6 threshold)
+
+For N1: E[h(N1)] = 7.2 (given — hard to isolate in dense cluster)
+  s(N1) = 2^{−7.2/3.46} = 2^{−2.081} = 1/2^{2.081}
+  2^{2.081}: 2^2=4.0, 2^{0.081}≈1.058 → 2^{2.081}≈4.231
+  s(N1) = 1/4.231 = 0.236  → NORMAL (s < 0.5 threshold)
+
+INTERPRETATION: O1 score 0.669 >> N1 score 0.236
+→ Clear separation between anomaly and normal points!</div>
+      <div class="key-finding">Mark Scheme: (a) 2 marks (1 per branch). (b) 2 marks. (c) 1 mark. (d) 1 mark. (e) 2 marks (1 per score computation).</div>
+    </div></details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-box">
+    <div class="qnum">Q2 — Autoencoder Threshold & FPR/TPR Analysis [10 Marks]</div>
+    <div class="qtxt">An Autoencoder is trained on 100,000 normal network packets. Validation results:<br>
+    Normal packets (N=10,000): RE follows N(0.030, 0.015²) approximately.<br>
+    Attack packets (N=500): RE follows N(0.280, 0.090²) approximately.<br><br>
+    (a) At threshold τ=0.060, compute the approximate FPR on normal packets using Z-score (assume normal distribution). [3 marks]<br>
+    (b) Compute the approximate TPR (attack detection rate) at the same threshold τ=0.060. [3 marks]<br>
+    (c) If the operational requirement is FPR ≤ 1%, find the threshold τ_1% that achieves exactly 1% FPR. [2 marks]<br>
+    (d) At τ_1%, what is the resulting TPR? Is this operationally acceptable for a national CERT? [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) FPR at τ=0.060 (Normal RE ~ N(0.030, 0.015²)):</strong></p>
+      <div class="formula-display">$$
+FPR = P(RE_normal > τ) = P(Z > (τ − μ_normal)/σ_normal)
+    = P(Z > (0.060 − 0.030)/0.015)
+    = P(Z > 0.030/0.015)
+    = P(Z > 2.0)
+
+From standard normal table: P(Z > 2.0) = 1 − Φ(2.0) = 1 − 0.9772 = 0.0228
+
+FPR ≈ 2.28% at τ=0.060
+
+In absolute numbers: 10,000 × 0.0228 = 228 normal packets falsely flagged
+$$</div>
+      <p style="margin-top:8px"><strong>(b) TPR at τ=0.060 (Attack RE ~ N(0.280, 0.090²)):</strong></p>
+      <div class="formula">TPR = P(RE_attack > τ) = P(Z > (τ − μ_attack)/σ_attack)
+    = P(Z > (0.060 − 0.280)/0.090)
+    = P(Z > −0.220/0.090)
+    = P(Z > −2.444)
+    = Φ(2.444)  [by symmetry: P(Z > -a) = P(Z < a) = Φ(a)]
+
+Φ(2.44) ≈ 0.9927
+Φ(2.45) ≈ 0.9929
+Interpolate: Φ(2.444) ≈ 0.9928
+
+TPR ≈ 99.28% at τ=0.060
+
+In absolute numbers: 500 × 0.9928 = 497 attack packets detected (3 missed)</div>
+      <p style="margin-top:8px"><strong>(c) Threshold τ for FPR = 1%:</strong></p>
+      <div class="formula-display">$$
+FPR = 1% = P(RE_normal > τ) = P(Z > (τ − 0.030)/0.015) = 0.01
+
+P(Z > z*) = 0.01  →  z* = 2.326  (from standard normal table: Φ(2.326) = 0.99)
+
+τ_1% = μ_normal + z* × σ_normal
+      = 0.030 + 2.326 × 0.015
+      = 0.030 + 0.034886
+      = 0.0649 ≈ 0.065
+$$</div>
+      <p style="margin-top:8px"><strong>(d) TPR at τ_1% = 0.065:</strong></p>
+      <div class="formula-display">$$
+TPR = P(RE_attack > 0.065) = P(Z > (0.065 − 0.280)/0.090)
+    = P(Z > −0.215/0.090)
+    = P(Z > −2.389)
+    = Φ(2.389)
+
+Φ(2.38) ≈ 0.9913,  Φ(2.39) ≈ 0.9916
+Φ(2.389) ≈ 0.9916
+
+TPR ≈ 99.16% at τ_1% = 0.065
+
+OPERATIONAL ACCEPTABILITY:
+  FPR = 1.0% → on 10M packets/day → 100,000 false alerts/day
+  This is operationally PROBLEMATIC without tier-2 filtering.
+  With 3-tier architecture: AE deep-scan reduces 100K false alerts
+  significantly → ACCEPTABLE.
+  TPR = 99.16%: excellent for a CERT — missing only 0.84% of attacks
+  (84 missed per 10,000 attacks) is acceptable if combined with
+  other defensive layers.
+$$</div>
+      <div class="key-finding">Key insight: Moving τ from 0.060 (FPR=2.28%) to 0.065 (FPR=1%) barely affects TPR (99.28% → 99.16%) because the attack RE distribution is so far above the normal RE distribution. This "easy" separation is why autoencoders work well when the normal/anomalous distributions are well-separated. Mark: (a) 3, (b) 3, (c) 2, (d) 2.</div>
+    </div></details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-box">
+    <div class="qnum">Q3 — OCSVM ν Parameter Design [10 Marks]</div>
+    <div class="qtxt">A CERT analyst is designing an OCSVM for network anomaly detection. The training set has 50,000 normal packets (cleaned, no attacks known at training time). The analyst estimates the production traffic will contain approximately 2% attack traffic.<br><br>
+    (a) What value of ν should the analyst start with and why? [2 marks]<br>
+    (b) After training OCSVM with ν=0.02, the model flags 1,400 of the 50,000 training packets as outside the boundary (margin violations). Is this expected? Explain using the ν interpretation. [3 marks]<br>
+    (c) A colleague suggests ν=0.20 "to be safe and catch more anomalies." Explain why this is incorrect reasoning and what the actual consequence would be. [3 marks]<br>
+    (d) The final deployed model with ν=0.02, γ=0.10 achieves FPR=1.8% and TPR=88.2% on the test set (which has 2% attacks). The analyst's manager requests "both FPR and TPR should be improved simultaneously." Explain why this is mathematically impossible with a fixed model, and what the actual options are. [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Starting ν value and justification:</strong></p>
+      <div class="formula-display">$$
+Start with ν = 0.02 (matching the estimated 2% attack traffic rate)
+
+Justification: ν is the upper bound on the fraction of training points 
+that can be outside the boundary. If 2% of production traffic is attacks,
+and assuming some attack contamination leaked into training despite cleaning,
+setting ν≈contamination_fraction is the principled starting point.
+
+Also: ν is the lower bound on support vectors. With ν=0.02 and N=50,000:
+  Min support vectors = 0.02 × 50,000 = 1,000
+  This gives a rich enough boundary representation for 50K training points.
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Is 1,400 violations expected?</strong></p>
+      <div class="formula-display">$$
+ν = 0.02 → upper bound on fraction of training violations
+Maximum violations allowed = ν × N = 0.02 × 50,000 = 1,000
+
+1,400 violations > 1,000 (the ν bound)
+
+This seems to violate the ν constraint — BUT:
+The ν parameter is an asymptotic bound, not a strict constraint in all 
+finite cases. The actual fraction = 1,400/50,000 = 2.8%, slightly above ν=2%.
+
+In practice, this means the RBF kernel bandwidth γ=0.10 may be too large 
+(too flexible a boundary that still has violations), or ν needs slight 
+adjustment. The analyst should:
+  1. Check if increasing γ slightly (e.g., 0.08) tightens the boundary
+  2. Or accept 2.8% ≈ 2% as close enough (within noise of finite-sample effects)
+
+Alternatively: if training data was 100% clean (no attack contamination),
+the 1,400 violations are legitimate normal-traffic outliers — edge cases
+of normal behaviour that the model correctly treats as uncertain.
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Why ν=0.20 is wrong:</strong></p>
+      <div class="formula-display">$$
+ν=0.20 → allows 20% of training data outside boundary = 10,000 packets
+The boundary becomes VERY LOOSE — it only needs to enclose 80% of normal traffic.
+
+CONSEQUENCE: Many genuinely normal packets lie outside this loose boundary.
+At test time, normal packets that were outside the training boundary → flagged
+as anomalies → FPR explodes (far above 2%).
+
+The colleague's reasoning "more ν = catch more anomalies" is BACKWARDS:
+  Higher ν → LOOSER boundary → more normal data outside → higher FPR
+  Lower ν → TIGHTER boundary → less normal data outside → lower FPR
+                                                       → BUT may miss subtle anomalies
+
+ν controls the boundary TIGHTNESS, not the "anomaly sensitivity" directly.
+The correct way to catch more anomalies is to adjust the DECISION THRESHOLD
+or use a more powerful model (Autoencoder), not to increase ν.
+$$</div>
+      <p style="margin-top:8px"><strong>(d) Why FPR and TPR cannot both improve simultaneously:</strong></p>
+      <div class="formula-display">$$
+For a FIXED trained model, FPR and TPR are linked by the ROC curve.
+  Decreasing threshold → flags more packets → TPR ↑ but FPR ↑ too
+  Increasing threshold → flags fewer packets → FPR ↓ but TPR ↓ too
+
+Moving along the ROC curve: TPR and FPR are POSITIVELY CORRELATED 
+for any fixed model — you cannot increase one while decreasing the other.
+
+The ONLY ways to improve BOTH simultaneously:
+  1. Train a BETTER MODEL (e.g., Autoencoder instead of OCSVM) that 
+     achieves a higher AUROC — a better model has its entire ROC curve
+     shifted toward the top-left corner (higher TPR at same FPR)
+  2. Add more/better FEATURES that better distinguish normal from attack
+  3. Use an ENSEMBLE of OCSVM + Isolation Forest + threshold calibration
+     to achieve a better combined ROC point than either alone
+$$</div>
+      <div class="key-finding">The ROC curve insight is fundamental: for any fixed model, the operating point moves along the ROC curve as threshold changes. Improving both FPR AND TPR requires improving the model itself (higher AUROC), not adjusting the threshold. Mark: (a) 2, (b) 3, (c) 3, (d) 2.</div>
+    </div></details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-box">
+    <div class="qnum">Q4 — Insider Threat Multi-Modal Design [12 Marks]</div>
+    <div class="qtxt">A defence establishment wants to deploy an insider threat detection system for 1,000 employees. The CISO specifies: "We need to detect compromised credentials within 24 hours with ≥ 85% detection rate and ≤ 0.5% false positive rate per month."<br><br>
+    (a) The organisation has three candidate approaches: (i) Rule-based alerts only (e.g., after-hours login), (ii) LSTM Autoencoder on temporal sequence of events, (iii) Multi-modal anomaly detection combining temporal + content + volume features. Rank these by expected performance on the CISO's requirements and justify. [4 marks]<br>
+    (b) Design the feature vector for the multi-modal approach. List 10 features across three modalities (temporal, content-access, communication), specifying for each: the modality, feature type (count/rate/flag/categorical), and expected value range for a normal user. [4 marks]<br>
+    (c) The system flags User X for investigation. The LSTM AE reports RE=0.412 (threshold τ=0.090). The per-feature reconstruction errors are: Login_hour_deviation: 0.248, Files_accessed_fin: 0.089, Files_accessed_hr: 0.062, Ext_email_count: 0.013. Write a one-paragraph analyst brief explaining what behaviour drove the anomaly, suitable for submission to a security officer who is not an ML expert. [4 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Ranking and justification:</strong></p>
+      <p><strong>Rank 1: Multi-modal (best).</strong> Combines temporal (WHEN), content (WHAT), volume (HOW MUCH), and communication (WHO) dimensions. A sophisticated attacker who operates during business hours evades temporal-only detection, but cross-domain data access (finance + HR + engineering in one session) and unusual external email count still flag them. Multi-modal covers the detection gaps of each single-modality approach. Expected: ≥85% TPR, ≤0.5% FPR/month achievable with careful feature engineering and threshold calibration.</p>
+      <p style="margin-top:5px"><strong>Rank 2: LSTM Autoencoder (temporal).</strong> Captures temporal sequence patterns automatically, detecting deviations from established user timing baselines. Achieves 86.7% TPR in Case B. However misses the 2 accounts who operated during normal hours. FPR depends heavily on how much legitimate after-hours work occurs in the organisation. For 1,000 users, 0.5% FPR/month = ≤5 false alerts/month — achievable with per-user personalised thresholds but challenging for users with irregular work patterns.</p>
+      <p style="margin-top:5px"><strong>Rank 3: Rule-based (weakest).</strong> Simple rules (after-hours login → alert) have very high FPR in any real organisation (shift workers, overseas time zones, legitimate overtime) and very low TPR on sophisticated attackers who operate during business hours. Cannot be tuned to the CISO's 0.5% FPR requirement without making the rules so permissive they become useless.</p>
+
+      <p style="margin-top:10px"><strong>(b) Multi-modal feature vector (10 features):</strong></p>
+      <div class="formula">TEMPORAL MODALITY (4 features):
+  F1: Login_hour                 [count/float]     Normal: 8.0–18.0 hrs
+  F2: Login_hour_deviation       [float]            Normal: < 2.0 hrs from personal μ
+  F3: Weekend_login_flag         [binary flag]      Normal: 0 (most office workers)
+  F4: Session_duration_minutes   [count]            Normal: 30–480 min/session
+
+CONTENT-ACCESS MODALITY (4 features):
+  F5: Files_accessed_financial   [count/day]        Normal: 0–5 for non-finance staff
+  F6: Files_accessed_HR          [count/day]        Normal: 0–2 for non-HR staff
+  F7: Files_accessed_classified  [count/day]        Normal: varies by clearance level
+  F8: Unique_folder_paths        [count/day]        Normal: 3–15 (routine work areas)
+
+COMMUNICATION MODALITY (2 features):
+  F9: External_email_recipients  [count/day]        Normal: 1–8 unique external addresses
+  F10: USB_data_transfer_MB      [float/day]        Normal: 0 MB (most users)</div>
+
+      <p style="margin-top:8px"><strong>(c) Analyst brief for User X:</strong></p>
+      <div class="formula-display">$$
+SECURITY ALERT — USER X — ANOMALY SCORE: HIGH (RE=0.412, threshold=0.090)
+
+Summary for Security Officer:
+Our behavioural AI system has flagged User X for urgent investigation based 
+on an unusual combination of activities that deviate significantly from their 
+established work patterns.
+
+The most significant driver of this alert is a substantial LOGIN TIME DEVIATION
+(anomaly contribution score: 0.248 out of 0.412 total) — User X's account was 
+accessed at an unusual hour well outside their typical working pattern. This alone 
+is concerning.
+
+However, the alert is reinforced by UNUSUAL FILE ACCESS patterns: User X accessed 
+significantly more FINANCIAL documents (score: 0.089) and HR records (score: 0.062) 
+than is normal for their role. This cross-departmental data access is particularly 
+suspicious when combined with the off-pattern login time.
+
+The combination of: (a) login outside normal hours, (b) accessing financial files 
+beyond typical volume, and (c) accessing HR records atypical for their role, 
+collectively indicates potential credential compromise or malicious insider activity.
+
+RECOMMENDED ACTION: Verify with User X's supervisor whether these activities 
+were pre-authorised. If no authorisation, escalate to incident response.
+No unusual external email activity was detected (score: 0.013 — within normal range).
+$$</div>
+      <div class="key-finding">The analyst brief translates ML output (reconstruction error per feature) into actionable security intelligence: WHAT deviations occurred, HOW significant each was, and WHAT actions to take. The brief correctly identifies the dominant features, provides context (is this authorised?), and appropriately notes what WAS normal (no email anomaly). This is the bridge between ML anomaly detection and human decision-making. Mark: (a) 4, (b) 4, (c) 4.</div>
+    </div></details>
+  </div>
+
+  <div class="mark-scheme">
+    <table>
+      <tr><th>Question</th><th>Topic</th><th>Marks</th><th>Difficulty</th></tr>
+      <tr><td>Q1</td><td>Isolation Forest — manual path length & anomaly score computation</td><td>8</td><td>Medium</td></tr>
+      <tr><td>Q2</td><td>Autoencoder FPR/TPR threshold analysis using Gaussian RE distributions</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q3</td><td>OCSVM ν parameter design, interpretation and ROC trade-off</td><td>10</td><td>Medium</td></tr>
+      <tr><td>Q4</td><td>Insider threat system design, feature engineering and analyst brief</td><td>12</td><td>Hard</td></tr>
+      <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>40</strong></td><td></td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4 &nbsp;|&nbsp;
+  Lecture 5, Part 3: Answers & Assignment
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

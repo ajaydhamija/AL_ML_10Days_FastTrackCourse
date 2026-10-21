@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 4 Quiz — Clustering & Dimensionality Reduction</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--teal:#0D5C6F;--teal2:#128A9E;--lblue:#BDD7EE;
+    --green:#1E7A45;--orange:#E05218;--red:#C0392B;--amber:#C98A12;
+    --white:#FFFFFF;--light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--yellow:#FFF2A0;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+  #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px 18px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#0A2A30 100%);}
+  #intro .badge{background:var(--teal);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:16px;}
+  #intro h1{font-size:clamp(20px,4.5vw,32px);font-weight:800;line-height:1.2;margin-bottom:10px;}
+  #intro .sub{font-size:clamp(12px,2.5vw,15px);color:var(--lblue);margin-bottom:26px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:11px;max-width:620px;width:100%;margin:0 auto 24px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:11px;padding:12px;text-align:center;}
+  .info-card .val{font-size:clamp(20px,4.5vw,28px);font-weight:800;color:var(--teal2);}
+  .info-card .lbl{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:11px;padding:14px 18px;max-width:580px;width:100%;margin:0 auto 24px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:13px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:12.5px;color:#D0E8F5;margin-bottom:5px;list-style:none;padding-left:16px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:var(--teal2);}
+  .btn-start{background:var(--teal);color:#fff;border:none;padding:13px 44px;border-radius:28px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(13,92,111,0.5);transition:transform .15s;}
+  .btn-start:hover{transform:scale(1.04);}
+  .footer-info{margin-top:20px;font-size:11px;color:var(--grey);}
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--teal);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:var(--teal2);stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+  .qbody{flex:1;display:flex;flex-direction:column;padding:20px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+  .qtext{font-size:clamp(14px,2.6vw,18px);font-weight:700;color:var(--dark);line-height:1.45;margin-bottom:18px;padding:14px 16px;background:#fff;border-left:5px solid var(--teal);border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+  .options{display:grid;gap:10px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 5px rgba(0,0,0,0.04);}
+  .opt-key{min-width:27px;height:27px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+  .opt-text{font-size:13px;color:var(--dark);line-height:1.4;padding-top:4px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;}.opt.correct .opt-key{background:var(--green);}
+  .opt.wrong{border-color:var(--red);background:#FDE8E8;}.opt.wrong .opt-key{background:var(--red);}
+  .qfooter{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 16px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:26px 16px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#0A2A30 100%);}
+  #end h2{font-size:clamp(20px,5vw,30px);font-weight:800;margin-bottom:8px;}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid var(--teal2);border-radius:16px;padding:20px 36px;margin:14px 0 20px;}
+  .score-box .score-val{font-size:50px;font-weight:800;color:var(--teal2);}
+  .score-box .score-max{font-size:16px;color:var(--lblue);}
+  .score-box .score-grade{font-size:18px;color:var(--yellow);margin-top:6px;font-weight:700;}
+  .btn-restart{background:var(--teal);color:#fff;border:none;padding:11px 32px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;}
+  @media(max-width:600px){.options{grid-template-columns:1fr;}.info-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div id="intro">
+  <div class="badge">LECTURE 4 QUIZ</div>
+  <h1>Clustering &<br>Dimensionality Reduction</h1>
+  <p class="sub">Unsupervised Learning Part 1 — Unit 4</p>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong</div></div>
+  </div>
+  <div class="rules">
+    <h3>Instructions</h3>
+    <ul>
+      <li>Auto-advances at <strong>40 seconds</strong> — negative marking applies</li>
+      <li>Covers: k-Means · DBSCAN · GMM · EM Algorithm · Hierarchical · PCA · t-SNE · UMAP</li>
+      <li>Maximum: <strong>15 marks</strong></li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+
+<div id="quiz">
+  <div class="qheader">
+    <div><div class="qtag">LECTURE 4 QUIZ</div><div class="qcourse">Clustering & Dim. Reduction</div></div>
+    <div class="timer-circle">
+      <svg width="48" height="48" viewBox="0 0 48 48">
+        <circle class="bg" cx="24" cy="24" r="20"/>
+        <circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/>
+      </svg>
+      <div class="timer-text" id="timerNum">40</div>
+    </div>
+  </div>
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+
+<div id="end">
+  <h2>Quiz Complete!</h2>
+  <p style="color:var(--lblue);font-size:14px;margin-bottom:4px;">Lecture 4 — Clustering & Dimensionality Reduction</p>
+  <div class="score-box">
+    <div class="score-val" id="finalScore">0</div>
+    <div class="score-max">out of 15 marks</div>
+    <div class="score-grade" id="finalGrade"></div>
+  </div>
+  <p style="color:var(--lblue);font-size:14px;">Full answers in <strong>Lecture 4 — Part 3</strong></p>
+  <button class="btn-restart" onclick="location.reload()">↺ Restart</button>
+  <p style="margin-top:14px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+
+<script>
+const Qs=[
+  {q:"k-Means minimises the Within-Cluster Sum of Squares (WCSS): J = Σⱼ Σ_{x∈Cⱼ} ||x − μⱼ||². The M-step (centroid update) sets μⱼ = (1/|Cⱼ|) Σ_{x∈Cⱼ} x. Why does this specific formula for μⱼ minimise the contribution of cluster Cⱼ to WCSS?",
+   opts:["Because the mean minimises the sum of squared deviations from a fixed point — taking the derivative ∂/∂μⱼ (Σ ||x−μⱼ||²) = 0 yields exactly μⱼ = mean of Cⱼ","Because the median minimises absolute deviations and the mean minimises squared deviations, but k-Means accidentally uses the median rather than the mean","Because the centroid is always the geometric centre of the convex hull bounding the cluster, which by Euclidean geometry uniquely minimises the sum of squared distances","Because WCSS is a quadratic form and its global minimum is always achieved at the mean regardless of the distribution of points in the cluster"],
+   ans:0,exp:"∂/∂μⱼ Σ_{x∈Cⱼ} ||x−μⱼ||² = −2 Σ (x−μⱼ) = 0 → Σx = |Cⱼ|·μⱼ → μⱼ = (1/|Cⱼ|)Σx. The mean IS the point minimising sum of squared Euclidean distances — this is precisely why we use it. k-Means is therefore guaranteed non-increasing WCSS at each M-step."},
+  {q:"The OPFOR clustering case study found k=5 optimal using both the Elbow Method (sharp WCSS drop from k=4 to k=5, then flattening) and Silhouette Score (S=0.712 at k=5, maximum across all k tested). Why is it important to USE BOTH methods rather than relying on just one?",
+   opts:["Using both methods doubles computation time, and the average of the two answers gives a more accurate k than either alone","The Elbow Method can produce an ambiguous, gradual curve rather than a sharp elbow, making k selection uncertain. Silhouette directly measures cluster quality (cohesion vs separation) rather than just inertia reduction, providing an independent validation. Agreement of both methods gives much stronger evidence for the chosen k","The Elbow Method requires the data to be normalised while Silhouette does not — using both corrects for this scaling inconsistency","Both methods are mathematically identical and produce the same result; using both is simply a regulatory requirement for defence AI systems"],
+   ans:1,exp:"Elbow detects when adding more clusters gives diminishing returns in explaining variance — but the 'elbow' can be gradual or subjective. Silhouette independently measures both cohesion (a: how tight within-cluster) and separation (b: how far from nearest other cluster) — a direct quality measure. WCSS always decreases with k; Silhouette peaks at the optimal k, making it a more direct indicator. Their agreement is powerful convergent evidence."},
+  {q:"In the OPFOR trajectory dataset, DBSCAN (ε=0.45, MinPts=8) identified 142 noise points (1.78% of data) that k-Means had forced into existing clusters. Upon expert investigation, these were revealed to be deliberate DECEPTION MANOEUVRES. What property of DBSCAN makes it able to detect these while k-Means cannot?",
+   opts:["DBSCAN uses more iterations than k-Means, allowing it to detect subtle patterns that converge slowly","DBSCAN explicitly classifies points that are NOT within ε of at least MinPts other points as NOISE rather than forcing them into the nearest cluster. These low-density isolated trajectories — with unusual combinations of features — are exactly what k-Means would assign to the most similar cluster, masking them","DBSCAN normalises features before clustering while k-Means does not, making DBSCAN more sensitive to unusual feature values","DBSCAN computes pairwise distances between ALL points, inherently detecting outliers as the points with the largest minimum distances to any other point"],
+   ans:1,exp:"k-Means hard-assigns every point to the nearest centroid — no concept of 'outlier'. A deceptive trajectory that doesn't match any of 5 archetypes still gets forced into whichever centroid is geometrically nearest, hiding it. DBSCAN's noise label identifies points that lack sufficient density in their neighbourhood — they are the 'loners' of feature space, which is exactly the signature of rare, unusual behaviours like deception manoeuvres."},
+  {q:"A Gaussian Mixture Model with K=5 components computes soft membership r_ik = π_k N(x_i; μ_k, Σ_k) / Σⱼ πⱼ N(x_i; μⱼ, Σⱼ). Trajectory T_481 has r(ASSAULT)=0.62 and r(INFILTRATION)=0.38. What is the operational significance of this ambiguous assignment, and how does it differ from k-Means behaviour for the same trajectory?",
+   opts:["GMM reports an error code for trajectories with split membership. k-Means automatically resolves such ambiguity by iterating until the trajectory achieves r=1.0 for one cluster","GMM correctly reports that T_481 has characteristics overlapping two archetypes — it is 62% consistent with ASSAULT and 38% consistent with INFILTRATION. k-Means would hard-assign it to ASSAULT (nearest centroid) and hide the ambiguity. The GMM's soft output correctly signals to analysts that this trajectory warrants scrutiny — it could be an ASSAULT force using INFILTRATION-style movement","GMM assigns T_481 to the cluster with the highest weight (ASSAULT at 62%) in a hard decision identical to k-Means, but reports the soft probabilities as a post-processing visualisation step","GMM's soft assignments are meaningless probabilities: since both clusters are Gaussian, any trajectory will always receive partial membership in multiple clusters, so r=0.62/0.38 carries no actionable intelligence value"],
+   ans:1,exp:"GMM's soft memberships are meaningful probabilistic statements: T_481's feature vector is geometrically near the boundary between ASSAULT and INFILTRATION clusters. k-Means forces a hard choice (ASSAULT) and discards the 38% INFILTRATION signal entirely. GMM preserves this uncertainty, correctly flagging T_481 as an ambiguous case warranting analyst attention — is this a fast ASSAULT force adopting evasion techniques (i.e., a more sophisticated threat)? The ambiguity IS the intelligence product."},
+  {q:"In the GMM EM Algorithm, the M-step computes Σ_k = (1/N_k) Σᵢ r_ik (x_i − μ_k)(x_i − μ_k)ᵀ. A known failure mode is covariance singularity where Σ_k → 0. When does this happen and what is the standard fix?",
+   opts:["Singularity occurs when N_k > N/K (a cluster captures more than its fair share of points), preventing matrix inversion. Fix: constrain all clusters to equal size by adjusting π_k","Singularity occurs when a single point has r_ik ≈ 1.0 for some cluster k, making N_k ≈ 1 and Σ_k ≈ 0 (a one-point cluster has zero spread). The covariance then has near-zero eigenvalues, making its inverse N(x; μ_k, Σ_k) → ∞, destabilising the E-step. Fix: add regularisation Σ_k += ε·I (e.g., ε=0.01) to keep eigenvalues away from zero","Singularity occurs when the log-likelihood L(θ) fails to increase during the M-step, which by EM theory should never happen but does in practice for K > 10. Fix: reduce K to avoid numerical overflow","Singularity is a fixed property of the data determined at initialisation and cannot be corrected during training — the only fix is to restart with a different random seed"],
+   ans:1,exp:"If a cluster 'collapses' — its mean μ_k moves exactly onto one training point xᵢ — then all other points have near-zero responsibility for that cluster (N_k → 1). The computed Σ_k is the outer product of a single zero vector → near-zero matrix → N(xᵢ; μ_k, 0) = ∞. This makes the log-likelihood diverge to +∞, which is a numerical degenerate solution. Regularisation Σ_k += εI keeps minimum eigenvalues ≥ ε, bounding N(x; μ_k, Σ_k) and preventing collapse."},
+  {q:"Ward linkage hierarchical clustering merges clusters by minimising the INCREASE in WCSS from the merge. The case study showed Ward's dendrogram cut at height 1.5 producing 5 clusters with ARI=0.847 agreement with k-Means. Why does Ward linkage consistently outperform Single and Complete linkage for defence trajectory data?",
+   opts:["Ward linkage uses a different distance metric (Mahalanobis) than Single/Complete (Euclidean), making it more appropriate for high-dimensional feature spaces","Ward linkage penalises merges proportional to how much within-cluster variance increases — it preferentially creates compact, homogeneous clusters similar to k-Means objectives. Single linkage suffers from 'chaining' (elongated chains of points), Complete linkage oversizes small compact clusters. For trajectory data where compact archetypes are expected (PATROL is genuinely tight in feature space), Ward's preference for compact, roughly spherical merges is well-matched","Ward linkage is the only hierarchical method that supports the dendrogram cut being determined automatically by a statistical test, while Single and Complete require manual height selection","Ward linkage runs in O(N log N) time compared to Single linkage's O(N³), making it the only computationally feasible method for the 8,000-trajectory dataset"],
+   ans:1,exp:"Ward's merge criterion: merge clusters A and B minimising ΔJ = (n_A·n_B/(n_A+n_B)) ||μ_A − μ_B||². This penalises merges that create internally diverse clusters. Single linkage follows the nearest-neighbour chain (vulnerable to chaining — connecting sparse bridge points). Complete linkage ensures all points in merged clusters are within a maximum distance (tends to break large natural clusters). For trajectory archetypes that are genuinely compact and spherical (tactical behaviour patterns are consistent within an archetype), Ward is the natural choice."},
+  {q:"PCA on the 12-feature OPFOR dataset found that 4 principal components explain 84.4% of variance. The WCSS drops from 4 features to 12 features when clustering, yet PCA can reduce to 4 features while retaining most information. What is the fundamental reason PCA can discard 8 features (dimensions) while retaining 84.4% of information?",
+   opts:["The 8 discarded dimensions contain identical information (exact duplicates) of the retained 4, so discarding them loses nothing by construction","Correlations among the 12 original features mean they share information — they do not span 12 independent directions of variation. PCA finds the orthogonal directions (eigenvectors) of the covariance matrix ordered by variance explained. The first 4 eigenvectors capture the dominant directions of variation; the remaining 8 directions explain only 15.6% of variance and largely represent noise or redundant information","PCA selects the 4 features with the highest individual variance and discards the 8 low-variance features, which is equivalent to feature selection rather than feature extraction","PCA retains information by storing the discarded 8 dimensions in a compressed database for later retrieval when needed, rather than truly eliminating them from the model"],
+   ans:1,exp:"The 12 original features are not independent — speed, max_speed, and direction_change are all correlated (fast units also tend to have high max speed and more directional change). PCA decomposes these correlations: PC1 captures the 'Activity/Aggression' direction (0.48 on speed, 0.41 on max_speed, 0.38 on direction_change) because that's the direction of maximum variance in the data. The covariance structure means 4 orthogonal directions suffice to explain most variation — the remaining 8 principal directions add little new information."},
+  {q:"The k-Distance plot for choosing DBSCAN's ε showed the 8th-nearest-neighbour distances sorted in ascending order, with a sharp 'knee' at approximately the 70th percentile (ε=0.45). Points ABOVE the knee (80th-100th percentile) have larger 8th-NN distances. What does a LARGE 8th-NN distance indicate about a trajectory, and why does setting ε above the knee cause problems?",
+   opts:["Large 8th-NN distance indicates a trajectory is very similar to many others — these are the core points that DBSCAN will merge first, and setting ε above the knee would prevent them from being classified as core points","Large 8th-NN distance indicates a trajectory is in a SPARSE region of feature space — few similar trajectories nearby. Setting ε well above the knee (e.g., ε=1.5) would include these sparse-region points in clusters — merging truly distinct clusters into one, losing the natural cluster boundaries and drastically reducing Silhouette score","Large 8th-NN distance causes infinite recursion in the DBSCAN density-reachability computation, so ε must always be set below the 70th percentile to avoid computational overflow","Large 8th-NN distance indicates measurement error in the trajectory data that should be cleaned before applying DBSCAN, and setting ε above the knee would effectively apply a data imputation step"],
+   ans:1,exp:"The k-distance plot reveals data density structure. Points with small k-NN distances are in DENSE regions (many similar neighbours close by) — these become core points and form cluster interiors. Points with large k-NN distances are in SPARSE regions (few or no similar neighbours within ε). The knee separates these regimes. Setting ε too large (above the knee) connects sparse-region points to clusters, merging what should be distinct clusters or noise into a single large mass — destroying cluster structure and inflating WCSS while reducing Silhouette."},
+  {q:"The Silhouette score formula s(i) = (b(i) − a(i)) / max(a(i), b(i)) uses both cohesion (a) and separation (b). A trajectory in Cluster C-4 (INFILTRATION) has a(i)=0.42 and b(i)=0.67. What is s(i), and what does this value tell an intelligence analyst about this specific trajectory?",
+   opts:["s(i) = 0.37; the trajectory is firmly in the INFILTRATION cluster with no risk of mis-assignment","s(i) = 0.37; the trajectory is reasonably assigned to INFILTRATION (positive s means correct cluster), but the nearest alternative cluster is not dramatically farther than the within-cluster average. The analyst should know this trajectory shares some features with the nearest other archetype (likely ASSAULT, which overlaps with INFILTRATION) and may warrant secondary review","s(i) = −0.37; the trajectory is likely mis-assigned and should be manually reviewed for possible reassignment to a different archetype","s(i) = 0.63; the maximum silhouette corresponds to b(i) because it is larger than a(i), so the formula selects b as the normalisation"],
+   ans:1,exp:"s(i) = (0.67−0.42)/max(0.42,0.67) = 0.25/0.67 = 0.373. Positive s means correctly assigned to INFILTRATION (b > a: the nearest other cluster is farther than within-cluster average). However s=0.37 is below the strong threshold (0.70), suggesting this trajectory sits near the cluster boundary. For intelligence: this trajectory has INFILTRATION characteristics but shares features with another archetype (high-speed evasion = could be fast ASSAULT in deceptive mode). This is an analyst flag, not an error."},
+  {q:"t-SNE uses a t-distribution (with 1 degree of freedom / Cauchy distribution) in the low-dimensional space while using a Gaussian in the high-dimensional space. What is the SPECIFIC mathematical reason for using the t-distribution in 2D?",
+   opts:["The t-distribution has heavier tails than a Gaussian, which prevents the 'crowding problem': in 2D, there is less space than in d-dimensional space, so moderately distant high-dim points would be crowded together. The t-distribution's heavy tail allows these points to be placed further apart in 2D while keeping near-neighbours close — avoiding the collapse of non-neighbourhood structure","The t-distribution is used because it makes the KL divergence objective convex, guaranteeing convergence to a global optimum unlike the non-convex optimisation that would result from using a Gaussian in 2D","The t-distribution with 1 degree of freedom is equivalent to the Gaussian distribution in 2D due to the central limit theorem, so the choice between them is arbitrary and only affects numerical stability during gradient computation","The t-distribution is chosen because it requires fewer parameters than a Gaussian (no mean or variance to estimate), making t-SNE's 2D optimisation significantly faster than it would be with Gaussian low-dimensional similarities"],
+   ans:0,exp:"The 'crowding problem': high-dim spaces have much more volume than 2D. A point with 10 equally-spaced neighbours in 12D cannot be faithfully represented in 2D without crowding — all 10 would need to cluster near the centre. The t-distribution's heavy tail (longer than Gaussian) allows moderately-dissimilar points to repel each other to large distances in 2D, giving non-neighbourhood structure room to breathe. This is why t-SNE produces clear cluster separation: the t-tail actively pushes different clusters apart."},
+  {q:"UMAP projects new, previously unseen trajectories into an existing 2D embedding for real-time classification. t-SNE cannot do this. What mathematical property of UMAP enables out-of-sample projection while t-SNE lacks it?",
+   opts:["UMAP stores the original training data in memory and computes new projections by k-NN lookup in the high-dimensional space, while t-SNE deletes training data after optimisation to save memory","UMAP learns an explicit parametric function f: ℝ^d → ℝ² (via the fuzzy simplicial complex approximation) that can be applied directly to new points. t-SNE is a non-parametric optimisation — it positions a specific set of training points by iterative gradient descent, but the resulting coordinates are not a function: there is no f that maps arbitrary new x to a position in the existing 2D space","UMAP uses random projections that are computed once and stored as a matrix W ∈ ℝ^{d×2}, while t-SNE uses iterative methods that are not reducible to a fixed matrix multiplication","UMAP out-of-sample projection uses kernel PCA under the hood, which always supports new data projection. t-SNE's use of KL divergence prevents it from supporting kernel methods"],
+   ans:1,exp:"t-SNE optimises coordinates {y₁,...,yN} by gradient descent on KL(P||Q) — the result is N specific 2D points, not a function. Given a new xN+1, there is no learned function to apply. UMAP learns a fuzzy topological representation that can be expressed as a parametric map from ℝ^d → ℝ² (via the simplicial set construction and its low-dimensional approximation). New points can be embedded by finding their nearest neighbours in the training set and applying the learned topology map — enabling real-time embedding of new trajectories."},
+  {q:"The PCA covariance matrix C = (1/N)X̄ᵀX̄ has eigenvectors V and eigenvalues Λ. PC1 has loading vector [0.48, 0.41, 0, 0, 0, 0, 0.38, 0, 0, 0, 0, 0] (non-zero on Speed, MaxSpeed, DirChange). An INFILTRATION trajectory is projected onto PC1. What does a HIGH PC1 score indicate, and why might INFILTRATION trajectories have lower PC1 scores than ASSAULT trajectories?",
+   opts:["A high PC1 score indicates the trajectory has high values on the features with negative loadings (PC1 measures suppression of speed-related features)","PC1 captures the 'Activity/Aggression' direction: high speed, high max speed, high direction change rate. INFILTRATION trajectories (moderate speed 29.4, moderate direction change 18.7°) are less extreme on all three than ASSAULT (speed 62.7, direction change 28.4°). Therefore INFILTRATION projects to LOWER PC1 scores than ASSAULT, and this difference is visible in PCA scatter plots as INFILTRATION clusters below ASSAULT along the PC1 axis","PC1 loadings are positive for speed features, but a high PC1 score means the trajectory moves perpendicular to the speed axis in feature space, not along it — so ASSAULT and INFILTRATION would have similar PC1 scores","PC1 scores are always zero-mean by construction, so high and low scores are relative only to each other within the dataset and cannot be used to compare specific trajectories to cluster archetypes"],
+   ans:1,exp:"PC1 loading [0.48 on Speed, 0.41 on MaxSpeed, 0.38 on DirChange]: a trajectory's PC1 score = 0.48×(speed) + 0.41×(maxspeed) + 0.38×(dirchange) (plus zero contributions from other features). ASSAULT: 0.48×62.7 + 0.41×118.4 + 0.38×28.4 = 30.1+48.5+10.8 = 89.4. INFILTRATION: 0.48×29.4 + 0.41×68.1 + 0.38×18.7 = 14.1+27.9+7.1 = 49.1. ASSAULT projects to PC1≈89.4, INFILTRATION to PC1≈49.1. The 'Activity/Aggression' axis cleanly separates these two archetypes that otherwise overlap in raw feature space."},
+  {q:"The Adjusted Rand Index (ARI) measures agreement between two cluster assignments. The OPFOR Ward Hierarchical clustering achieved ARI=0.847 with k-Means (k=5) clustering of the same data. What does ARI=0.847 imply about the TWO CLUSTERING SOLUTIONS?",
+   opts:["ARI=0.847 means that hierarchical clustering produced 84.7% of the same cluster assignments as k-Means, corrected for chance agreement. Since both methods use completely different mathematical approaches (agglomerative merging vs centroid optimisation), this high agreement provides strong evidence that the 5-archetype structure is genuine rather than an artefact of either algorithm","ARI=0.847 means that 84.7% of the trajectories were assigned to the same cluster number (e.g., both assigned to cluster '1') — but since k-Means and hierarchical clustering use different cluster numbering, only 15.3% of assignments agree","ARI=0.847 indicates that hierarchical clustering found 84.7% more clusters than k-Means (i.e., Ward found approximately 9 clusters vs k-Means's 5), and ARI measures this ratio","ARI cannot be meaningfully computed between two unsupervised methods since neither has ground-truth labels — ARI only applies when comparing clustering output to known ground truth"],
+   ans:0,exp:"ARI corrects for chance: ARI=0 means agreement at random, ARI=1.0 means perfect agreement. ARI=0.847 is exceptionally high between two algorithmically different methods — one (k-Means) minimises WCSS via centroid iteration, the other (Ward linkage) builds a merge tree minimising WCSS increase at each merge. Their agreement does NOT arise from mathematical dependency. High ARI between methodologically independent approaches is the gold standard for validating that clusters represent real structure in the data, not algorithmic artefacts."},
+  {q:"The Gap Statistic compares Gap(k) = E[log WCSS(k_random)] − log WCSS(k_data) to choose k. The expectation E[log WCSS(k_random)] is computed over reference datasets. What should these reference datasets look like, and why does comparing to random data validate the cluster count?",
+   opts:["Reference datasets should be samples from the actual OPFOR dataset with labels removed. Comparing to labelled data ensures the Gap Statistic finds the 'true' number of classes encoded in the labels","Reference datasets are generated by UNIFORM random sampling within the bounding box (or PCA-aligned box) of the original data — preserving the overall data range but containing NO cluster structure. Gap(k) measures how much better the real data clusters compared to structureless random data. If real clusters are genuine, real WCSS(k) << random WCSS(k) → large positive Gap. Gap is maximised at the true k where the genuine structure is fully captured","Reference datasets are generated by k-Means clustering with k=1, then artificially adding Gaussian noise to create synthetic trajectories. Comparing to k=1 data tests whether the real data has more structure than a single Gaussian","Reference datasets must be generated from a multivariate Gaussian fit to the original data to ensure they have the same covariance structure, ensuring the Gap Statistic is unaffected by feature correlations"],
+   ans:1,exp:"The Gap Statistic logic: random data (no real clusters) has WCSS that decreases with k — but not as fast as data with genuine clusters. The null reference is structureless data (uniform in the feature bounding box). For each k, WCSS_random >> WCSS_real → Gap(k) > 0. At k less than the true number, Gap grows as k increases (more real clusters captured). At k = k_true, Gap is maximised (all genuine structure captured) and adding more clusters gives diminishing returns — Gap stops growing. This provides a principled, data-driven method for selecting k."},
+  {q:"In the OPFOR analysis, the recommended workflow was: k-Means → GMM → Ward Hierarchical → DBSCAN. Using k-Means output to INITIALISE GMM is specifically recommended over random initialisation for GMM. Why does k-Means initialisation improve GMM?",
+   opts:["k-Means initialisation forces GMM to start with spherical covariances Σ_k = I, which prevents singularity during the first E-step and guarantees convergence to the global likelihood maximum","k-Means provides μ_k̂ (cluster centres) that are already close to the GMM solution, dramatically accelerating EM convergence. Starting from k-Means centroids means the E-step is nearly correct at iteration 0 — responsibilities r_ik are approximately right from the start. This skips the slow initial phase where EM searches for reasonable cluster centres, reducing iterations from ~65 to ~20 in practice, while also substantially reducing risk of convergence to poor local maxima","k-Means initialisation sets π_k = 1/K exactly, which is mathematically required for the GMM EM algorithm to be valid. Random initialisation violates this requirement and produces biased EM updates in the first 10 iterations","k-Means and GMM are mathematically equivalent when Σ_k = σ²I (spherical covariances), so using k-Means output as GMM initialisation is not just helpful but required by the EM convergence theorem"],
+   ans:1,exp:"EM is sensitive to initialisation because log-likelihood has multiple local maxima. Random init may place centroids in low-density regions, requiring many iterations to escape. k-Means centroids are already close to high-density cluster centres (k-Means also minimises intra-cluster distances). Starting EM with μ_k = k-Means_centroid_k, Σ_k = sample_cov_of_k-Means_cluster_k, π_k = cluster_fraction_k gives E-step responsibilities that are already good approximations → fast convergence (~20 vs ~65 iterations) and much less risk of degenerate local maxima."}
+];
+
+let currentQ=0,score=0,timer=null,answered=false;
+const TOTAL_TIME=40,DASH=2*Math.PI*20;
+const $=id=>document.getElementById(id);
+function startQuiz(){$('intro').style.display='none';$('quiz').style.display='flex';loadQuestion();}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered=false;const q=Qs[currentQ];
+  $('qnum').textContent=`Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('progressFill').style.width=`${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent=`Score: ${score.toFixed(2)}`;
+  const optDiv=$('options');optDiv.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const d=document.createElement('div');d.className='opt';d.id=`opt${i}`;
+    d.innerHTML=`<div class="opt-key">${k}</div><div class="opt-text">${q.opts[i]}</div>`;
+    optDiv.appendChild(d);
+  });
+  renderMath(optDiv);
+  startTimer();
+}
+function startTimer(){
+  let remaining=TOTAL_TIME;
+  const circle=$('timerCircle'),numEl=$('timerNum');
+  circle.style.stroke='#128A9E';circle.style.strokeDashoffset=0;numEl.textContent=TOTAL_TIME;
+  timer=setInterval(()=>{
+    remaining--;numEl.textContent=remaining;
+    circle.style.strokeDashoffset=DASH*(1-remaining/TOTAL_TIME);
+    if(remaining<=10)circle.style.stroke='#E05218';
+    else if(remaining<=20)circle.style.stroke='#C98A12';
+    if(remaining<=0){clearInterval(timer);revealAnswer(-1);}
+  },1000);
+}
+function revealAnswer(chosen){
+  if(answered)return;answered=true;clearInterval(timer);
+  const q=Qs[currentQ];
+  if(chosen===q.ans)score+=1;else if(chosen>=0)score-=0.25;
+  q.opts.forEach((_,i)=>{
+    const el=$(`opt${i}`);
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===chosen&&chosen!==q.ans)el.classList.add('wrong');
+  });
+  setTimeout(advance,2500);
+}
+function advance(){currentQ++;if(currentQ>=Qs.length){showEnd();return;}loadQuestion();}
+function showEnd(){
+  $('quiz').style.display='none';$('end').style.display='flex';
+  const s=parseFloat(score.toFixed(2));$('finalScore').textContent=s;
+  let g='';
+  if(s>=12)g='🏆 Outstanding (≥12/15)';
+  else if(s>=9)g='⭐ Proficient (9–11/15)';
+  else if(s>=6)g='📚 Developing (6–8/15)';
+  else g='🔄 Needs Review (<6/15)';
+  $('finalGrade').textContent=g;
+}
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

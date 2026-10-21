@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 9 Quiz — Culmination & Revision</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--plum:#5E1F6A;--plum2:#8A3CA0;--lblue:#BDD7EE;
+    --green:#1E7A45;--red:#C0392B;--amber:#C98A12;
+    --white:#FFFFFF;--light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--yellow:#FFF2A0;
+    --l1:#E05218;--l2:#1E7A45;--l3:#6B2D8B;--l4:#0D5C6F;
+    --l5:#A93226;--l6:#2C3E80;--l7:#1B7A5E;--l8:#9B5E1A;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+  #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px 18px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#100818 100%);}
+  #intro .badge{background:var(--plum);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:16px;}
+  #intro h1{font-size:clamp(20px,4.5vw,32px);font-weight:800;line-height:1.2;margin-bottom:10px;}
+  #intro .sub{font-size:clamp(12px,2.5vw,15px);color:var(--lblue);margin-bottom:20px;}
+  .lec-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:20px;max-width:600px;}
+  .lec-tag{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#fff;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:11px;max-width:620px;width:100%;margin:0 auto 22px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:11px;padding:12px;text-align:center;}
+  .info-card .val{font-size:clamp(20px,4.5vw,28px);font-weight:800;color:var(--plum2);}
+  .info-card .lbl{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:11px;padding:14px 18px;max-width:580px;width:100%;margin:0 auto 22px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:13px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:12.5px;color:#D0E8F5;margin-bottom:4px;list-style:none;padding-left:16px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:var(--plum2);}
+  .btn-start{background:var(--plum);color:#fff;border:none;padding:13px 44px;border-radius:28px;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s;}
+  .btn-start:hover{transform:scale(1.04);}
+  .footer-info{margin-top:18px;font-size:11px;color:var(--grey);}
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:10px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--plum);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .lec-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;color:#fff;margin-left:6px;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);margin-top:2px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:var(--plum2);stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+  .qbody{flex:1;display:flex;flex-direction:column;padding:18px 20px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+  .qtext{font-size:clamp(13px,2.4vw,17px);font-weight:700;color:var(--dark);line-height:1.45;margin-bottom:14px;padding:12px 14px;background:#fff;border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+  .options{display:grid;gap:9px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:9px;cursor:pointer;}
+  .opt-key{min-width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0;color:#fff;}
+  .opt-text{font-size:12.5px;color:var(--dark);line-height:1.4;padding-top:3px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;}.opt.correct .opt-key{background:var(--green)!important;}
+  .opt.wrong{border-color:var(--red);background:#FDE8E8;}.opt.wrong .opt-key{background:var(--red)!important;}
+  .qfooter{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 14px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--plum);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 16px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#100818 100%);}
+  #end h2{font-size:clamp(20px,5vw,30px);font-weight:800;margin-bottom:8px;}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid var(--plum2);border-radius:16px;padding:20px 36px;margin:12px 0 18px;}
+  .score-box .score-val{font-size:50px;font-weight:800;color:var(--plum2);}
+  .score-box .score-max{font-size:16px;color:var(--lblue);}
+  .score-box .score-grade{font-size:18px;color:var(--yellow);margin-top:6px;font-weight:700;}
+  .btn-restart{background:var(--plum);color:#fff;border:none;padding:11px 32px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;}
+  @media(max-width:600px){.options{grid-template-columns:1fr;}.info-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div id="intro">
+  <div class="badge">LECTURE 9 — REVISION QUIZ</div>
+  <h1>Cross-Course Revision</h1>
+  <p class="sub">One question from each major topic · Lectures 1–8</p>
+  <div class="lec-tags">
+    <span class="lec-tag" style="background:#E05218">L1: Foundations</span>
+    <span class="lec-tag" style="background:#1E7A45">L2: Classification</span>
+    <span class="lec-tag" style="background:#6B2D8B">L3: Regression</span>
+    <span class="lec-tag" style="background:#0D5C6F">L4: Clustering</span>
+    <span class="lec-tag" style="background:#A93226">L5: Anomaly</span>
+    <span class="lec-tag" style="background:#2C3E80">L6: Q-Learning</span>
+    <span class="lec-tag" style="background:#1B7A5E">L7: Policy Grad.</span>
+    <span class="lec-tag" style="background:#9B5E1A">L8: MARL</span>
+  </div>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong</div></div>
+  </div>
+  <div class="rules">
+    <h3>Revision Quiz Instructions</h3>
+    <ul>
+      <li>Each question is tagged with its source lecture</li>
+      <li>Use this to identify which topics need more study</li>
+      <li>Maximum: <strong>15 marks</strong> · Negative marking applies</li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN REVISION QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+
+<div id="quiz">
+  <div class="qheader">
+    <div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div class="qtag">REVISION QUIZ</div>
+        <span class="lec-badge" id="lecBadge">L1</span>
+      </div>
+      <div class="qcourse">Cross-Course Culmination Unit 4</div>
+    </div>
+    <div class="timer-circle"><svg width="48" height="48" viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"/><circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/></svg><div class="timer-text" id="timerNum">40</div></div>
+  </div>
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext" style="border-left:5px solid #E05218">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+
+<div id="end">
+  <h2>Revision Quiz Complete!</h2>
+  <p style="color:var(--lblue);font-size:14px;margin-bottom:4px;">Lectures 1–8 Cross-Course Revision</p>
+  <div class="score-box"><div class="score-val" id="finalScore">0</div><div class="score-max">out of 15 marks</div><div class="score-grade" id="finalGrade"></div></div>
+  <p style="color:var(--lblue);font-size:13px;margin-bottom:10px;">Full worked answers in <strong>Lecture 9 — Part 3</strong></p>
+  <div id="topicsToReview" style="background:rgba(255,255,255,0.06);border-radius:10px;padding:12px 16px;max-width:500px;text-align:left;font-size:12px;color:#D0E8F5;margin-bottom:16px;"></div>
+  <button class="btn-restart" onclick="location.reload()">↺ Retry</button>
+  <p style="margin-top:12px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+
+<script>
+const Qs=[
+  {lec:'L1',col:'#E05218',
+   q:"Afghan mine detection classifier trained in 2003 achieved 94.1% accuracy. When deployed in Iraq in 2006 it dropped to 58.7%. Which data pitfall BEST explains this, and what should the developer have done before deployment?",
+   opts:["Overfitting: the model had too many parameters and memorised the Afghan training data. Fix: use a simpler model with fewer features","Covariate distribution shift: mine casing materials, burial patterns, and soil composition in Iraq differed from the Afghan training distribution. The model learned features of AFGHAN mines, not mines in general. Fix: collect even small Iraq samples and test distributional similarity (KS test on feature distributions) before deployment — never assume cross-theatre transfer without validation","Label noise: field technicians in Afghanistan mislabelled some safe areas as mined. Fix: relabel all training data before deploying to Iraq","Class imbalance: Iraq had fewer mines per square kilometre than Afghanistan, making the baseline accuracy misleading. Fix: apply SMOTE oversampling to equalise mine/no-mine ratios before redeployment"],
+   ans:1,exp:"Distribution shift (covariate shift): P(X) changes between train and deployment. Afghan mines used specific casing materials, burial depths, soil types, and spacing patterns. The ML model learned these spurious correlations — they predicted 'mine' based on features specific to Afghan conditions rather than universal mine signatures. In Iraq, these environmental features differed entirely. This is the core generalisation failure described in L1. Pre-deployment validation: collect even 50-100 Iraq samples, compute feature distribution overlap (KL divergence, KS test), and measure performance drop. If degradation is >5%, do NOT deploy — retrain with Iraq data."},
+  {lec:'L2',col:'#1E7A45',
+   q:"The IADS classifier has class imbalance: 78% Close In (CI), 12% Airborne (AB), 6% EW Jamming, 4% Ballistic Missile. Random Forest achieves 94% accuracy but the ABM team reports missing 87% of Ballistic Missiles. Which metric should the ABM team demand, and what architectural fix addresses the imbalance?",
+   opts:["They should demand higher overall accuracy (>96%) and use a larger forest (B=1000 trees) to fix the imbalance","They should demand Recall (TPR) per class, specifically Recall for Ballistic Missile = TP_BM/(TP_BM+FN_BM). 94% accuracy can coexist with 13% BM recall if the majority classes are nearly perfect. Fix: class-weighted loss (weight BM class by 1/0.04=25×), or SMOTE oversampling of BM samples, or adjust classification threshold specifically for BM — lower threshold increases BM recall at cost of some precision","They should demand F1-score averaged across all classes (macro-F1) and increase the number of IADS sensors to collect more Ballistic Missile training examples in the field","They should demand AUROC and retrain using XGBoost instead of RF, since XGBoost is specifically designed for imbalanced datasets"],
+   ans:1,exp:"Accuracy is a misleading metric under imbalance. If BM = 4% of data and the classifier predicts 'never BM', accuracy on BM = 0% but overall accuracy ≈ 96% (all other classes correct). For a threat identification system, MISSING a ballistic missile is catastrophically worse than a false alarm — the asymmetric cost demands HIGH RECALL for the rarest and most dangerous class. Class weights: penalise misclassifying BM by 25× (1/0.04) during training, making RF optimise for BM recall. This forces the algorithm to treat each BM sample as 25 samples' worth of gradient signal."},
+  {lec:'L2',col:'#1E7A45',
+   q:"A kNN classifier (k=1) achieves 99.8% training accuracy but only 72% test accuracy. A kNN (k=21) achieves 89.8% on both training and test. Explain this in terms of bias-variance tradeoff and identify which k is preferable for operational deployment.",
+   opts:["k=1 has low bias and low variance — it is always preferable because it memorises more training patterns. k=21 has high bias making it systematically wrong on difficult threats","k=1 has ZERO bias (perfectly fits all training points) but VERY HIGH variance — it memorises noise and outliers, producing different predictions with small data perturbations (99.8% train vs 72% test = massive overfitting). k=21 has higher bias (smooth decision boundary, misses some fine detail) but much LOWER variance — generalises stably (89.8% both). Deploy k=21: the 10% accuracy difference between train and test for k=1 is unacceptable operationally. The 89.8%/89.8% split for k=21 means it performs at test time as it does in validation — the only metric that matters","k=21 overfits more than k=1 because it uses more neighbours, creating a more complex decision boundary. k=1 is preferable because its lower test accuracy comes from using insufficient neighbours for smooth decision boundaries","Both classifiers are identically preferable since test accuracy is the only relevant metric — k=1 at 72% test and k=21 at 89.8% test are directly comparable and k=21 wins on this metric alone with no further analysis needed"],
+   ans:1,exp:"The bias-variance tradeoff: k=1 is the most flexible kNN (low bias — can fit any decision boundary perfectly) but HIGHLY sensitive to noise (high variance). Train accuracy 99.8% means it memorised training data. Test 72% means it fails on unseen data — classic overfitting signature. k=21 averages over 21 neighbours — the boundary is smooth and ignores individual noise points (higher bias, lower variance). The 89.8%/89.8% train/test match is the key operational indicator: this model generalises. In the field, you never see training data — you see new sensor readings. k=21's stability is what matters."},
+  {lec:'L3',col:'#6B2D8B',
+   q:"Ridge regression adds penalty λ||β||² to the OLS loss; Lasso adds λ||β||₁. A sensor fusion model has 45 features but an analyst suspects only 8 are truly relevant (the rest are noise). Which regulariser should be used and why does the geometry of the constraint region matter?",
+   opts:["Ridge regression should be used because it has a closed-form solution (X^TX + λI)^{-1}X^Ty which is always invertible even for collinear features — Lasso requires iterative coordinate descent and cannot handle more features than samples","Lasso should be used. The L1 penalty ||β||₁ has a diamond-shaped constraint region in parameter space with corners on the coordinate axes. The optimal solution often lands at a CORNER — where many coefficients are exactly ZERO. This is geometric sparsity: when the OLS ellipse intersects the constraint diamond at a corner, the corresponding features get zeroed out exactly. Ridge (L2 sphere) rarely touches axes — all coefficients shrink toward zero but remain non-zero. For the analyst's problem (45 features, 8 truly relevant), Lasso automatically performs feature selection, producing an interpretable model with 8-12 non-zero coefficients and exactly zero weight on irrelevant features","ElasticNet should be used because it combines L1 and L2 penalties, which is always superior to either alone for sensor fusion applications with collinear features","Neither regulariser helps with feature selection — the analyst should manually select the 8 features using domain expertise before applying OLS, because regularisation cannot distinguish relevant from irrelevant features in principle"],
+   ans:1,exp:"The diamond geometry is the key L3 insight. Ridge constraint: {β: Σβᵢ² ≤ t} — a hypersphere in d dimensions. The OLS loss ellipsoid is unlikely to be tangent to the sphere exactly ON an axis — shrinks all coefficients smoothly. Lasso constraint: {β: Σ|βᵢ| ≤ t} — a cross-polytope (diamond in 2D, having corners on coordinate axes). When the OLS loss ellipsoid intersects the Lasso diamond, the geometric tangent is very often at a CORNER (where some βᵢ = 0 exactly). This is why Lasso produces sparse solutions — pure geometry, not statistical magic. For 45 features with 8 truly relevant: Lasso will zero out ~37 irrelevant features exactly."},
+  {lec:'L3',col:'#6B2D8B',
+   q:"A Kalman Filter fuses Radar (z_radar=4.2 km, R_radar=0.04) and IR (z_IR=4.5 km, R_IR=0.25) measurements of a target range. The predict step gives x̂_{k|k-1}=4.0 km, P_{k|k-1}=0.09. The Kalman gain for a single-sensor 1D system is K = P H^T(H P H^T + R)^{-1} = P/(P+R). For the radar update: compute K_radar, and x̂_{k|k}. What does K_radar tell you about relative trust in the measurement vs prediction?",
+   opts:["K_radar = P/(P+R) = 0.09/(0.09+0.04) = 0.692; x̂_{k|k} = 4.0 + 0.692×(4.2−4.0) = 4.0+0.138 = 4.138 km. K≈0.69 means the filter trusts the radar measurement 69% and the prior prediction 31%, because the radar measurement noise (R=0.04) is much smaller than the prediction uncertainty (P=0.09)","K_radar = R/(P+R) = 0.04/(0.09+0.04) = 0.308; x̂_{k|k} = 4.0 + 0.308×0.2 = 4.062 km. The Kalman gain formula uses measurement noise in the numerator","K_radar = 0.5 always in a 1D Kalman Filter, representing equal weight between prediction and measurement. The posterior is simply the average of prior and measurement","K_radar = P/(P+R) = 0.692; however since R_radar < P, the filter IGNORES the measurement and returns x̂_{k|k} = x̂_{k|k-1} = 4.0 km, since high Kalman gain indicates unreliable measurement"],
+   ans:0,exp:"K = P/(P+R) = 0.09/(0.09+0.04) = 0.09/0.13 = 0.692. x̂_{k|k} = x̂_{k|k-1} + K(z−x̂_{k|k-1}) = 4.0 + 0.692×(4.2−4.0) = 4.0 + 0.692×0.2 = 4.0 + 0.138 = 4.138 km. Interpretation: K=0.692 means 69.2% weight on the new radar measurement and 30.8% on the prior prediction. The radar is trusted MORE than the prediction because R_radar=0.04 << P=0.09: measurement uncertainty is less than prediction uncertainty. If R were very large (noisy sensor), K→0 and the filter ignores the measurement (trusts the prediction). If P were very large (uncertain prediction), K→1 and the filter trusts the measurement completely."},
+  {lec:'L4',col:'#0D5C6F',
+   q:"k-Means converges with WCSS=18,440 at k=5 (Silhouette=0.712) and WCSS=15,260 at k=6 (Silhouette=0.664). A student argues: 'We should use k=6 because WCSS is lower.' What is the fundamental error in this reasoning, and which k is correct?",
+   opts:["The student is correct — lower WCSS always indicates a better clustering solution, so k=6 is objectively superior to k=5. The Silhouette score is only a secondary validation metric that can be ignored when WCSS gives a clear result","The error: WCSS always decreases as k increases (at k=N, WCSS=0). A lower WCSS at k=6 vs k=5 means nothing by itself — it is mathematically guaranteed, not an improvement signal. The Silhouette score (S) is a QUALITY measure: S=0.712 at k=5 means points are well-matched to their own cluster and well-separated from others. S=0.664 at k=6 means adding a 6th cluster actually DEGRADED cluster quality — it split a natural group into two artificial halves. Use k=5: it maximises cluster quality (Silhouette), not just WCSS reduction","The student is making a bias-variance error: k=6 overfits the training data (lower WCSS) but generalises poorly to new OPFOR trajectories. Fix: use cross-validation to select k that minimises out-of-sample WCSS on held-out trajectories","Both k=5 and k=6 are valid; the choice should be made by a military domain expert who reviews the cluster member lists, not by any statistical metric. Data-driven k selection is methodologically inappropriate for defence applications"],
+   ans:1,exp:"WCSS is a monotone decreasing function of k — you can ALWAYS reduce WCSS by adding more clusters. k=N gives WCSS=0 with N useless singleton clusters. The Elbow method looks for where the RATE OF DECREASE slows (diminishing returns), not absolute minimum. Silhouette directly measures what matters: are the clusters genuinely coherent (tight) and well-separated? S=0.712 at k=5 > S=0.664 at k=6: adding the 6th cluster HURT quality. This means k=6 split a real, natural cluster (say, ASSAULT) into two arbitrary halves. k=5 is correct — confirmed by both Elbow and Silhouette, and by the expert-cluster ARI=0.870."},
+  {lec:'L4',col:'#0D5C6F',
+   q:"DBSCAN (ε=0.45, MinPts=8) found 142 noise points in the 8,000-trajectory OPFOR dataset. A colleague suggests running k-Means afterwards on just the 142 noise points to classify them. Why would this be operationally counterproductive?",
+   opts:["k-Means on the 142 noise points is computationally infeasible because k-Means requires N > 10×k samples and 142/7 ≈ 20 samples per cluster would violate this requirement","The 142 noise points are classified as noise specifically because they have NO DENSE NEIGHBOURHOOD — they lack the density structure that defines meaningful clusters. Forcing k-Means on them would create k artificial clusters from inherently sparse, heterogeneous points. In the OPFOR case, the noise points represent DECEPTIVE MANOEUVRES that are deliberately unusual and varied. Grouping them into 'Deception Cluster 1' and 'Deception Cluster 2' creates a false structure — these trajectories are anomalies, not a homogeneous group. The operational value IS their noise status: flag each individually for analyst review, not cluster them together","k-Means would work well on the 142 noise points and is an appropriate follow-up step, but only if k is set to 1 (treating all deceptive trajectories as one category)","The colleague is correct — k-Means should always be run as a follow-up to DBSCAN to classify noise points, because DBSCAN's noise label is only temporary during the algorithm's execution"],
+   ans:1,exp:"DBSCAN noise points fail the density criterion — they have fewer than MinPts=8 points within ε=0.45. This means they are GENUINELY ISOLATED in feature space: no similar trajectories nearby. k-Means would force them into k groups regardless of actual similarity — if the 142 noise points represent 142 different types of unusual behaviour (some deceptive, some sensor errors, some truly novel tactics), k-Means would assign them to k clusters based on accidental proximity in feature space. The military intelligence value: each noise point is a POTENTIAL DECEPTION INDICATOR — an analyst should examine each individually or characterise them as 'unclassified/anomalous' rather than creating artificial sub-categories."},
+  {lec:'L5',col:'#A93226',
+   q:"An Isolation Forest trained on 482,000 normal network packets achieves inference in 0.002ms. An Autoencoder trained on the same data achieves 0.04ms. Both are deployed in a 3-tier architecture. What is the TOTAL daily inference compute for all 10 million packets using the recommended tier-1 (IF) + tier-2 (AE on flagged) deployment, if the IF flags 1.1% of packets?",
+   opts:["Total = 10M × 0.002ms = 20 seconds (IF screens all) + 10M × 0.04ms = 400 seconds (AE screens all) = 420 seconds total. The 3-tier architecture requires both methods to process all packets","Total = 10M × 0.002ms (IF on all) + 0.011×10M × 0.04ms (AE on flagged only) = 20s + 4.4s = 24.4 seconds per day. The AE only processes the 1.1% flagged by IF, reducing its daily load from 400s to 4.4s — a 99× reduction in AE compute. This is the operational advantage of the funnel architecture","Total = 10M × 0.04ms = 400 seconds. The IF is bypassed in tier-1 when an AE is available — the AE serves both tier-1 and tier-2 because it has higher accuracy","Total = 0.011 × 10M × 0.002ms = 0.22 seconds (IF only screens flagged) + 10M × 0.04ms = 400 seconds (AE screens everything). The tier-1 purpose is to flag the most suspicious packets, not to screen all packets"],
+   ans:1,exp:"3-tier funnel: Tier-1 (IF) screens ALL 10M packets → flags 1.1% = 110,000 packets. Tier-2 (AE) deep-scans only the 110,000 flagged packets. IF daily: 10M × 0.000002s = 20 seconds. AE daily: 110,000 × 0.00004s = 4.4 seconds. Total: 24.4 seconds/day. Compare to AE-on-everything: 10M × 0.00004 = 400 seconds. The funnel reduces AE compute by 400/4.4 = 91×. This is the operational efficiency case for tiered architecture: the fast (but less accurate) IF filters out 98.9% of traffic so the accurate (but slower) AE only works on genuinely suspicious traffic."},
+  {lec:'L5',col:'#A93226',
+   q:"The Insider Threat LSTM Autoencoder detected 13/15 compromised accounts within 48 hours (86.7% recall). Two accounts were missed because attackers operated during the victim's normal business hours. What is the MEAN TIME TO DETECT (MTTD) if the system's baseline MTTD is 31.4 hours, and why does reducing MTTD from the industry average of 207 days matter financially?",
+   opts:["The MTTD is irrelevant for insider threats — what matters is the percentage of accounts detected (86.7%), not how quickly they are detected. Financial impact is determined by the number of breaches, not their duration","MTTD = 31.4 hours. The reduction from 207 days to 31.4 hours (a 160× improvement) matters because breach costs scale with dwell time: every day an attacker is inside the network, they can exfiltrate more data, establish more persistence mechanisms, and cover their tracks more thoroughly. IBM's breach cost research shows breach costs grow roughly linearly with dwell time — a breach detected in 31.4 hours has a fraction of the cost of one discovered after 207 days. Additionally, early detection enables CONTAINMENT before exfiltration of the most sensitive data (which typically happens in the first 48-72 hours of a breach)","MTTD = 31.4 hours / 13 accounts = 2.4 hours per account, since the system must detect each account separately. The 207-day figure applies to accounts detected last","MTTD = 207 days (the industry average) because the 2 missed accounts (13.3% of compromised accounts) experienced the industry-average detection time, making the overall average 207 × 0.133 + 31.4 × 0.867 = 54.8 days"],
+   ans:1,exp:"MTTD = 31.4 hours (as stated in the case study — median time to detection across the 13 detected compromised accounts). The financial argument: IBM Cost of a Data Breach Report 2023 shows: breaches with dwell time < 200 days cost on average $1.02M less than breaches > 200 days. At 207 days vs 31.4 hours: the attacker in the 207-day case has 150× more time to: (1) exfiltrate intellectual property/classified materials, (2) establish persistent backdoors, (3) escalate privileges to higher-value systems, (4) delete forensic evidence. The early detection at 31.4 hours means catching the attacker BEFORE most exfiltration is complete and before persistence is established."},
+  {lec:'L6',col:'#2C3E80',
+   q:"In the wargame MDP, state s₁ has Q*(s₁, ATTACK)=18.7, Q*(s₁, DEFEND)=9.2. The discount factor γ=0.95. What does Q*(s₁, ATTACK)=18.7 represent in operational terms, and why can we conclude that ATTACK is optimal ONLY in state s₁?",
+   opts:["Q*(s₁, ATTACK)=18.7 means the attack will succeed with 18.7% probability in state s₁. ATTACK is universally optimal because 18.7 > 9.2 regardless of state","Q*(s₁, ATTACK)=18.7 = the EXPECTED CUMULATIVE DISCOUNTED REWARD starting from state s₁, taking action ATTACK, and then following the OPTIMAL POLICY from every subsequent state. This includes all future captures, kills, and losses, discounted by γ=0.95 per turn. ATTACK is optimal ONLY in s₁ because Q* depends on the full state vector — in a state s₂ where the unit is exposed, out of ammo, or OPFOR has AA coverage, Q*(s₂, ATTACK) might be 4.1 while Q*(s₂, DEFEND)=11.8. The optimal action changes with state — that is the entire point of Q-learning: learn state-dependent optimal actions, not a fixed global action","Q*(s₁, ATTACK)=18.7 is the immediate reward for attacking in state s₁. The optimal policy is computed by taking argmax over these immediate rewards, so ATTACK is globally optimal across all states wherever this value is highest","Q*(s₁, ATTACK)=18.7 means the expected number of enemy units destroyed by attacking from state s₁. Q-values have no discount factor interpretation — γ only affects the speed of convergence, not the Q-values themselves"],
+   ans:1,exp:"Q*(s,a) is the expected sum of future discounted rewards: Q*(s,a) = E[r₀ + γr₁ + γ²r₂ + ...| s₀=s, a₀=a, following π* thereafter]. For s₁ with high ammo, cover, and adjacent enemy: Q*(ATTACK)=18.7 reflects that attacking now leads to kills (+5), likely objective capture (+10), with γ-discounted future wins. The critical operational point: Q-values are STATE-SPECIFIC. A commander's optimisation: in state s₁ (favourable), attack. In state s₂ (out of ammo, exposed), defend or resupply. This context-sensitivity is the fundamental advantage of Q-learning over a fixed decision rule."},
+  {lec:'L6',col:'#2C3E80',
+   q:"Vanilla DQN without experience replay achieved 74% win rate; DQN with replay achieved 83%. The key mechanism is 'breaking temporal correlations.' Concretely: if the agent spends turns 1-20 fighting in the NORTHERN sector and turns 21-40 in the SOUTHERN sector, what SPECIFIC problem occurs without replay, and how does replay fix it?",
+   opts:["Without replay: the agent trains twice as fast on northern-sector states (seen earlier) than southern-sector states. Replay balances the frequency of updates across all states equally, fixing the training imbalance","Without replay: turns 1-20 generate correlated northern-sector state transitions. Updating on these in sequence causes the network to STRONGLY SPECIALISE in northern-sector tactics. When turns 21-40 begin, gradient updates for southern-sector states OVERWRITE the northern-sector knowledge (catastrophic forgetting). Simultaneously, the 40-step sequential batch has near-zero variance between samples — the gradient direction barely changes across 40 updates, causing the network to take one large step in a misleading direction. Replay buffer: randomly mixes samples from ALL turns and ALL episodes. A single mini-batch of 32 contains turns from northern, southern, and various intermediate states — the gradient averages over diverse situations, neither catastrophically forgetting nor over-specialising","Without replay: the DQN network's replay buffer fills with northern-sector states, preventing southern-sector states from being stored. Fix: increase replay buffer size to ensure all sectors fit","Without replay the DQN is forced to update on each transition immediately. This is computationally inefficient (no GPU batching). Replay enables efficient GPU batch processing, which is the primary advantage — the correlation-breaking is a secondary benefit"],
+   ans:1,exp:"Temporal correlation is the core stability problem. Without replay: gradient update at step t uses (s_t, a_t, r_t, s_{t+1}). At steps 1-20: all from northern sector. Network weights shift strongly toward northern tactics. At steps 21-40: southern sector updates now CONTRADICT the northern-specialised weights → oscillation. Also: consecutive transitions (s_t, s_{t+1}) share 99% of features → gradient estimates are extremely correlated (essentially 40 near-identical gradient steps instead of 40 independent ones). Replay: a batch of 32 samples drawn from 100K transitions spanning hundreds of episodes and both sectors. The gradient is an average over diverse situations → stable learning → both northern AND southern tactics retained."},
+  {lec:'L7',col:'#1B7A5E',
+   q:"PPO uses ε=0.2 (clip range). An action in state s has Â_t = +6.8 (good action). The old policy gave π_old(a|s)=0.12; after one gradient step the new policy gives π_new(a|s)=0.19. Compute r_t and L_CLIP. Is this transition clipped?",
+   opts:["r_t = 0.19/0.12 = 1.583. clip(1.583, 0.8, 1.2) = 1.2 (clipped). min(1.583×6.8, 1.2×6.8) = min(10.76, 8.16) = 8.16. Clipped — the policy increased this action's probability too fast (by 58.3%, exceeding the 20% PPO limit)","r_t = 0.12/0.19 = 0.632 (ratio inverted). clip(0.632, 0.8, 1.2) = 0.8. min(0.632×6.8, 0.8×6.8) = min(4.30, 5.44) = 4.30. Not clipped","r_t = 1.583. L_CLIP = 1.583 × 6.8 = 10.76 (unclipped). The gradient is not clipped when Â > 0, only when Â < 0 for a policy decrease","r_t = 1.583. clip(1.583, 0.8, 1.2) = 1.2. min(1.583×6.8, 1.2×6.8) = 8.16. But PPO would NOT use the clipped value here — the clipping only activates for bad actions (Â < 0)"],
+   ans:0,exp:"r_t = π_new/π_old = 0.19/0.12 = 1.583. Â_t = +6.8 (good action — want to increase probability). r_t = 1.583 > 1+ε = 1.2 → CLIPPED. clip(1.583, 0.8, 1.2) = 1.2 (hits upper bound). Unclipped: 1.583 × 6.8 = 10.76. Clipped: 1.2 × 6.8 = 8.16. min(10.76, 8.16) = 8.16. The clipped value (8.16) is LOWER → min selects it → L_CLIP = 8.16. PPO prevents the policy from making this good action more than 20% more probable per update, even though the advantage strongly suggests increasing it. This guards against overshooting — a 58.3% probability increase in one step could destabilise training."},
+  {lec:'L7',col:'#1B7A5E',
+   q:"SAC achieves 96.2% drone waypoint success; PPO achieves 94.3%. With 30% wind disturbance added, SAC drops to 88% and PPO to 71%. Why does the 17pp SAC advantage under wind disturbance EXCEED the 1.9pp advantage in calm conditions?",
+   opts:["SAC uses two Q-networks (Double-Q) which are specifically designed to handle wind disturbance — the dual-network architecture makes SAC physically robust to environmental perturbations in a way single-network PPO cannot replicate","SAC's maximum entropy objective forces the policy to maintain HIGH ENTROPY — a distribution over actions rather than one near-deterministic action. In calm conditions: both PPO (deterministic optimal thrust) and SAC (distribution over good thrusts) achieve similar waypoint success. Under 30% wind: wind shifts the drone to states slightly outside the training distribution. PPO's near-deterministic policy has no 'backup plan' for these perturbed states. SAC's high-entropy policy has already learned a spread of thrust vectors around the optimal — when wind pushes the drone to a perturbed state, the policy distribution still covers effective actions. The entropy regularisation IS the robustness mechanism","PPO's advantage degrades under wind because PPO uses on-policy sampling — wind changes the state distribution, making old policy data stale. SAC's off-policy replay buffer retains pre-wind experiences that better match the test conditions, giving it the advantage","SAC's robustness advantage compounds multiplicatively with wind strength: 1.9pp × 9 (wind factor 30%/3.4%) = 17pp. This is a general principle that all entropy-regularised methods scale their advantage proportionally with environmental perturbation magnitude"],
+   ans:1,exp:"The entropy mechanism explains the widening gap. In calm training: PPO converges to a near-deterministic optimal: 'In state s_optimal, thrust = [Fx=42.3N, Fy=18.1N].' SAC maintains H(π) ≈ 2.8 nats — a Gaussian with std ≈ 8N around the optimal. Both achieve ~95% in calm conditions. Wind: shifts state to s_perturbed (outside training distribution). PPO: the deterministic [42.3, 18.1] thrust is suboptimal for s_perturbed — no learned alternative. SAC: the Gaussian N(42.3, 8²) covers thrust values in the range [26, 58N] — s_perturbed is within this range, and the policy still has good probability mass on effective actions. SAC's robustness gap grows with the magnitude of perturbation because larger perturbations push states further from PPO's memorised state-action pairs while remaining within SAC's distributional coverage."},
+  {lec:'L8',col:'#9B5E1A',
+   q:"MAPPO uses a SHARED actor θ across all 6 agents. The actor input for agent i is [oᵢ, one-hot(i)]. Without the one-hot agent ID encoding, what specific failure mode emerges, and how does the one-hot vector fix it?",
+   opts:["Without one-hot: the shared network cannot process inputs of different dimensionality for heterogeneous agents (SEAD aircraft has different features than Infantry). The one-hot vector pads the input to a uniform dimension","Without one-hot: the network receives the same observation oᵢ = [nearby_units, position, health, ammo] for Infantry as for SEAD aircraft. Both agents have IDENTICAL inputs in overlapping state regions but need DIFFERENT optimal actions (Infantry should advance; SEAD should suppress air defences first). The shared network cannot learn agent-specific behaviour — it maps identical inputs to one action. With one-hot encoding [0,0,0,1,0,0] for Agent 4 (SEAD): the network learns separate response patterns for each agent ID. The same state s combined with agent_id=SEAD produces 'suppress SAM'; combined with agent_id=Infantry produces 'advance under cover'. One-hot unlocks agent-role specialisation within a shared parameter network","Without one-hot: the shared network's gradient updates are 6× too large because all 6 agents simultaneously update the same weights with potentially conflicting gradients. The one-hot vector acts as a gradient scaling mechanism that normalises each agent's contribution to 1/6 of the total update","Without one-hot: the agents cannot communicate with each other because the shared network has no mechanism to broadcast information between agents. The one-hot vector acts as the communication channel in MAPPO"],
+   ans:1,exp:"Role confusion without agent ID: consider Infantry and SEAD aircraft both in a state where an enemy unit is adjacent. Infantry optimal: ATTACK (close combat). SEAD optimal: SUPPRESS_AIR_DEFENCE (not the ground unit). Without agent ID: the network sees identical tactical states for both agents and must learn ONE response. It compromises, making Infantry partially suppress air defences (wrong) and SEAD partially engage ground units (wrong). With one-hot(SEAD=[0,0,0,0,0,1]): the full input [state, 0,0,0,0,0,1] activates SEAD-specific learned patterns. The network develops: for this tactical state + agent_id=SEAD → suppress air defence; + agent_id=Infantry → attack ground. Parameter sharing still works (same weights) but one-hot allows the network to CONDITION on role."},
+  {lec:'L8',col:'#9B5E1A',
+   q:"MAPPO (82.4%) exceeded the human expert team benchmark (81.3%) in the combined arms simulation. A defence procurement officer says: 'This proves AI should replace human commanders in combined arms operations.' Provide THREE specific technical reasons why this conclusion is premature.",
+   opts:["The conclusion is premature because: (1) MAPPO used more computing power than the human team; (2) the simulation ran at faster-than-real-time speed, giving MAPPO an unfair time advantage; (3) the human team was only given 60 seconds per decision while MAPPO had unlimited compute time","Three technical reasons the conclusion is premature: (1) SIM-TO-REAL GAP — 82.4% in a simulation that cannot capture fog of war, equipment failures, communications degradation, terrain friction, and human psychology. Real-world estimate is likely 65-70%. (2) ADVERSARIAL ADAPTATION — the human benchmark was a fixed evaluation scenario. Real OPFOR will observe MAPPO's patterns across repeated exercises and develop counter-strategies within hours. Fixed trained policies cannot adapt in real-time the way experienced commanders do. (3) SCENARIO GENERALITY — one combined arms attack scenario was tested. Military excellence requires performance across withdrawal, delay, defensive, urban, logistics interdiction, and coalition operations. MAPPO's 82.4% in ONE scenario type does not generalise to a broader operational capability claim","Three reasons: (1) the simulation used 2024-era computing hardware which will become obsolete; (2) MAPPO was not tested in winter conditions; (3) human commanders need rest breaks which were not accounted for in the comparison study","The conclusion is actually correct and the three technical reasons given by the officer are valid arguments IN FAVOUR of replacement: MAPPO's 82.4% vs 81.3% in any evaluation is sufficient evidence for a procurement decision under normal defence acquisition standards"],
+   ans:1,exp:"Procurement-grade AI evaluation requires far more than one benchmark result. (1) Sim-to-real: the simulator makes simplifying assumptions (perfect sensor data, known OPFOR, no communications failure, deterministic terrain effects). Every simplification favours AI that was trained in the same simulator. Real combined arms operations introduce irreducible uncertainty that the simulator cannot model. (2) Adversarial adaptation: the human benchmark was 81.3% in a standardised scenario. In a real exercise, experienced human OPFOR who observed MAPPO in three previous exercises would likely achieve 65%+ against MAPPO by exploiting its tactical patterns. Human commanders adapt in real-time; trained ML policies do not. (3) Scope: 1 scenario × 200K simulation episodes ≠ operational generalisation. Military doctrine tests across 6-12 core scenario types minimum."}
+];
+
+let currentQ=0,score=0,timer=null,answered=false;
+const wrongLecs=[];
+const TOTAL_TIME=40,DASH=2*Math.PI*20;
+const $=id=>document.getElementById(id);
+
+function startQuiz(){$('intro').style.display='none';$('quiz').style.display='flex';loadQuestion();}
+
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered=false;const q=Qs[currentQ];
+  $('qnum').textContent=`Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('qtext').style.borderLeftColor=q.col;
+  $('progressFill').style.width=`${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent=`Score: ${score.toFixed(2)}`;
+  const badge=$('lecBadge');
+  badge.textContent=q.lec; badge.style.background=q.col;
+  const optDiv=$('options');optDiv.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const d=document.createElement('div');d.className='opt';d.id=`opt${i}`;
+    d.innerHTML=`<div class="opt-key" style="background:${q.col}">${k}</div><div class="opt-text">${q.opts[i]}</div>`;
+    d.onclick=()=>revealAnswer(i);
+    optDiv.appendChild(d);
+  });
+  renderMath(optDiv);
+  startTimer();
+}
+
+function startTimer(){
+  let remaining=TOTAL_TIME;
+  const circle=$('timerCircle'),numEl=$('timerNum');
+  circle.style.stroke=Qs[currentQ].col;circle.style.strokeDashoffset=0;numEl.textContent=TOTAL_TIME;
+  timer=setInterval(()=>{
+    remaining--;numEl.textContent=remaining;
+    circle.style.strokeDashoffset=DASH*(1-remaining/TOTAL_TIME);
+    if(remaining<=10)circle.style.stroke='#C0392B';
+    else if(remaining<=20)circle.style.stroke='#C98A12';
+    if(remaining<=0){clearInterval(timer);revealAnswer(-1);}
+  },1000);
+}
+
+function revealAnswer(chosen){
+  if(answered)return;answered=true;clearInterval(timer);
+  const q=Qs[currentQ];
+  if(chosen===q.ans)score+=1;
+  else{
+    if(chosen>=0)score-=0.25;
+    wrongLecs.push(q.lec);
+  }
+  q.opts.forEach((_,i)=>{
+    const el=$(`opt${i}`);el.onclick=null;
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===chosen&&chosen!==q.ans)el.classList.add('wrong');
+  });
+  setTimeout(advance,2500);
+}
+
+function advance(){currentQ++;if(currentQ>=Qs.length){showEnd();return;}loadQuestion();}
+
+function showEnd(){
+  $('quiz').style.display='none';$('end').style.display='flex';
+  const s=parseFloat(score.toFixed(2));$('finalScore').textContent=s;
+  let g='';
+  if(s>=12)g='🏆 Outstanding — Assessment Ready (≥12/15)';
+  else if(s>=9)g='⭐ Proficient — Minor Revision Needed (9–11)';
+  else if(s>=6)g='📚 Developing — Targeted Revision Required (6–8)';
+  else g='🔄 Needs Significant Revision (<6/15)';
+  $('finalGrade').textContent=g;
+  if(wrongLecs.length>0){
+    const unique=[...new Set(wrongLecs)];
+    const lecColors={'L1':'#E05218','L2':'#1E7A45','L3':'#6B2D8B','L4':'#0D5C6F','L5':'#A93226','L6':'#2C3E80','L7':'#1B7A5E','L8':'#9B5E1A'};
+    const lecNames={'L1':'Foundations & Data Pitfalls','L2':'Classification','L3':'Regression & Sensor Fusion','L4':'Clustering','L5':'Anomaly Detection','L6':'Q-Learning & DQN','L7':'Policy Gradient Methods','L8':'Multi-Agent RL'};
+    $('topicsToReview').innerHTML='<strong style="color:#FFF2A0">📌 Topics to revisit:</strong><br><br>'+
+      unique.map(l=>`<span style="display:inline-block;background:${lecColors[l]};color:#fff;padding:2px 8px;border-radius:8px;font-size:11px;margin:3px;font-weight:700">${l}: ${lecNames[l]}</span>`).join('');
+  }
+}
+
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

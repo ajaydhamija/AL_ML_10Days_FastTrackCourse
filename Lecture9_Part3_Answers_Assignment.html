@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 9 — Part 3: Answers & Capstone Assignment</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--plum:#5E1F6A;--plum2:#8A3CA0;--lblue:#BDD7EE;
+    --green:#1E7A45;--red:#C0392B;--amber:#C98A12;
+    --light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--lgrey:#E0EBF5;
+    --yellow:#FFF3B0;--white:#FFFFFF;
+    --l1:#E05218;--l2:#1E7A45;--l3:#6B2D8B;--l4:#0D5C6F;
+    --l5:#A93226;--l6:#2C3E80;--l7:#1B7A5E;--l8:#9B5E1A;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  .top-bar{background:var(--navy);color:#fff;padding:13px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--plum);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .top-bar h1{font-size:16px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  .container{max-width:1000px;margin:0 auto;padding:22px 16px;}
+  .section-head{background:var(--navy);color:#fff;padding:11px 17px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:9px;}
+  .section-head .badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;}
+  .section-head h2{font-size:14px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:16px;margin-bottom:22px;}
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;margin-bottom:12px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:10px;border-left:4px solid var(--plum);}
+  .ans-card .qn{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:2px;}
+  .ans-card .lec{font-size:10px;font-weight:700;border-radius:6px;display:inline-block;padding:1px 6px;color:#fff;margin-bottom:4px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--plum);}
+  .ans-card .key{font-size:10px;color:var(--dark);}
+  .q-item{margin-bottom:14px;border-left:4px solid var(--plum);padding-left:12px;}
+  .q-item .qtag{display:inline-block;color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:4px;}
+  .q-item .qtext{font-weight:700;font-size:13px;margin-bottom:6px;}
+  .q-item .ans-line{font-size:13px;color:var(--plum);font-weight:700;margin-bottom:3px;}
+  .q-item .exp{font-size:12px;color:var(--grey);background:var(--light);padding:7px 10px;border-radius:6px;}
+  .assign-intro{background:var(--yellow);border:1px solid var(--amber);border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px;}
+  .assign-intro h3{color:var(--plum);margin-bottom:8px;font-size:15px;}
+  .q-box{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:14px;margin-bottom:12px;border-left:5px solid var(--plum);}
+  .q-box .qnum{font-size:11px;font-weight:700;color:var(--plum);text-transform:uppercase;margin-bottom:4px;}
+  .q-box .lec-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+  .q-box .lec-tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#fff;}
+  .q-box .qtxt{font-size:13px;font-weight:600;color:var(--dark);}
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--plum2);padding:7px 10px;background:var(--lgrey);border-radius:6px;list-style:none;margin-top:10px;}
+  details summary::before{content:"▶ ";color:var(--plum);}
+  details[open] summary::before{content:"▼ ";}
+  details .sol{background:#F6EEFF;border:1px solid #C090D8;border-radius:0 0 6px 6px;padding:12px 14px;font-size:12.5px;}
+  details .sol .formula{background:#fff;border:1.5px solid var(--plum);border-radius:6px;padding:9px;font-family:monospace;font-size:12px;margin:7px 0;white-space:pre-wrap;}
+  details .sol .kf{background:var(--yellow);border:1px solid var(--amber);border-radius:6px;padding:8px 12px;margin-top:9px;font-weight:700;font-size:12.5px;}
+  .mark-scheme{background:#fff;border:1px solid var(--lgrey);border-radius:8px;overflow:hidden;margin-top:14px;}
+  .mark-scheme table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .mark-scheme th{background:var(--plum);color:#fff;padding:8px 11px;text-align:left;}
+  .mark-scheme td{padding:7px 11px;border-bottom:1px solid var(--lgrey);}
+  .mark-scheme tr:last-child td{border-bottom:none;}
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:12px;font-size:11px;margin-top:8px;}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — REVISION ANSWERS & CAPSTONE ASSIGNMENT</div>
+    <h1>Lecture 9: Culmination — Revision Answers & Integrative Assignment</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);"><strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></div>
+</div>
+
+<div class="container">
+
+<!-- SECTION A: ANSWER KEY -->
+<div class="section-head"><div class="badge" style="background:var(--plum)">A</div><h2>Revision Quiz Answer Key (Cross-Course, L1–L8)</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="lec" style="background:var(--l1)">L1</div><div class="qn">Q1</div><div class="ans">B</div><div class="key">Covariate distribution shift (Afghanistan→Iraq)</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l2)">L2</div><div class="qn">Q2</div><div class="ans">B</div><div class="key">Demand Recall per class; class-weighted loss</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l2)">L2</div><div class="qn">Q3</div><div class="ans">B</div><div class="key">k=1: zero bias, high variance (overfitting); k=21 preferred</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l3)">L3</div><div class="qn">Q4</div><div class="ans">B</div><div class="key">Lasso L1 diamond geometry → exact zeros</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l3)">L3</div><div class="qn">Q5</div><div class="ans">A</div><div class="key">K=0.692; x̂=4.138km; high K=trust measurement</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l4)">L4</div><div class="qn">Q6</div><div class="ans">B</div><div class="key">WCSS always decreases with k; Silhouette measures quality</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l4)">L4</div><div class="qn">Q7</div><div class="ans">B</div><div class="key">Noise points are genuinely sparse; k-Means forces false structure</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l5)">L5</div><div class="qn">Q8</div><div class="ans">B</div><div class="key">IF: 20s + AE on 1.1% flagged: 4.4s = 24.4s total</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l5)">L5</div><div class="qn">Q9</div><div class="ans">B</div><div class="key">MTTD=31.4h; dwell time scales breach cost</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l6)">L6</div><div class="qn">Q10</div><div class="ans">B</div><div class="key">Q*(s₁,ATTACK) = expected cumulative discounted reward; state-specific</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l6)">L6</div><div class="qn">Q11</div><div class="ans">B</div><div class="key">Temporal correlation → catastrophic forgetting; replay fixes both</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l7)">L7</div><div class="qn">Q12</div><div class="ans">A</div><div class="key">r_t=1.583; clipped to 1.2; L_CLIP=8.16</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l7)">L7</div><div class="qn">Q13</div><div class="ans">B</div><div class="key">SAC entropy distribution covers perturbed states; PPO memorises exact states</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l8)">L8</div><div class="qn">Q14</div><div class="ans">B</div><div class="key">Without one-hot: role confusion; one-hot enables role specialisation</div></div>
+    <div class="ans-card"><div class="lec" style="background:var(--l8)">L8</div><div class="qn">Q15</div><div class="ans">B</div><div class="key">Sim-to-real gap + adversarial adaptation + scenario generality</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--grey);">Scoring: +1 correct | −0.25 incorrect | 0 skipped | Maximum: 15 marks</p>
+</div>
+
+<!-- SECTION B: SELECTED EXPLANATIONS -->
+<div class="section-head"><div class="badge" style="background:var(--plum)">B</div><h2>Key Explanations for Commonly Missed Questions</h2></div>
+<div class="section-body">
+  <div class="q-item"><div class="qtag" style="background:var(--l3)">Q4 — Ridge vs Lasso</div>
+  <div class="qtext">Why does Lasso perform feature selection but Ridge does not?</div>
+  <div class="ans-line">✅ B — The L1 diamond constraint region has corners on coordinate axes; the OLS ellipsoid is likely to be tangent at a corner, giving exact zeros.</div>
+  <div class="exp">Ridge L2 constraint: {β: Σβᵢ² ≤ t} is a smooth sphere — the OLS loss ellipsoid can be tangent to this sphere at infinitely many non-axis points. Ridge shrinks all coefficients toward zero but rarely reaches exactly zero. Lasso L1 constraint: {β: Σ|βᵢ| ≤ t} has corners at axis intersections (e.g., β = (t,0,0,...,0)). When the OLS loss ellipsoid intersects the diamond, it is geometrically very likely to be tangent at a corner — setting one or more coefficients exactly to zero. This automatic feature selection is why Lasso is preferred when you expect sparsity.</div></div>
+
+  <div class="q-item"><div class="qtag" style="background:var(--l6)">Q10 — Q-value interpretation</div>
+  <div class="qtext">What does Q*(s₁, ATTACK)=18.7 represent, and why is ATTACK only optimal in state s₁?</div>
+  <div class="ans-line">✅ B — Expected cumulative discounted reward from s₁ taking ATTACK and then acting optimally; optimality is state-dependent.</div>
+  <div class="exp">Q*(s,a) = E[Σ γᵏrₜ₊ₖ | s₀=s, a₀=a, π*]. The 18.7 is NOT a probability, NOT an immediate reward — it is the expectation over all future discounted rewards assuming optimal play after the first ATTACK action. In state s₁ (high ammo, terrain cover, enemy adjacent): ATTACK leads to kills (+5), objective capture (+10), discounted future wins. In state s₂ (exposed, low ammo): Q*(s₂,ATTACK) might be 4.1 while Q*(s₂,DEFEND)=12.3. The entire point of learning Q* is to capture this state-dependence: different tactical situations warrant different actions.</div></div>
+
+  <div class="q-item"><div class="qtag" style="background:var(--l7)">Q12 — PPO clipping</div>
+  <div class="qtext">Compute L_CLIP for r_t=1.583, Â=+6.8, ε=0.2.</div>
+  <div class="ans-line">✅ A — r_t=1.583 > 1+ε=1.2, clipped; L_CLIP = 1.2×6.8 = 8.16</div>
+  <div class="exp">r_t = π_new/π_old = 0.19/0.12 = 1.583. Â=+6.8 > 0 (good action — want to increase probability). clip(1.583, 0.8, 1.2) = 1.2 (upper bound hit — policy increased too fast). Unclipped = 1.583×6.8 = 10.76. Clipped = 1.2×6.8 = 8.16. min(10.76, 8.16) = 8.16 (clipped wins — lower value is more conservative). PPO limits this good action's probability increase to 20% per update, even though advantage strongly suggests going further. This prevents overshooting into an unstable policy.</div></div>
+</div>
+
+<!-- SECTION C: CAPSTONE ASSIGNMENT -->
+<div class="section-head"><div class="badge" style="background:var(--plum)">C</div><h2>Capstone Assignment 9 — Integrated Defence AI System Design</h2></div>
+<div class="section-body">
+  <div class="assign-intro">
+    <h3>🎯 The Integrated Challenge</h3>
+    <p>This is your capstone assignment — it tests your ability to SELECT, COMBINE, and JUSTIFY AI/ML algorithms across the full course. No single lecture is sufficient. You must integrate tools from at least 3 different lectures in each question.</p>
+    <p style="margin-top:8px"><strong>Total: 40 marks | Approx. 90 minutes | Attempt before revealing solutions!</strong></p>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-box">
+    <div class="qnum">Q1 — Cross-Lecture Pipeline Design [12 Marks]</div>
+    <div class="lec-tags">
+      <span class="lec-tag" style="background:var(--l1)">L1</span>
+      <span class="lec-tag" style="background:var(--l2)">L2</span>
+      <span class="lec-tag" style="background:var(--l4)">L4</span>
+      <span class="lec-tag" style="background:var(--l5)">L5</span>
+    </div>
+    <div class="qtxt">A CERT team monitors a military network with 2 million packets per day. The training data has: 1.9 million labelled normal packets, 80,000 labelled known-attack packets (4%), and approximately 20,000 unlabelled packets of unknown origin.<br><br>
+    (a) Identify which packets should be used to train each of the following, and justify: (i) a supervised threat classifier, (ii) an Isolation Forest, (iii) an Autoencoder anomaly detector. [4 marks]<br>
+    (b) Design a 3-tier deployment pipeline specifying: what each tier does, which algorithm runs at each tier, the latency requirement at each tier, and what information passes between tiers. [5 marks]<br>
+    (c) The team discovers their labelled attack data only contains DoS and Probe attacks. A new R2L attack type appears in production. Which tier(s) of your pipeline will detect it, and which will miss it? Explain. [3 marks]</div>
+    <details><summary>Show Full Solution</summary><div class="sol">
+      <p><strong>(a) Training data allocation:</strong></p>
+      <div class="formula-display">$$
+(i) SUPERVISED THREAT CLASSIFIER:
+   Use: 1.9M normal + 80K labelled attacks (known classes only)
+   Purpose: Identify KNOWN attack patterns (DoS, Probe) with high precision
+   Rationale: Supervised learning requires labels for each class
+   WARNING (L1): The 20K unlabelled packets must NOT be included without
+   validation — they may contain novel attacks that would contaminate labels
+   Handle imbalance: attack:normal = 4:96 → apply class weighting 24× for
+   attack class, or SMOTE to generate synthetic attack samples
+
+(ii) ISOLATION FOREST:
+   Use: ONLY the 1.9M normal packets (no attacks in training!)
+   Purpose: Learn the distribution of NORMAL to isolate deviations
+   Rationale: IF is semi-supervised anomaly detection — it learns the
+   "normal manifold" and flags anything isolated from it
+   Including attack data in IF training would make attacks LESS anomalous
+   (IF would learn "attack patterns are also somewhat normal")
+   The 20K unlabelled packets: EXCLUDE from training (may be attacks)
+
+(iii) AUTOENCODER ANOMALY DETECTOR:
+   Use: ONLY the 1.9M normal packets (train only on normal!)
+   Purpose: Learn to reconstruct normal traffic; high RE = anomaly
+   Rationale: AE trained only on normal traffic learns normal patterns
+   perfectly — attack packets produce high reconstruction error because
+   the AE never learned to reconstruct attack feature patterns
+   20K unlabelled: DO NOT include — same contamination risk as IF
+$$</div>
+      <p style="margin-top:8px"><strong>(b) 3-Tier Pipeline Design:</strong></p>
+      <div class="formula-display">$$
+TIER 1: ISOLATION FOREST (Real-Time Screening)
+  Algorithm: Isolation Forest (B=100, ψ=256)
+  Latency: ≤0.002ms per packet (handles 2M/day = 23 packets/second average)
+  What it does: Screens ALL 2M daily packets for statistical anomalies
+  Threshold: s* chosen for FPR=1.1% → flags ~22,000 packets/day as suspicious
+  Output → Tier 2: flagged packet features + anomaly score s(x)
+  Handles: NOVEL zero-day attacks (zero-day advantage!)
+  Misses: Sophisticated attacks designed to blend with normal distribution
+
+TIER 2: COMBINED AUTOENCODER + SUPERVISED CLASSIFIER
+  Algorithm: AE (reconstruction error) + RF classifier (ensemble decision)
+  Latency: ≤0.04ms per packet × 22,000 packets = 0.88 seconds (fine!)
+  What it does: Deep-scans Tier-1 flagged packets with two independent signals:
+    AE RE: Is this statistically unlike normal traffic? (unsupervised)
+    RF confidence: Does this match a known attack signature? (supervised)
+  Decision rule: Flag if (RE > τ_AE) OR (RF class ≠ 'Normal' with P > 0.80)
+  Output → Tier 3: confirmed anomalies with AE RE breakdown + RF class label
+  Handles: Both known attacks (RF) and unknown anomalies (AE)
+
+TIER 3: ANALYST INVESTIGATION
+  Latency: 1–10 minutes per alert
+  What it does: Human CERT analyst reviews per-feature RE breakdown,
+    checks against threat intelligence feeds, updates threat library
+  Inputs: AE per-feature RE (SHAP-explained), RF class probabilities,
+    packet metadata, historical context from similar packets
+  Output: Confirmed/dismissed alert + threat library update + IOC
+    (Indicators of Compromise) if new attack pattern confirmed
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Novel R2L attack — which tiers detect it:</strong></p>
+      <div class="formula-display">$$
+WILL DETECT: Tier 1 (IF) and Tier 2 (AE)
+
+Tier 1 (IF): Detects because R2L is statistically anomalous vs normal traffic
+  R2L involves failed login attempts, unusual auth sequences → these create
+  unusual values in src_bytes, failed_logins, num_shells features
+  → short path length in IF trees → high anomaly score s(x) → flagged ✓
+
+Tier 2 (AE): Detects because R2L features were never seen in training
+  The AE trained on normal traffic cannot reconstruct R2L auth patterns
+  → high reconstruction error on failed_logins, auth_protocol features ✓
+
+WILL MISS (partially): Tier 2 Supervised RF Classifier
+  RF was trained only on DoS + Probe attack classes
+  R2L produces a novel feature pattern not in the RF training distribution
+  RF will likely classify R2L as 'Normal' (nearest known class in RF decision
+  space is normal traffic, since R2L has never been seen)
+  HOWEVER: the AE in Tier 2 still catches it — so the COMBINED tier-2 system
+  succeeds even though the RF component fails
+
+KEY INSIGHT: This is exactly why a HYBRID tier-2 (AE + RF) outperforms
+either alone: AE covers novel attacks that RF misses; RF precisely classifies
+known attacks that may have borderline AE reconstruction error.
+$$</div>
+      <div class="kf">Mark Scheme: (a) 4 marks (1 per method × 3 + unlabelled handling 1). (b) 5 marks (Tier 1: 1.5, Tier 2: 2, Tier 3: 1, information flow 0.5). (c) 3 marks (IF detects 1, AE detects 1, RF misses but combined succeeds 1).</div>
+    </div></details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-box">
+    <div class="qnum">Q2 — Algorithm Selection Justification [10 Marks]</div>
+    <div class="lec-tags">
+      <span class="lec-tag" style="background:var(--l2)">L2</span>
+      <span class="lec-tag" style="background:var(--l4)">L4</span>
+      <span class="lec-tag" style="background:var(--l6)">L6</span>
+      <span class="lec-tag" style="background:var(--l8)">L8</span>
+    </div>
+    <div class="qtxt">For each of the following four defence AI problems, select the MOST appropriate algorithm from the course, justify in 2–3 sentences referencing specific course concepts, and name ONE key metric to validate success.<br><br>
+    (a) You have 50,000 past radar tracks labelled by experienced analysts as: Fighter, Bomber, Helicopter, UAV, or Civilian. You want to classify new tracks in real-time (&lt;10ms). [2.5 marks]<br>
+    (b) You have 12,000 OPFOR patrol logs with NO analyst labels. You want to discover if there are distinct patrol patterns and identify any that look like reconnaissance/deception activity. [2.5 marks]<br>
+    (c) A wargame simulation has 12 discrete actions per unit and a 30×30 hex grid. You want to train an advisory system that suggests the top-3 actions with estimated values. [2.5 marks]<br>
+    (d) A naval task force of 5 platforms needs to coordinate interception of an adversary convoy, with limited communications bandwidth at sea. [2.5 marks]</div>
+    <details><summary>Show Full Solution</summary><div class="sol">
+      <div class="formula-display">$$
+(a) RANDOM FOREST for radar track classification
+
+Algorithm: Random Forest (B=500 trees, max_depth=12)
+Justification: Labelled data → supervised classification (L2). RF is the
+  course's best-performing classifier (97.5% on IADS), handles multi-class
+  naturally via class-vote, is robust to noisy radar features, provides
+  feature importance for explainability (important for ROE compliance), and
+  can run inference in &lt;1ms (well within 10ms budget).
+  SVM is an alternative but requires careful kernel selection; DNN would
+  need more data; XGBoost is also strong here.
+Key validation metric: Per-class Recall (especially for Fighter/UAV which
+  may be rare and most operationally critical). Also: AUROC per class.
+
+(b) DBSCAN + k-MEANS COMBINATION for OPFOR patrol discovery
+
+Algorithm: Run k-Means first (fast first pass, elbow + silhouette for k),
+  then DBSCAN (ε, MinPts from k-distance plot) as second method
+  Justification: No labels → unsupervised clustering (L4). The question has
+  TWO requirements: (1) discover distinct patrol patterns → k-Means is fast and
+  gives clean archetype centroids with interpretable features; (2) identify
+  deception/reconnaissance → DBSCAN's NOISE POINTS are the key: unusual
+  patrol logs that don't fit any dense cluster are exactly the deception
+  manoeuvres. k-Means alone would force these into clusters, hiding them.
+  Use DBSCAN's noise to specifically flag 'unclassified/anomalous' patrols.
+Key validation metric: Silhouette score (&gt;0.65 = strong structure) + expert
+  label agreement on random sample (ARI with analyst review).
+
+(c) DQN (Dueling + Double) for wargame advisory system
+
+Algorithm: Dueling + Double DQN with experience replay
+  Justification: Interactive environment + discrete actions → RL, specifically
+  Q-Learning family (L6). Dueling DQN decomposes Q into V(s)+A(s,a),
+  which is ideal for the advisory role: V(s) tells the commander "how good
+  is this overall position?" and A(s,a) tells "which of the 12 actions is
+  most beneficial?" Double DQN corrects overestimation bias for more reliable
+  Q-value advisory numbers. Output: top-3 actions with Q-values = the exact
+  advisory format needed. MAPPO would be overkill for a single-agent problem.
+Key validation metric: Win rate vs novice human player (target &gt;80%) and
+  Q-value correlation with actual game outcomes (Bellman error).
+
+(d) MAPPO with CTDE for naval multi-platform coordination
+
+Algorithm: MAPPO (Multi-Agent PPO) with Centralised Training Decentralised Execution
+  Justification: Multiple agents + cooperative task → MARL (L8). CTDE is
+  essential: during training, the centralised critic V(s) takes the full naval
+  picture (all 5 platform positions, convoy tracks, patrol aircraft). At
+  execution: each platform's actor π_i(a_i|o_i) runs on LOCAL observations
+  only — no inter-ship communication needed at execution time. This is the
+  KEY operational advantage for limited-bandwidth sea operations. QMIX is
+  also valid but MAPPO handles the heterogeneous platforms (frigate vs
+  helicopter vs submarine) better via agent-ID encoding, and supports
+  continuous actions for helicopter navigation.
+Key validation metric: Mission success rate (convoy intercepted &gt;80%) and
+  friendly casualties per engagement (lower = better). Also: performance
+  in communication-DENIED scenario to validate decentralised execution.
+$$</div>
+      <div class="kf">Mark Scheme: 2.5 marks per question: algorithm selection (0.5), justification referencing course concepts (1.5), key metric (0.5). Strong answers connect to specific numerical results from course case studies.</div>
+    </div></details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-box">
+    <div class="qnum">Q3 — Integrated Numerical Chain [12 Marks]</div>
+    <div class="lec-tags">
+      <span class="lec-tag" style="background:var(--l2)">L2</span>
+      <span class="lec-tag" style="background:var(--l3)">L3</span>
+      <span class="lec-tag" style="background:var(--l6)">L6</span>
+    </div>
+    <div class="qtxt">An integrated air defence system (IADS) pipeline has three stages. Work through each calculation.<br><br>
+    <strong>Stage 1 (L2 — Classification):</strong> A target produces features: speed=1,200 km/h, altitude=8,000m, radar cross-section=0.8m². The kNN classifier (k=5) compares it to the 5 nearest training neighbours: 2 Fighter (d=0.4, 0.6), 2 Bomber (d=0.8, 1.1), 1 UAV (d=0.9). Determine the predicted class. [2 marks]<br><br>
+    <strong>Stage 2 (L3 — Sensor Fusion):</strong> Radar reports range z_R = 85.0 km (R_R = 1.0 km²). IR sensor reports z_IR = 87.5 km (R_IR = 6.25 km²). Kalman prediction: x̂_{k|k-1} = 84.0 km, P_{k|k-1} = 2.25 km². Using sequential Kalman updates (update with Radar first, then IR), compute the final fused estimate x̂_{k|k} and the updated uncertainty P_k|k after both updates. Use K = P/(P+R). [6 marks]<br><br>
+    <strong>Stage 3 (L6 — Decision Support):</strong> The fused track is now at range 85.2 km, closing at 400 m/s (time to engagement boundary: 180 seconds). The wargame DQN agent has Q-values: Q(ENGAGE)=14.8, Q(TRACK)=11.2, Q(EVADE)=7.4, Q(ALERT_HQ)=13.1. The agent uses ε=0.05, |A|=4 actions. (a) What is the greedy action? (b) What is P(ALERT_HQ)? (c) What should a human operator consider before executing the DQN's recommended action? [4 marks]</div>
+    <details><summary>Show Full Solution</summary><div class="sol">
+      <p><strong>Stage 1 — kNN Classification:</strong></p>
+      <div class="formula-display">$$
+kNN with k=5. Count votes from 5 nearest neighbours:
+  Neighbour 1: Fighter (d=0.4)
+  Neighbour 2: Fighter (d=0.6)
+  Neighbour 3: Bomber  (d=0.8)
+  Neighbour 4: UAV     (d=0.9)
+  Neighbour 5: Bomber  (d=1.1)
+
+Vote count: Fighter = 2,  Bomber = 2,  UAV = 1
+TIE between Fighter and Bomber!
+
+Standard kNN tie-breaking: use NEAREST neighbour among tied classes
+  Nearest Fighter: d=0.4
+  Nearest Bomber:  d=0.8
+Winner: FIGHTER (nearest among tied classes)
+
+Predicted class: FIGHTER
+Confidence: 2/5 = 40% (weak! — should flag for secondary review)
+$$</div>
+      <p style="margin-top:8px"><strong>Stage 2 — Sequential Kalman Fusion:</strong></p>
+      <div class="formula-display">$$
+STEP 1: Radar Update (x̂_{k|k-1}=84.0, P=2.25, z_R=85.0, R_R=1.0)
+
+K_R = P/(P+R_R) = 2.25/(2.25+1.0) = 2.25/3.25 = 0.6923
+
+x̂_after_radar = x̂_{k|k-1} + K_R(z_R − x̂_{k|k-1})
+              = 84.0 + 0.6923×(85.0−84.0)
+              = 84.0 + 0.6923×1.0
+              = 84.0 + 0.692 = 84.692 km
+
+P_after_radar = (1−K_R)×P = (1−0.6923)×2.25
+             = 0.3077×2.25 = 0.692 km²
+
+STEP 2: IR Update (use result from Step 1 as new prior)
+  New prior: x̂=84.692 km, P=0.692 km²
+  IR measurement: z_IR=87.5 km, R_IR=6.25 km²
+
+K_IR = P_after_radar/(P_after_radar+R_IR) = 0.692/(0.692+6.25)
+     = 0.692/6.942 = 0.09969 ≈ 0.0997
+
+x̂_final = 84.692 + 0.0997×(87.5−84.692)
+         = 84.692 + 0.0997×2.808
+         = 84.692 + 0.280 = 84.972 km
+
+P_final = (1−0.0997)×0.692
+        = 0.9003×0.692 = 0.623 km²
+
+FINAL FUSED ESTIMATE:
+  Range: 84.97 km  (vs Radar: 85.0 km, IR: 87.5 km)
+  Uncertainty: P = 0.623 km² (σ = 0.79 km)
+
+INTERPRETATION:
+  Radar (P=2.25) × correction by R_R=1.0 → P dropped to 0.692
+  IR (R_IR=6.25) adds very little new info (K_IR only 10%)
+  → Final estimate heavily weighted toward radar (more precise sensor)
+  → IR barely moves the estimate from 84.692 to 84.972 km
+$$</div>
+      <p style="margin-top:8px"><strong>Stage 3 — DQN Decision Support:</strong></p>
+      <div class="formula">(a) GREEDY ACTION:
+  Q(ENGAGE)=14.8 ← HIGHEST → Greedy action = ENGAGE
+
+(b) P(ALERT_HQ) with ε=0.05, |A|=4:
+  ALERT_HQ is NOT the greedy action (Q=13.1 < Q(ENGAGE)=14.8)
+  P(ALERT_HQ) = ε/|A| = 0.05/4 = 0.0125 (1.25%)
+
+  P(ENGAGE) = (1−ε) + ε/|A| = 0.95 + 0.0125 = 0.9625
+  (Note: at deployment, ε should be 0 — pure greedy. ε=0.05 only during training)
+
+(c) HUMAN OPERATOR CONSIDERATIONS before executing ENGAGE:
+  ① ROE VERIFICATION: Q-value advisory is NOT a firing authority.
+     The DQN was trained to maximise engagement success in simulation.
+     Does the current ROE permit engagement at 84.97 km range?
+     Is the target positively identified (Fighter class with only 40% kNN
+     confidence — weak! The tied kNN result should trigger secondary ID)?
+
+  ② PROPORTIONALITY: Is engagement proportionate?
+     Fused range 84.97 km, closing at 400 m/s → 213 seconds to boundary.
+     Time allows re-verification. If fused range uncertainty = ±0.79 km,
+     is the target actually within engagement boundary?
+
+  ③ IFF/DISTINCTION: kNN predicted Fighter (40% confidence — tied vote).
+     Has IFF (Identification Friend or Foe) confirmed hostile intent?
+     Speed 1,200 km/h and altitude 8,000m match fighter profile but
+     also match some commercial fast jets. Require additional confirmation.
+
+  ④ Q-VALUE GAP: ENGAGE(14.8) vs ALERT_HQ(13.1) — gap of only 1.7 units.
+     This is a relatively SMALL advantage for ENGAGE over ALERT_HQ.
+     The model is not overwhelmingly confident. ALERT_HQ may be the
+     appropriate first action while additional classification is performed.
+
+RECOMMENDED HUMAN DECISION: ALERT_HQ first (Q=13.1), get additional
+identification, THEN ENGAGE if hostile confirmed (Q=14.8 still highest).
+This is exactly the Level 2 Human-on-the-Loop advisory mode in action.</div>
+      <div class="kf">Mark Scheme: Stage 1: 2 marks (tie identified 1, fighter winner 1). Stage 2: 6 marks (K_R 1, x̂ after radar 1, P after radar 1, K_IR 1, x̂_final 1, P_final 1). Stage 3: 4 marks (greedy action 0.5, P(ALERT_HQ) 0.5, human considerations 3 — at least 3 distinct considerations required for full marks).</div>
+    </div></details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-box">
+    <div class="qnum">Q4 — Ethical AI & System Design [6 Marks]</div>
+    <div class="lec-tags">
+      <span class="lec-tag" style="background:var(--l1)">L1</span>
+      <span class="lec-tag" style="background:var(--l5)">L5</span>
+      <span class="lec-tag" style="background:var(--l8)">L8</span>
+    </div>
+    <div class="qtxt">A Ministry of Defence committee is evaluating an autonomous system that uses MAPPO (trained in simulation) to recommend engagement actions against suspected hostile vehicles in an urban area. The system's developer claims 84% success rate in simulation and requests deployment at Level 3 autonomy (human out of the loop) to "match adversary AI speed."<br><br>
+    (a) Identify THREE specific technical or ethical objections to this deployment proposal, citing specific course concepts and data from the course case studies. [4 marks]<br>
+    (b) Propose a modified deployment architecture at Level 2 (human on the loop) that addresses the developer's concern about adversary AI speed while maintaining meaningful human control. [2 marks]</div>
+    <details><summary>Show Full Solution</summary><div class="sol">
+      <p><strong>(a) Three objections to Level 3 autonomous deployment:</strong></p>
+      <div class="formula-display">$$
+OBJECTION 1: SIM-TO-REAL GAP MAKES THE 84% CLAIM MISLEADING
+  Course data: MAPPO combined arms achieved 82.4% in simulation but
+  estimated ~65% in real operations (16-20pp sim-to-real gap is typical —
+  see L7: PPO drone 94%→78%, L8 discussion). Urban environments add
+  additional complexity (civilian presence, non-combatant vehicles,
+  visual similarity of civilian/military vehicles) not fully modelled
+  in combat simulations. Claiming 84% simulation performance as evidence
+  for autonomous lethal action in urban areas is methodologically flawed.
+  An independent operational trial (not simulation) is required before any
+  deployment — never mind Level 3 autonomous.
+
+OBJECTION 2: IHL PROPORTIONALITY CANNOT BE AUTOMATED (L8 Ethics)
+  IHL Article 51(5)(b) requires assessment of whether expected civilian harm
+  is excessive relative to anticipated military advantage. This is a
+  contextual legal judgment requiring:
+    - Dynamic identification of protected persons (civilians, surrendering
+      combatants, medical personnel) in real-time urban chaos
+    - Assessment of strategic military advantage in THIS political context
+    - Understanding of collateral damage to civilian infrastructure
+  MAPPO optimises a reward function (L8: r_OPFOR_killed = +10, r_own_lost = -15)
+  — this is NOT proportionality assessment. The reward function CANNOT encode
+  IHL proportionality; this objection is legally and technically fundamental.
+
+OBJECTION 3: ADVERSARIAL ADAPTATION + NO REAL-TIME LEARNING (L8)
+  The committee is told "adversary AI speed" requires Level 3. However:
+  MAPPO's fixed trained policy can be REVERSE-ENGINEERED by adversaries who
+  observe it in operations (L8: same warning for the combined arms case study).
+  Level 3 autonomous MAPPO repeating the same learned patterns is actually
+  MORE vulnerable to adversarial exploitation than a human commander who
+  adapts in real-time. The "adversary AI speed" argument is a red herring:
+  human + AI at Level 2 can make decisions in 1-2 seconds — fast enough to
+  counter most adversary tempo while maintaining IHL compliance.
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Level 2 modified deployment architecture:</strong></p>
+      <div class="formula-display">$$
+MODIFIED ARCHITECTURE: "1-Second Confirmation Loop"
+
+Speed concern: If adversary AI acts in 0.5 seconds, human review of
+5 minutes is tactically unacceptable. Solution: TIERED DECISION WINDOWS.
+
+TIER A (automated, Level 1): Pure defensive actions
+  MAPPO can automatically activate defensive countermeasures:
+    - Smoke/IR decoys (passive defence, no civilian harm risk)
+    - Evasive manoeuvring of own platforms
+    - Passive electronic countermeasures
+  These require no human confirmation — fully automated is IHL-compliant
+  for defensive measures.
+
+TIER B (1-second confirmation, Level 2): Non-lethal active responses
+  MAPPO recommends: top-3 actions with Q-values + confidence %
+  Operator sees: visual overlay on threat track + Q-values
+  Human action: single-button CONFIRM or OVERRIDE within 1-2 seconds
+  This matches adversary AI tempo while preserving meaningful human control.
+  Key: the confirmation is GENUINE (operator has been trained to evaluate
+  key indicators in 1 second) not rubber-stamping.
+
+TIER C (10-30 second deliberate review, Level 2): Lethal engagement
+  MAPPO recommends engage action with full justification:
+    - Per-feature explanation (SHAP on threat classification)
+    - Kalman-fused range/velocity with uncertainty
+    - IFF status + confidence
+    - ROE compliance check (automated rule engine)
+  Human operator (and commander if possible) confirms lethal action.
+  30 seconds for lethal action in most urban scenarios is operationally
+  acceptable and maintains the legally required meaningful human control.
+$$</div>
+      <div class="kf">Mark Scheme: (a) 4 marks — 3 objections, at least 2 must cite specific course data/concepts. Accept any 3 of: sim-to-real gap, IHL proportionality, adversarial adaptation, data distribution (urban≠simulation), scenario generality, emergent behaviour unpredictability. (b) 2 marks: tiered architecture with speed vs control trade-off addressed (1), specific mechanism for genuine rather than rubber-stamp human confirmation (1).</div>
+    </div></details>
+  </div>
+
+  <div class="mark-scheme">
+    <table>
+      <tr><th>Question</th><th>Lectures Tested</th><th>Topic</th><th>Marks</th></tr>
+      <tr><td>Q1</td><td>L1, L2, L4, L5</td><td>3-tier CERT pipeline design with novel attack analysis</td><td>12</td></tr>
+      <tr><td>Q2</td><td>L2, L4, L6, L8</td><td>Algorithm selection and justification (4 scenarios)</td><td>10</td></tr>
+      <tr><td>Q3</td><td>L2, L3, L6</td><td>Integrated numerical chain: kNN → Kalman → DQN advisory</td><td>12</td></tr>
+      <tr><td>Q4</td><td>L1, L5, L8</td><td>Ethical AI objections and Level 2 deployment design</td><td>6</td></tr>
+      <tr><td colspan="3"><strong>TOTAL</strong></td><td><strong>40</strong></td></tr>
+    </table>
+  </div>
+
+  <div style="background:#F6EEFF;border:1.5px solid var(--plum);border-radius:8px;padding:14px;margin-top:16px;">
+    <p style="font-weight:700;color:var(--plum);margin-bottom:6px;">🎓 From the Instructor</p>
+    <p style="font-size:13px;color:var(--dark);">You have now completed the core curriculum of <em>AI & ML in Warfare</em>. The capstone questions above intentionally have no single correct answer — strong answers are those that cite specific algorithms with their performance numbers from the course, acknowledge trade-offs honestly, and apply the ethical framework rigorously. In Lecture 10, you will present your own project applying these tools to a defence scenario of your choosing. Come prepared.</p>
+  </div>
+</div>
+</div>
+
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4 &nbsp;|&nbsp;
+  Lecture 9, Part 3: Culmination Answers & Capstone Assignment
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

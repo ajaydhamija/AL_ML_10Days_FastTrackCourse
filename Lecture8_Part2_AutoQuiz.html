@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 8 Quiz — Multi-Agent RL</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--brz:#9B5E1A;--brz2:#C4791F;--lblue:#BDD7EE;
+    --green:#1E7A45;--red:#C0392B;--amber:#C98A12;
+    --white:#FFFFFF;--light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--yellow:#FFF2A0;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+  #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px 18px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#1A0E00 100%);}
+  #intro .badge{background:var(--brz);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:16px;}
+  #intro h1{font-size:clamp(20px,4.5vw,32px);font-weight:800;line-height:1.2;margin-bottom:10px;}
+  #intro .sub{font-size:clamp(12px,2.5vw,15px);color:var(--lblue);margin-bottom:26px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:11px;max-width:620px;width:100%;margin:0 auto 24px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:11px;padding:12px;text-align:center;}
+  .info-card .val{font-size:clamp(20px,4.5vw,28px);font-weight:800;color:var(--brz2);}
+  .info-card .lbl{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:11px;padding:14px 18px;max-width:580px;width:100%;margin:0 auto 24px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:13px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:12.5px;color:#D0E8F5;margin-bottom:5px;list-style:none;padding-left:16px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:var(--brz2);}
+  .btn-start{background:var(--brz);color:#fff;border:none;padding:13px 44px;border-radius:28px;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s;}
+  .btn-start:hover{transform:scale(1.04);}
+  .footer-info{margin-top:20px;font-size:11px;color:var(--grey);}
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--brz);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:var(--brz2);stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+  .qbody{flex:1;display:flex;flex-direction:column;padding:20px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+  .qtext{font-size:clamp(14px,2.6vw,18px);font-weight:700;color:var(--dark);line-height:1.45;margin-bottom:18px;padding:14px 16px;background:#fff;border-left:5px solid var(--brz);border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+  .options{display:grid;gap:10px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+  .opt-key{min-width:27px;height:27px;border-radius:50%;background:var(--brz);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+  .opt-text{font-size:13px;color:var(--dark);line-height:1.4;padding-top:4px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;}.opt.correct .opt-key{background:var(--green);}
+  .opt.wrong{border-color:var(--red);background:#FDE8E8;}.opt.wrong .opt-key{background:var(--red);}
+  .qfooter{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 16px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--brz);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:26px 16px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#1A0E00 100%);}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid var(--brz2);border-radius:16px;padding:20px 36px;margin:14px 0 20px;}
+  .score-box .score-val{font-size:50px;font-weight:800;color:var(--brz2);}
+  .score-box .score-max{font-size:16px;color:var(--lblue);}
+  .score-box .score-grade{font-size:18px;color:var(--yellow);margin-top:6px;font-weight:700;}
+  .btn-restart{background:var(--brz);color:#fff;border:none;padding:11px 32px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;}
+  @media(max-width:600px){.options{grid-template-columns:1fr;}.info-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div id="intro">
+  <div class="badge">LECTURE 8 QUIZ</div>
+  <h1>Multi-Agent RL &<br>Autonomous Combat Platforms</h1>
+  <p class="sub">RL Part 3 — MARL for Combined Arms Operations — Unit 4</p>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong</div></div>
+  </div>
+  <div class="rules">
+    <h3>Instructions</h3>
+    <ul>
+      <li>Auto-advances at <strong>40 seconds</strong> — negative marking applies</li>
+      <li>Covers: Dec-POMDP · CTDE · QMIX · MAPPO · MADDPG · Credit Assignment · Emergent Tactics · MUM-T · LAWS</li>
+      <li>Maximum: <strong>15 marks</strong></li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+<div id="quiz">
+  <div class="qheader">
+    <div><div class="qtag">LECTURE 8 QUIZ</div><div class="qcourse">Multi-Agent RL</div></div>
+    <div class="timer-circle"><svg width="48" height="48" viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"/><circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/></svg><div class="timer-text" id="timerNum">40</div></div>
+  </div>
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+<div id="end">
+  <h2>Quiz Complete!</h2>
+  <p style="color:var(--lblue);font-size:14px;margin-bottom:4px;">Lecture 8 — Multi-Agent RL & Autonomous Platforms</p>
+  <div class="score-box"><div class="score-val" id="finalScore">0</div><div class="score-max">out of 15 marks</div><div class="score-grade" id="finalGrade"></div></div>
+  <p style="color:var(--lblue);font-size:14px;">Full answers in <strong>Lecture 8 — Part 3</strong></p>
+  <button class="btn-restart" onclick="location.reload()">↺ Restart</button>
+  <p style="margin-top:14px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+<script>
+const Qs=[
+  {q:"Single-agent Q-Learning applied to a 6-agent combined arms scenario treats the environment as if it were stationary. Why does the presence of multiple LEARNING agents make this assumption fundamentally false, and what is the consequence for convergence guarantees?",
+   opts:["The environment is non-stationary because the physical battlefield changes during an episode — terrain degrades, ammunition is consumed. This is unrelated to multi-agent learning and also affects single-agent RL","From agent i's perspective, the transition P(s'|s,aᵢ) appears to depend only on aᵢ — but it actually depends on ALL agents' joint action (a₁,...,aN). Since other agents are simultaneously LEARNING and changing their policies, P(s'|s,aᵢ) shifts every training step. This violates the stationarity assumption required by Q-Learning's convergence proof. IQL (Independent Q-Learning) therefore has NO convergence guarantee to Nash equilibrium in multi-agent settings","The non-stationarity problem only applies to competitive multi-agent settings. In fully cooperative scenarios with shared reward, the environment IS stationary from each agent's perspective because all agents are aligned toward the same goal","IQL converges more slowly than single-agent Q-Learning but to the same optimal Q* values, given sufficient training episodes. The convergence guarantee weakens quantitatively (requiring more episodes) but is not fundamentally violated"],
+   ans:1,exp:"Q-Learning convergence theorem requires a stationary MDP: P(s'|s,a) must be fixed. In multi-agent: agent i's effective transition P(s'|s,aᵢ) = Σ_{a_{-i}} P(a_{-i}|s) P(s'|s,aᵢ,a_{-i}) where P(a_{-i}|s) is the joint policy of others. As others learn, P(a_{-i}|s) changes every episode → effective transition is non-stationary. IQL therefore cannot prove convergence to Q* or to a Nash equilibrium. CTDE methods address this by training a centralised component that takes global state, making the training process stationary."},
+  {q:"The CTDE paradigm trains with global information but executes with local observations. In the combined arms scenario, why is decentralised execution at deployment time not merely a preference but an OPERATIONAL NECESSITY?",
+   opts:["Decentralised execution is required to satisfy GDPR data protection regulations, which prohibit sharing individual agents' observation data during mission execution","In contested operational environments, communication can be JAMMED, DEGRADED, or SPOOFED. If agents must constantly exchange full state information during execution, a jammed comm link renders the entire multi-agent system inoperable — single point of failure. Decentralised execution: each agent acts on its LOCAL observation without needing real-time communication from others or a central controller. The coordination knowledge is baked into the policy during training, not required at execution. This is how real military units operate: rehearse together, then maintain radio silence during the mission","Decentralised execution reduces GPU compute load at inference time by N× since N separate smaller networks run in parallel rather than one large centralised network. The operational necessity is purely computational, not tactical","Centralised execution is actually preferred for military operations — decentralised execution is only used when the number of agents N > 10 because larger networks become too slow for real-time use"],
+   ans:1,exp:"Contested electromagnetic environments (CEMA): modern adversaries deploy EW systems specifically to jam tactical communications. A centralised-execution multi-agent system has a single catastrophic vulnerability: jam the central controller or the communication link and the entire team is neutralised. Decentralised policies encode the cooperation implicitly in each agent's network weights — they can function effectively with ZERO real-time communication. The CTDE paradigm solves the training/execution split: exploit global information for training quality, while preserving operational robustness through decentralised execution."},
+  {q:"QMIX enforces the monotonicity constraint $\partial Q_{\text{tot}}/\partial Q_i>0$ for all agents i by constraining mixing network weights to be non-negative (via absolute value). How does this constraint enable DECENTRALISED GREEDY EXECUTION?",
+   opts:["Monotonicity allows the mixer to be replaced by a simple average at execution time, eliminating the need for the global state s and enabling each agent to act independently","Because $\partial Q_{\text{tot}}/\partial Q_i>0$: increasing Qᵢ always increases Q_tot. Therefore, the joint action that maximises Q_tot is obtained by each agent independently maximising its own Qᵢ. Proof: argmax_{a₁,...,aN} Q_tot = argmax_{a₁} Q₁ ... argmax_{aN} QN. If any agent took a non-maximising action for Qᵢ, switching to the maximising action would increase Qᵢ → increase Q_tot (by monotonicity). So the individual greedy actions ARE the jointly optimal actions under QMIX. This means agents can execute greedily from their local Q-functions without ever needing to communicate or coordinate at execution time","Monotonicity constrains each Qᵢ to be non-negative, preventing negative Q-values from disrupting the mixing operation and allowing stable decentralised action selection","The non-negative constraint means Q_tot is always a weighted SUM of Qᵢ values — argmax of a sum of independent terms is the argmax of each term separately, enabling decentralised execution by linearity"],
+   ans:1,exp:"The mathematical identity: argmax_a Q_tot(s,a) where Q_tot = f_monotonic(Q₁(a₁),...,QN(aN)) — if f is monotonically increasing in each argument, then increasing any Qᵢ(aᵢ) increases Q_tot. Therefore any action vector that isn't individually greedy in each Qᵢ can be improved by greedily changing one agent's action → joint optimal = individually greedy. This is the IGM (Individual-Global-Max) property. Note: QMIX DOES NOT constrain to simple sums — the mixer is a nonlinear function of Q-values and state s, providing richer value representation than VDN (Value Decomposition Networks) while still maintaining the IGM property."},
+  {q:"In the combined arms case study, the SEAD aircraft learned to ALWAYS neutralise SAM sites before any ground advance (100% of episodes) without this being explicitly programmed. What reward structure drove this emergent behaviour?",
+   opts:["A specific +50 reward was manually coded for 'SEAD engages SAM first' to teach the sequential ordering — the emergence is actually a direct consequence of this explicit programming","The reward only contains: mission success (+100), enemy neutralised (+10 each), friendly unit lost (−15 each), mission failure (−50). No explicit reward for ordering. The SEAD-first protocol emerged because: episodes where SAM remained active had CATASTROPHICALLY HIGHER friendly casualty rates (SAM = anti-air → drone losses; ground advance under active SAM = exposure → tank losses → −15 each → large negative reward). The policy learned that activating SAM first is the action sequence that maximises cumulative reward — it correlated strongly with lower casualties and higher mission success. The AGENT discovered the causal chain: SEAD→SAM down→safe ground advance→objective capture","The SEAD agent received a unique separate reward stream not shared with other agents — its dedicated reward for reducing the SAM threat naturally led it to prioritise this action","SEAD-first emerged because the SEAD agent was trained first in a curriculum before other agents, making it the dominant decision-maker. Other agents learned to wait for SEAD to complete its phase before acting"],
+   ans:1,exp:"This is pure credit assignment working correctly. No explicit ordering reward was given. The chain: SAM active → drone/air assets lost (−15 each) → ground units advance without air support → higher casualty rate (−15 each more) → lower mission success probability (−50). The total expected negative reward from NOT neutralising SAM first is large. QMIX's joint Q-value learning correctly attributes: Q(SEAD acts first, rest wait) >> Q(any other ordering). The SEAD agent's Qᵢ for 'engage SAM' becomes the highest Q-value in the very first turn because the downstream reward chain is learned across 200K episodes. This is operationally valuable: an AI agent rediscovered a core principle of modern air-ground integration from REWARD ALONE."},
+  {q:"The free rider problem in cooperative MARL: Agent 5 (drone, malfunctioned, did nothing) receives the same shared team reward as agents who contributed critically. How does QMIX's monotonic factorisation address this compared to naive reward sharing?",
+   opts:["QMIX penalises agents who take the 'no-op' action by adding a negative term to Q_tot whenever any agent's action is the null action — this directly solves the free rider problem by explicit programming","In QMIX, each agent maintains its own Qᵢ(oᵢ,aᵢ) network. Agent 5 (malfunction/no-op) receives only its LOCAL observation and takes the no-op action. The Qᵢ for Agent 5's no-op action will be LOW because: in states where Agent 5 could provide ISR coverage but doesn't, the team performs worse → lower Q_tot → via backpropagation through the monotonic mixer, Agent 5's Q-value for no-op gets a lower gradient signal than action alternatives. The mixer LEARNS to assign lower weight to Agent 5's Q-contribution in states where it should be active. Agent 5 learns that no-op has low value → policy prefers action alternatives","Naive reward sharing: all 6 agents receive r/6 = +16.7, including Agent 5. QMIX cannot improve on this because the monotonic mixer still propagates the full Q_tot gradient to all agents equally","QMIX addresses free riding by explicitly detecting no-op actions via an action mask applied at the mixing layer — the mask zeros out any agent's Q-contribution when they play a null action"],
+   ans:1,exp:"QMIX's individual Q-networks create individual credit signals through the joint value decomposition. When Agent 5 takes no-op: Q₅(o₅, no-op) ≈ low value. The mixer learns: Q_tot is BETTER when Agent 5 takes ISR actions (higher Qᵢ for active actions). Through training, Agent 5's Q-network learns that its ISR actions → better Q₅ values → better Q_tot (by monotonicity) → higher reward signal. No-op → lower Q₅ → lower gradient from Q_tot → Agent 5 learns no-op is suboptimal. The key: the individual Q-functions encode each agent's CONTRIBUTION to the team's success, naturally solving the credit problem without explicit free-rider detection."},
+  {q:"MAPPO uses a SHARED actor θ across all N=6 agents, with agent identity encoded as a one-hot vector [oᵢ, one-hot(i)]. What are the TWO most significant advantages and the ONE key limitation of parameter sharing?",
+   opts:["Advantages: faster GPU inference (N networks in 1 forward pass) and smaller total model size. Limitation: agents cannot specialise at all — a tank and a drone must use the same weights regardless of how different their roles are","Advantages: (i) N× parameter efficiency — 1 network instead of N separate networks; for N=6 the actor parameter count drops by 6× (e.g., 500K→83K parameters). (ii) Better generalisation — all agents' experience trains the SAME weights, effectively multiplying the useful training data N× per update; rare scenarios experienced by one agent benefit all others. Limitation: assumes agents are HOMOGENEOUS or sufficiently similar that a shared representation is adequate. If agents have fundamentally different observation spaces (tank image vs drone altitude sensor) or action spaces, shared weights may force a compromise representation that underperforms specialist networks","Advantages: eliminates the need for CTDE entirely (shared weights implicitly coordinate agents) and enables decentralised training with no centralised component. Limitation: can only represent symmetric policies where all agents behave identically regardless of their role or position","Advantages: parameter sharing enables A3C-style asynchronous training across N agents simultaneously. Limitation: shared weights cause catastrophic forgetting — when one agent learns a new tactic, it overwrites the other agents' learned tactics in the shared network"],
+   ans:1,exp:"Parameter sharing benefits: (i) Efficiency: N=6 agents → 1 network → 6× fewer parameters to train → faster training, less memory. (ii) Data efficiency: each gradient update from any agent's experience improves the shared policy — effectively N× data for the same network. With 150K episodes × 6 agents = 900K agent-episodes of experience training 1 network. Limitation: heterogeneity. Tank (discrete action: which direction to move/fire angle) vs SEAD aircraft (continuous altitude + missile release) → different observation semantics, different action semantics. Forcing identical representations may hurt both. MAPPO handles this via the one-hot agent ID input, allowing role-specific specialisation within the shared network — a partial fix for heterogeneity."},
+  {q:"CommsMAPPO added an emergent communication channel where each drone broadcasts a learned 8-dimensional message mᵢ. After 50K training episodes, linear probing revealed: m[0-2] = enemy position, m[3-5] = SAM lock-on status, m[6-7] = fuel state. The probing was done by training a SEPARATE linear classifier to predict these ground-truth variables from mᵢ. What does the success of this linear probing demonstrate about the learned communication?",
+   opts:["Linear probing success demonstrates that the messages contain random noise that happens to correlate with environment variables — this is a statistical coincidence rather than meaningful communication","Agents communicating via gradient descent through a differentiable message encoder SPONTANEOUSLY encode tactically relevant information in the message space. Linear probability success (high accuracy of a LINEAR classifier predicting ground truth from mᵢ) specifically shows that the information is LINEARLY DECODABLE from the message — it is the primary structured content of the message, not buried in complex nonlinear interactions. The agents did not receive any explicit reward for encoding these specific variables — they emerged because encoding USEFUL tactical information (enemy position, threat level, fuel state) HELPS the team achieve higher rewards. The communication is semantically meaningful, not random","Linear probing demonstrates that the messages contain exactly the same information as the agents' observations — the communication channel is redundant and provides no additional value to the team beyond what each agent already knows","The probing success is a consequence of the message dimension (d=8) being too small — with only 8 values, the network has no choice but to encode the most salient environmental variables. Increasing to d=32 would eliminate this structured encoding"],
+   ans:1,exp:"Linear probing is a standard technique for understanding learned representations. If a linear classifier achieves high accuracy predicting y from representation m, it means y is linearly encoded in m. This implies: (1) the information is present in m (not an accidental correlation), and (2) it is primary structured content (linearly accessible), not secondary hidden in complex nonlinear patterns. The communication is semantically meaningful: agents CHOSE to encode enemy positions and SAM status because doing so (and having others use this information) increases team Q_tot → reward signal. This is one of the most striking results in emergent multi-agent communication — language for shared objectives emerges from reward optimisation alone."},
+  {q:"COMA's counterfactual baseline for agent i is b_i(s,a_{-i}) = Σ_{a_i'} π_i(a_i'|o_i) Q(s,(a_i',a_{-i})). In the case study, Agent 3 (artillery, fired early and missed) received advantage A₃ = −3.2. What does this negative advantage indicate, and how does it correctly solve the credit assignment problem that naive reward sharing cannot?",
+   opts:["A₃ = −3.2 means Agent 3's Q-value contribution was negative, which triggers a QMIX penalty rule that reduces its share of the team reward in proportion to its negative advantage","A₃ = −3.2 means: Agent 3's ACTUAL action (fire early, miss) yielded Q_total = Q that was 3.2 LESS than what the team would have achieved if Agent 3 had played its average policy (random among its action distribution). Specifically: Q(s,a) − b₃ = −3.2 → if Agent 3 had randomly sampled its actions (the counterfactual), the team would have done 3.2 reward units BETTER on average. This correctly blames Agent 3 for making a suboptimal choice: firing early was WORSE than the average of all its possible actions. Agent 3's policy gradient therefore DECREASES the probability of 'fire early' in this state — the correct behavioural update. Naive reward sharing gives Agent 3 the same +16.7 as everyone else → no signal to change its early-firing behaviour","A₃ = −3.2 is computed by QMIX's monotonic mixer as the difference between Q_tot with Agent 3 active vs Agent 3 inactive — it measures the counterfactual impact of removing Agent 3 entirely from the team","COMA's counterfactual cannot produce negative advantages because the baseline b_i is defined as a minimum over alternative actions — Agent 3 must have received a positive advantage with the correct interpretation being A₃ = 3.2 (not −3.2)"],
+   ans:1,exp:"Counterfactual baseline b_i(s,a_{-i}) = E_{a_i~π_i}[Q(s,(a_i,a_{-i}))]: the expected Q-value if Agent 3 had randomly chosen any action according to its current policy, while ALL OTHER agents did exactly what they did. A₃ = Q(s,a_actual) − b_i = −3.2. This means: firing early specifically REDUCED team performance by 3.2 units compared to Agent 3's AVERAGE action. Policy gradient: ∇L = A₃ × ∇ log π(fire_early|o₃) = −3.2 × positive_gradient → DECREASE probability of fire_early. This correctly identifies and penalises the suboptimal action while rewarding Agents 1,2,4,6 who contributed positively. Naive sharing gives all the same +16.7 → Agent 3 receives a POSITIVE signal for firing early and missing — the wrong direction entirely."},
+  {q:"IQL (Independent Q-Learning) baseline achieved 58.3% mission success with 6 separate Q-learning agents. MAPPO achieved 82.4%. What specifically is IQL missing that causes this 24.1 percentage point gap?",
+   opts:["IQL uses a tabular Q-table which is too small to represent the 252-dimensional state space — MAPPO uses neural networks which are inherently more powerful in high-dimensional spaces. The gap is purely a function approximation advantage, not a coordination mechanism","IQL trains each agent's Q-function as if it is the only agent: Qᵢ(oᵢ,aᵢ) ignores what other agents are doing. The non-stationary environment (other agents also learning) causes Qᵢ estimates to be inconsistent with the true team Q-values. Each agent optimises greedily for its own estimate, producing miscoordinated joint actions: agents 1 and 2 may both advance (no suppression), or all agents may converge on the same target leaving others undefended. MAPPO's centralised critic V(s) sees the FULL global state including all agents' positions, OPFOR dispositions, and joint outcomes — it can attribute team failures to specific coordination breakdowns and propagate that signal to each agent's policy. MAPPO learns joint coordination; IQL learns individual policies that happen to coexist","IQL achieves lower performance because it uses ε-greedy exploration which is suboptimal in multi-agent settings — MAPPO uses entropy-based exploration which scales better to N agents. The 24.1% gap is an exploration efficiency advantage","IQL is limited to discrete action spaces while the combined arms task requires continuous actions for some agents. The performance gap is primarily due to IQL being unable to handle the continuous action dimensions of the SEAD aircraft and drones"],
+   ans:1,exp:"IQL's core flaw: each agent's Q-value Qᵢ(oᵢ,aᵢ) is estimated in a non-stationary environment where other agents are changing simultaneously. The result: Qᵢ estimates converge to locally consistent but globally inconsistent values — Agent 2 may learn 'advance is good' (when Agent 1 typically suppresses) but Agent 1 may simultaneously learn 'suppress is unnecessary' (when Agent 2 typically holds back) → oscillation, no coordination. MAPPO explicitly trains the value function on the joint global state V(s), learning how team configurations (not individual positions) affect outcomes. The 24.1% gap represents the quantitative value of COORDINATION information in the centralised critic."},
+  {q:"The emergent tactics discovered in MAPPO training included a 'flanking manoeuvre' (Infantry distracts frontally while Armour flanks, 71% of success cases). This was never explicitly rewarded. What SPECIFIC feature of MAPPO's joint training enabled this coordinated behaviour to emerge?",
+   opts:["MAPPO's parameter sharing forced Infantry and Armour to use the same policy network — since both see each other's positions, the shared network naturally learned to differentiate their roles based on their unit type encoding","MAPPO's centralised critic V(s) takes the FULL state s including all unit positions, OPFOR positions, and terrain. During training: when Infantry frontal action + simultaneous Armour flanking occurred (by exploration), the resulting state s' (OPFOR distracted frontally + exposed flank) led to much higher Q-values than non-flanking configurations. The centralised V(s) correctly valued these joint configurations highly, and the PPO update propagated this signal back to BOTH Infantry (increase P(frontal advance)) and Armour (increase P(flank movement)) in states where flanking is feasible. Neither agent receives an explicit flanking reward — but the joint value function correctly identifies and reinforces the value of COORDINATED manoeuvre. Individual IQL Q-functions cannot capture this joint state value because each only sees its own observation","MAPPO's entropy bonus forced agents to randomly explore all action combinations — by random chance, some flanking manoeuvres succeeded, and the PPO update reinforced them disproportionately due to the advantage weighting","The flanking manoeuvre emerged because MAPPO's architecture includes a separate 'flanking module' that detects when one agent is in a frontal position and automatically coordinates a flanking movement for nearby agents"],
+   ans:1,exp:"The centralised critic is the key. V(s) where s includes both Infantry position (frontal) AND Armour position (flank) captures JOINT STATE VALUE. When both agents happen to create a flanking configuration (via ε-greedy exploration), s' has high V(s') — OPFOR's defences are exposed on two fronts → higher mission success probability → high value. V(s_flanking) > V(s_all_frontal). The advantage: Â = r + γV(s') - V(s) is higher for the (frontal+flank) joint action than any uncoordinated alternative. PPO updates BOTH agents' policies simultaneously toward the flanking configuration. IQL cannot discover this because Agent 1's Q-function doesn't know where Agent 2 is — it cannot value the JOINT configuration of both being in coordinated positions."},
+  {q:"Manned-Unmanned Teaming (MUM-T) uses 1 human pilot + 2-4 loyal wingman UAVs with MAPPO policies. The human provides waypoints and ROE (Rules of Engagement); MAPPO agents optimise sub-tasks. Under what conditions could this human-on-the-loop architecture STILL violate the principle of meaningful human control?",
+   opts:["Meaningful human control is always preserved in MUM-T as long as the human pilot can physically see the UAVs — visual contact constitutes sufficient oversight of autonomous actions","Meaningful human control fails when: (i) TEMPO exceeds human review speed — if UAVs execute 10 engagement decisions per second and the human approves waypoints only every 30 seconds, the human has no effective control over most engagement decisions; (ii) INFORMATION ASYMMETRY — if the UAVs' engagement rationale is not explainable (black-box MAPPO), the human cannot meaningfully evaluate whether to approve suggested actions; (iii) AUTOMATION BIAS — the human may become habituated to approving AI recommendations without genuine evaluation ('rubber stamping'). In these conditions, the human is nominally 'on the loop' but functionally 'out of the loop' — the meaningful control criterion is not met","Meaningful human control requires the human to MANUALLY select each action for each UAV — any level of AI autonomy in action selection, even suggesting options, violates the meaningful control principle","MUM-T always achieves meaningful human control because the human pilot is physically present in the aircraft and can immediately disable the AI system by switching to manual mode — the override capability is sufficient to satisfy the control requirement"],
+   ans:1,exp:"Meaningful human control (MHC) under IHL requires: (i) UNDERSTANDING: the human must comprehend what the system is doing and why; (ii) OVERSIGHT: the human must have genuine ability to review actions before they occur; (iii) INTERVENTION: the human must be able to stop or modify actions. In high-tempo MARL scenarios, the UAVs may execute coordinated manoeuvres at machine speed — the human's 30-second approval cycle means many consequential actions occur between approvals. Automation bias is well-documented in human factors research: operators in automated systems tend to approve system recommendations without genuine evaluation. Black-box MAPPO policies that cannot explain their actions to the human undermine criterion (i). All three conditions can fail even with a human nominally 'on the loop' — and any of them is sufficient to violate MHC."},
+  {q:"In MADDPG, each agent i has its OWN centralised critic Qᵢ(s, a₁,...,aN; φᵢ), unlike MAPPO/QMIX which use a shared critic. What scenario specifically REQUIRES per-agent critics rather than a shared one?",
+   opts:["Per-agent critics are only needed when the action space is continuous — for discrete action spaces, a shared critic is always sufficient regardless of the reward structure","MIXED COOPERATIVE-COMPETITIVE scenarios (e.g., Red vs Blue): Agent i (Blue) and Agent j (Red) have OPPOSING reward functions rᵢ(s,a) = −rⱼ(s,a). A shared critic would need to simultaneously represent 'this state is high value for Blue' and 'this state is low value for Red' — contradictory objectives cannot be captured by a single scalar V(s). Per-agent critics: Q₁(s,a; φ₁) represents Blue's value; Q₂(s,a; φ₂) represents Red's value — each reflects its own reward function. MADDPG can therefore handle competitive, cooperative, and mixed settings with the same architecture. In purely cooperative settings (same reward), a shared critic is sufficient — per-agent critics are wasteful (N× parameters for the same information)","Per-agent critics are required when N > 4 agents because shared critics become computationally infeasible above this threshold — parameter counts grow quadratically with N for shared critics","Per-agent critics are needed when agents have different sensor ranges — the shared critic cannot handle heterogeneous observation dimensions without per-agent specialisation"],
+   ans:1,exp:"The key insight is reward heterogeneity. QMIX and MAPPO implicitly assume shared or identical rewards — a single value function V(s) or Q_tot meaningfully represents 'the value of this state for the team.' In mixed/competitive settings, the same state s has DIFFERENT values for different agents: s = (Blue tank near objective, Red defending) → high value for Blue, low for Red. A shared V(s) must reconcile these contradictory valuations → nonsensical. Per-agent critics: Q₁(s,a;φ₁) learns Blue's valuation, Q₂(s,a;φ₂) learns Red's valuation. This also enables modelling adversarial opponents' Q-values during centralised training, improving the quality of each team's policy. The N² parameter cost is the price of handling general-sum games."},
+  {q:"Domain expert review of MARL training replays revealed that in some training runs, agents learned to conserve ammunition by avoiding engagement until the final objective capture — locally rational but operationally suboptimal. This is described as an unintended emergent behaviour. How would you diagnose and fix this in the reward function?",
+   opts:["The fix is to add a fixed −1 reward per timestep per agent for not engaging OPFOR when within range — this directly penalises conserving ammunition by making inaction costly","Diagnosis: the reward function likely has: mission success bonus (+100) dominating all intermediate rewards. Agents learned: 'arriving at the objective with ammo remaining maximises reward' because there is no intermediate reward for suppressing OPFOR en route. The ammo is valuable as a terminal resource (used in final capture), so conserving it seems rational. Fix requires re-examining the CAUSAL REWARD CHAIN: add shaping rewards for tactical engagement (suppression of OPFOR reduces their threat → enables faster advance → more likely mission success). Specifically: r_suppress = +2 per OPFOR unit suppressed (not destroyed), r_advance_under_fire = +1 per hex advanced while OPFOR is active. This makes intermediate engagement POSITIVELY rewarded rather than only the terminal outcome","The unintended behaviour indicates a bug in the QMIX mixer's monotonicity constraint — fix by re-initialising the hypernet weights with positive initialisation to prevent ammo conservation from being incorrectly valued","Ammo conservation is operationally correct behaviour in many military contexts — military doctrine recommends preserving fire superiority for decisive engagements. The AI correctly discovered a valid tactic; domain experts are wrong to label it unintended"],
+   ans:1,exp:"This is reward specification error. The original reward: mission success (+100) + enemy neutralised (+10 each) + casualties (−15 each). Ammo conservation: agents don't waste ammo on near-misses (no +10 for suppression) → save for certain kills at the objective. CONSEQUENCE: OPFOR remains active during the approach → friendly exposure → higher casualty risk (−15) → but this risk is underweighted vs the ammo conservation benefit in the objective capture. FIX: shaping rewards that make intermediate engagement rational: r_suppress: even suppressing (not destroying) OPFOR reduces their effective threat. r_advance_progress: reward for advancing closer to objective under contested conditions. These shaped rewards must be potential-based (γΦ(s') − Φ(s)) to preserve optimal policy invariance — ad hoc shaping may solve one problem while creating another."},
+  {q:"The combined arms MARL achieved 82.4% (MAPPO) vs 81.3% (human expert team) in simulation. Before declaring MARL operationally superior, a military analyst should apply strict scrutiny. What are the THREE most critical caveats to this comparison?",
+   opts:["The three caveats are: (i) the simulation was run in India rather than the specific operational theatre; (ii) the human experts were not given enough time to study the scenario; (iii) MAPPO used more computational resources than available in the field","(i) SIM-TO-REAL GAP: The 82.4% is in a simulated environment that cannot perfectly model friction, weather variability, equipment failure rates, or intelligence degradation. Human experts implicitly apply decades of domain knowledge about these factors; MAPPO was never exposed to them. Real-world MAPPO performance may be significantly lower. (ii) ADVERSARIAL ADAPTATION: The human expert benchmark is against a STATIC evaluation scenario. Real OPFOR will observe the AI's repeated patterns and exploit them within hours. Human commanders adapt in real-time; current MARL policies are fixed post-training. (iii) EVALUATION SCOPE: One scenario type (defended position assault) is insufficient. Military performance must generalise across withdrawal, delay, defensive operations, urban warfare, logistics interdiction. MAPPO's generalisation across scenario types is unknown and likely much weaker than the 82.4% figure suggests","The three caveats are: sample size (only one human team was tested), hardware (MAPPO ran on GPU while humans ran on biological hardware), and time pressure (humans had 60 seconds per decision while MAPPO had 0.001 seconds)","The comparison is invalid because human experts are inherently superior to AI in military judgment — the result should be treated as a calibration error in the simulation environment rather than a genuine performance finding"],
+   ans:1,exp:"Three critical scientific caveats: (1) Sim-to-real: MAPPO was BORN in simulation and has never encountered real fog-of-war, equipment unreliability, or human psychological factors (fear, fatigue, initiative). Human experts implicitly compensate for these. A 16% gap (82%→66%) in sim-to-real is realistic based on other autonomous systems. (2) Adversarial adaptation: a fixed trained policy can be reverse-engineered and exploited. In the first exercise MAPPO beats humans; in the third exercise, experienced OPFOR who have watched MAPPO twice may achieve 90%+ against it by exploiting pattern repetition. Humans don't have this vulnerability at the same timescale. (3) Scenario generality: the 82.4% is ONE task. Military excellence is measured across dozens of scenario types under varying constraints — MAPPO's narrow training distribution is a fundamental limitation."},
+  {q:"LAWS (Lethal Autonomous Weapons Systems) at Level 3 autonomy (human out of the loop) raise the IHL principle of PROPORTIONALITY as a critical challenge. Why is proportionality assessment fundamentally difficult for an autonomous system, even one with MAPPO-level performance?",
+   opts:["Proportionality assessment is difficult for MARL because the reward function cannot encode the value of human life — there is no monetary equivalent that could be used as a proxy","IHL proportionality requires weighing expected civilian harm against anticipated military advantage — a continuous, contextual, judgment-intensive assessment. MARL agents optimize discrete rewards and cannot perform this: (i) CONTEXTUAL JUDGMENT: proportionality requires interpreting what 'military advantage' means in THIS specific political-strategic context (not captured in any feature vector); (ii) INCIDENTAL HARM ESTIMATION: assessing civilian casualties requires understanding who is a civilian at THIS moment (medical personnel, surrendering combatants, dual-use infrastructure) — context that changes faster than any sensor can verify; (iii) PRECEDENT AND INTENT: IHL proportionality considers the commander's intent and subsequent actions — machine systems have no intent in the legal sense. A MAPPO agent optimising mission success (+100) cannot perform this multi-dimensional assessment; it optimises for reward, not for compliance with an inherently contextual legal standard","Proportionality is only an issue at Level 4 autonomy (fully autonomous) — at Level 3, the human remains responsible for proportionality assessment during the mission planning phase, and the autonomous system only executes pre-approved engagement criteria","Proportionality is technically solvable by encoding it as a reward: add a term r_proportionality = −k × (estimated_civilian_harm / military_advantage). With sufficient k, the agent will learn proportionate engagement from training data"],
+   ans:1,exp:"IHL proportionality (Additional Protocol I, Art. 51(5)(b)) requires judgment: excessive harm relative to anticipated military advantage. 'Excessive' is inherently contextual and involves: (i) Who are the civilians? (surrendering combatants become protected persons; medical personnel in military uniform are still protected — machine identification in real-time is unreliable). (ii) What is the military advantage? (this depends on strategic context, chain of command objectives, deception operations, alliance politics — none encodable as observation features). (iii) Foreseeability: the agent must assess not just immediate harm but foreseeable secondary effects (destroying a bridge prevents civilian food supply). These require the kind of contextual, precedent-aware, morally-inflected reasoning that no current AI system can perform. The reward-encoding 'fix' in option C is superficially appealing but fails because the components (civilian_harm, military_advantage) are themselves the quantities that require IHL-standard assessment to evaluate."}
+];
+
+let currentQ=0,score=0,timer=null,answered=false;
+const TOTAL_TIME=40,DASH=2*Math.PI*20;
+const $=id=>document.getElementById(id);
+function startQuiz(){$('intro').style.display='none';$('quiz').style.display='flex';loadQuestion();}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered=false;const q=Qs[currentQ];
+  $('qnum').textContent=`Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('progressFill').style.width=`${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent=`Score: ${score.toFixed(2)}`;
+  const optDiv=$('options');optDiv.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const d=document.createElement('div');d.className='opt';d.id=`opt${i}`;
+    d.innerHTML=`<div class="opt-key">${k}</div><div class="opt-text">${q.opts[i]}</div>`;
+    d.onclick=()=>revealAnswer(i);
+    optDiv.appendChild(d);
+  });
+  renderMath(optDiv);
+  startTimer();
+}
+function startTimer(){
+  let remaining=TOTAL_TIME;
+  const circle=$('timerCircle'),numEl=$('timerNum');
+  circle.style.stroke='#C4791F';circle.style.strokeDashoffset=0;numEl.textContent=TOTAL_TIME;
+  timer=setInterval(()=>{
+    remaining--;numEl.textContent=remaining;
+    circle.style.strokeDashoffset=DASH*(1-remaining/TOTAL_TIME);
+    if(remaining<=10)circle.style.stroke='#C0392B';
+    else if(remaining<=20)circle.style.stroke='#C98A12';
+    if(remaining<=0){clearInterval(timer);revealAnswer(-1);}
+  },1000);
+}
+function revealAnswer(chosen){
+  if(answered)return;answered=true;clearInterval(timer);
+  const q=Qs[currentQ];
+  if(chosen===q.ans)score+=1;else if(chosen>=0)score-=0.25;
+  q.opts.forEach((_,i)=>{
+    const el=$(`opt${i}`);el.onclick=null;
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===chosen&&chosen!==q.ans)el.classList.add('wrong');
+  });
+  setTimeout(advance,2500);
+}
+function advance(){currentQ++;if(currentQ>=Qs.length){showEnd();return;}loadQuestion();}
+function showEnd(){
+  $('quiz').style.display='none';$('end').style.display='flex';
+  const s=parseFloat(score.toFixed(2));$('finalScore').textContent=s;
+  let g='';
+  if(s>=12)g='🏆 Outstanding (≥12/15)';
+  else if(s>=9)g='⭐ Proficient (9–11/15)';
+  else if(s>=6)g='📚 Developing (6–8/15)';
+  else g='🔄 Needs Review (<6/15)';
+  $('finalGrade').textContent=g;
+}
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

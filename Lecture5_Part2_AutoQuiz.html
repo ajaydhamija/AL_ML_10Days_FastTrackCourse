@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 5 Quiz — Anomaly Detection & Cybersecurity</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--crim:#A93226;--red2:#C0392B;--lblue:#BDD7EE;
+    --green:#1E7A45;--orange:#E05218;--amber:#C98A12;
+    --white:#FFFFFF;--light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--yellow:#FFF2A0;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+  #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px 18px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#2A0808 100%);}
+  #intro .badge{background:var(--crim);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:16px;}
+  #intro h1{font-size:clamp(20px,4.5vw,32px);font-weight:800;line-height:1.2;margin-bottom:10px;}
+  #intro .sub{font-size:clamp(12px,2.5vw,15px);color:var(--lblue);margin-bottom:26px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:11px;max-width:620px;width:100%;margin:0 auto 24px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:11px;padding:12px;text-align:center;}
+  .info-card .val{font-size:clamp(20px,4.5vw,28px);font-weight:800;color:var(--red2);}
+  .info-card .lbl{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:11px;padding:14px 18px;max-width:580px;width:100%;margin:0 auto 24px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:13px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:12.5px;color:#D0E8F5;margin-bottom:5px;list-style:none;padding-left:16px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:var(--red2);}
+  .btn-start{background:var(--crim);color:#fff;border:none;padding:13px 44px;border-radius:28px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(169,50,38,0.5);transition:transform .15s;}
+  .btn-start:hover{transform:scale(1.04);}
+  .footer-info{margin-top:20px;font-size:11px;color:var(--grey);}
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--crim);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:var(--red2);stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+  .qbody{flex:1;display:flex;flex-direction:column;padding:20px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+  .qtext{font-size:clamp(14px,2.6vw,18px);font-weight:700;color:var(--dark);line-height:1.45;margin-bottom:18px;padding:14px 16px;background:#fff;border-left:5px solid var(--crim);border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+  .options{display:grid;gap:10px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 5px rgba(0,0,0,0.04);}
+  .opt-key{min-width:27px;height:27px;border-radius:50%;background:var(--crim);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+  .opt-text{font-size:13px;color:var(--dark);line-height:1.4;padding-top:4px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;}.opt.correct .opt-key{background:var(--green);}
+  .opt.wrong{border-color:var(--red2);background:#FDE8E8;}.opt.wrong .opt-key{background:var(--red2);}
+  .qfooter{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 16px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--crim);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:26px 16px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#2A0808 100%);}
+  #end h2{font-size:clamp(20px,5vw,30px);font-weight:800;margin-bottom:8px;}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid var(--red2);border-radius:16px;padding:20px 36px;margin:14px 0 20px;}
+  .score-box .score-val{font-size:50px;font-weight:800;color:var(--red2);}
+  .score-box .score-max{font-size:16px;color:var(--lblue);}
+  .score-box .score-grade{font-size:18px;color:var(--yellow);margin-top:6px;font-weight:700;}
+  .btn-restart{background:var(--navy);color:#fff;border:none;padding:11px 32px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;border:1px solid var(--crim);}
+  @media(max-width:600px){.options{grid-template-columns:1fr;}.info-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div id="intro">
+  <div class="badge">LECTURE 5 QUIZ</div>
+  <h1>Anomaly Detection &<br>Cybersecurity</h1>
+  <p class="sub">Unsupervised Learning Part 2 — Unit 4</p>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong</div></div>
+  </div>
+  <div class="rules">
+    <h3>Instructions</h3>
+    <ul>
+      <li>Auto-advances at <strong>40 seconds</strong> — negative marking applies</li>
+      <li>Covers: Z-score · Mahalanobis · Isolation Forest · OCSVM · Autoencoders · Intrusion · Insider Threat</li>
+      <li>Maximum: <strong>15 marks</strong></li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+
+<div id="quiz">
+  <div class="qheader">
+    <div><div class="qtag">LECTURE 5 QUIZ</div><div class="qcourse">Anomaly Detection & Cybersecurity</div></div>
+    <div class="timer-circle">
+      <svg width="48" height="48" viewBox="0 0 48 48">
+        <circle class="bg" cx="24" cy="24" r="20"/>
+        <circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/>
+      </svg>
+      <div class="timer-text" id="timerNum">40</div>
+    </div>
+  </div>
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+
+<div id="end">
+  <h2>Quiz Complete!</h2>
+  <p style="color:var(--lblue);font-size:14px;margin-bottom:4px;">Lecture 5 — Anomaly Detection & Cybersecurity</p>
+  <div class="score-box">
+    <div class="score-val" id="finalScore">0</div>
+    <div class="score-max">out of 15 marks</div>
+    <div class="score-grade" id="finalGrade"></div>
+  </div>
+  <p style="color:var(--lblue);font-size:14px;">Full answers in <strong>Lecture 5 — Part 3</strong></p>
+  <button class="btn-restart" onclick="location.reload()">↺ Restart</button>
+  <p style="margin-top:14px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+
+<script>
+const Qs=[
+  {q:"Point anomaly, contextual anomaly, and collective anomaly are three distinct types. A SIGINT system detects 1,000 packets arriving in 10 ms — each individual packet is normal in isolation. Which type of anomaly is this, and why does it evade univariate Z-score detection?",
+   opts:["Point anomaly: one packet has extreme byte count. Z-score detects it because extreme values always exceed 3σ in the feature distribution","Collective anomaly: the GROUP of 1,000 packets in 10ms is anomalous even though each individual packet is normal. Z-score checks each feature of each packet independently — it never aggregates across the time window to detect the unusual RATE of arrival","Contextual anomaly: the packets are normal during day but anomalous at night. Z-score would detect this if time-of-day was included as a feature","Point anomaly: the packet count of 1,000 in the time window is an extreme value that Z-score would flag if connection_count is one of the 41 features included"],
+   ans:1,exp:"Collective anomaly: no individual packet is unusual, but the COLLECTION (1000 in 10ms) is a SYN flood. Z-score evaluates each packet feature independently — it sees normal packet sizes, normal headers, normal flags. It has no concept of inter-arrival time aggregation over a window. The collective pattern requires temporal aggregation features (packets/sec) to be pre-computed before any univariate method can detect it."},
+  {q:"Mahalanobis distance D_M(x) = √[(x−μ)^T Σ⁻¹ (x−μ)] incorporates the inverse covariance matrix Σ⁻¹. Why does multiplying by Σ⁻¹ make Mahalanobis more informative than Euclidean distance for network packet anomaly detection?",
+   opts:["Σ⁻¹ squares all distances, making them larger and easier to threshold compared to the smaller Euclidean distances","Σ⁻¹ normalises each feature direction by its variance AND accounts for correlations between features. Features that are highly correlated are 'compressed' into fewer effective dimensions, preventing them from dominating the distance. A packet that is unusual in the direction of genuine variance (not just in a correlated redundant direction) receives a high D_M score","Σ⁻¹ converts the feature vectors from byte-space to probability space, making the threshold interpretable as a p-value under the Gaussian distribution","Σ⁻¹ removes all negative feature values from the distance computation, which is necessary because network packet features (bytes, counts) are always non-negative"],
+   ans:1,exp:"In network traffic, src_bytes and dst_bytes are highly correlated (large uploads often have large downloads). Euclidean distance would give these two features independent weight, double-counting their correlated signal. Σ⁻¹ de-correlates the feature space — it stretches directions of low variance and compresses directions of high variance (principal component stretching/shrinking). A packet that deviates in a genuinely rare direction (orthogonal to normal variation) gets a large D_M; one that deviates along a common correlation direction gets a small one."},
+  {q:"Isolation Forest uses path length h(x) in randomly constructed trees as the anomaly score. A normal packet from a dense region has expected path length E[h(x)]=6.84. A DoS attack packet has E[h(x)]=2.31. Why do anomalies consistently have shorter path lengths across many random trees?",
+   opts:["Anomalies have more extreme feature values, and extreme values always appear at the ROOT level of random trees because the random split criterion selects the highest-variance feature first","In dense data regions, any random split near a point will have many other similar points on the same side — the attacker is 'camouflaged' by its neighbours. In sparse regions, any random split will isolate an anomaly in just 1-2 cuts because it has no similar neighbours to hide behind","Random trees always grow to depth log₂(ψ) for normal points but terminate early for anomalies due to a special early-stopping rule triggered when a node contains only anomalous examples","Anomalies have shorter path lengths because the random split values are biased toward the boundary of the data distribution, where anomalies concentrate"],
+   ans:1,exp:"The isolation mechanism: normal points in a dense cluster have many similar neighbours. Any random split through the feature space divides the dense cluster, leaving the target point surrounded by many other points — requiring many more splits to fully isolate it (long path). Anomalous points in sparse regions have few or no neighbours nearby — the very FIRST random split on any feature is likely to separate them from the bulk of data immediately → short path length. This is the fundamental geometric insight: density → long path, sparsity → short path."},
+  {q:"The Isolation Forest anomaly score formula is $s(x,\psi)=2^{-E[h(x)]/c(\psi)}$ where c(ψ) is the expected path length of an unsuccessful search in a BST with ψ nodes. If s(x)=0.88, what does this indicate, and what happens to s(x) as E[h(x)] → 0?",
+   opts:["s(x)=0.88 indicates the point is 88% likely to be normal based on Bayesian posterior probability; as E[h(x)]→0, s(x)→0 (predicted as normal)","s(x)=0.88 indicates a high anomaly score (close to 1) — this point is isolated very quickly in random trees. As E[h(x)]→0 (path length approaches zero, isolated at root), s(x)→2^0=1.0: maximum anomaly score — a point isolated at the very root of every tree","s(x)=0.88 means the path length equals 88% of the normalisation constant c(ψ), which is a statistical artefact with no operational meaning","s(x)=0.88 indicates the point belongs to the 12th percentile of path lengths. As E[h(x)]→0, s(x)→0.5 (the default value for ambiguous points)"],
+   ans:1,exp:"s(x,ψ)=2^{-E[h(x)]/c(ψ)}. When E[h(x)] is small (short path, isolated early): exponent ≈ 0, s→2^0=1.0 (maximum anomaly). When E[h(x)]≈c(ψ) (average path, similar to normal): s→2^{-1}=0.5 (ambiguous). When E[h(x)]>>c(ψ) (long path, hard to isolate, very normal): s→2^{-large}≈0. So s=0.88 > threshold 0.60 → anomaly flag. This is the DoS SYN flood packet with short path length 2.31 compared to normal path 6.84."},
+  {q:"OCSVM with ν=0.05 was optimal for Case A (TPR=89.7%, FPR=0.9%). The ν parameter has TWO simultaneous interpretations: an upper bound and a lower bound. What are they, and why does setting ν=0.001 (very small) risk poor anomaly detection even though it sounds conservative?",
+   opts:["ν is an upper bound on the training error rate and a lower bound on the margin width. ν=0.001 makes the margin very wide, which causes the boundary to expand outward and include all anomalies inside the 'normal' region","ν is simultaneously (1) an upper bound on the FRACTION of training points that can be outside the boundary (margin violations, ξᵢ>0) AND (2) a lower bound on the fraction of training points that become support vectors. ν=0.001 allows almost no training points outside → extremely tight boundary → during testing, even slightly unusual NORMAL traffic (not just attacks) is flagged → high FPR with no benefit to TPR","ν is the probability threshold for the OCSVM to reject a new point. ν=0.001 sets a 0.1% rejection rate globally, which means only 500 of 500,000 packets will be flagged regardless of actual anomaly content","ν controls the RBF kernel bandwidth γ internally — setting ν too small forces γ to become very large, causing the same overfitting problem as large γ in regular SVM classification"],
+   ans:1,exp:"ν=0.001: virtually all training data must be inside the boundary (0.1% can be outside). For noisy real-world network data where normal traffic has natural variation, this forces an extremely tight boundary that encloses only the most stereotypical normal packets. Any slight deviation — a backup job sending an unusually large file, a software update triggering an unusual connection pattern — falls outside. This inflates FPR dramatically without meaningfully improving TPR on actual attacks. ν should approximately match the expected proportion of anomalous traffic in training data."},
+  {q:"An Autoencoder trained on 482K normal network packets achieves: Normal RE mean=0.024, std=0.018; Attack RE mean=0.354, std=0.142. The threshold τ=0.087 is set at FPR=0.6% on the validation set. Approximately what percentage of normal packets have RE > 0.087, and why do attack packets have higher RE?",
+   opts:["0.6% of normal packets (by definition of how τ was chosen on the validation set). Attacks have high RE because the autoencoder's decoder outputs random values for attack packets, since it has never seen any malicious patterns","Approximately 0.6% of normal packets exceed τ (since τ was chosen at FPR=0.6% on validation, and train/val come from the same normal distribution). Attack packets have high RE because the autoencoder's latent space bottleneck compresses information about NORMAL patterns — when an attack packet is encoded, the resulting bottleneck representation cannot reconstruct the attack's unusual features well, resulting in high reconstruction error","3.0% of normal packets exceed τ because τ=0.087 is 3.5 standard deviations above the normal mean (0.024+3.5×0.018=0.087), and 3σ corresponds to 0.3% per tail or 0.6% two-tailed","100% of attack packets are detected because RE_attack_mean=0.354 >> τ=0.087, so every single attack packet has RE above threshold"],
+   ans:1,exp:"By construction: τ was chosen so FPR=0.6% on validation (which came from the same normal distribution as training). So approximately 0.6% of normal packets exceed τ at test time. Attack detection: the autoencoder learned to encode and decode the NORMAL manifold efficiently. Attack packets, being structurally different (e.g., DoS has tiny src_bytes=1, unusual flag combinations), encode to a bottleneck representation that when decoded produces a normal-looking packet — but the normal-looking output differs significantly from the anomalous input, yielding high reconstruction error."},
+  {q:"The LSTM Autoencoder for insider threat detection achieved MTTD=31.4 hours compared to the industry average of 207 days. Two accounts were missed: both were careful attackers who accessed credentials during the victim's own normal business hours. What does this reveal about the FUNDAMENTAL LIMITATION of behavioural anomaly detection based only on TEMPORAL patterns?",
+   opts:["The LSTM failed because it was not trained with enough training data — 500 users is insufficient to generalise to all possible user behaviour patterns in a 500-user organisation","Temporal patterns (WHEN events occur) are necessary but not sufficient for insider threat detection. A sophisticated attacker who operates during normal hours defeats temporal anomaly detection. The missing dimension is WHAT was accessed: the data category combination (finance + HR + technical documentation in one session) is abnormal regardless of the time. Multi-modal features (time × content × volume × recipient) are needed to detect sophisticated insiders","The LSTM simply needs a larger bottleneck dimension (e.g., latent=64 instead of latent=16) to capture more complex temporal patterns and detect careful attackers who operate during business hours","MTTD of 31.4 hours indicates that behavioural anomaly detection is too slow for operational use — an attacker can exfiltrate substantial data in 31 hours before detection, making the system operationally useless"],
+   ans:1,exp:"The two missed accounts illustrate that temporal behavioural profiling ('when you access systems') is only one dimension of insider threat. Temporal: access at 2am = anomaly. Content: accessing finance AND HR AND engineering in one session = unusual cross-domain access regardless of time. Volume: transferring 2GB when your baseline is 50MB = anomaly. Recipient: emailing an external address for the first time. The sophisticated insider defeats single-dimension detection but creates anomalies in the content/volume/recipient dimensions. Multi-modal fusion across ALL behavioural dimensions is the state-of-the-art approach (UEBA: User and Entity Behaviour Analytics)."},
+  {q:"In the 3-tier deployment architecture (Isolation Forest → Autoencoder → Analyst), the Isolation Forest uses a threshold s*=0.55 that is LOWER than the optimal single-detector threshold (s*=0.60). Why is a lower threshold appropriate for the first tier, and what metric should be prioritised at each tier?",
+   opts:["Lower threshold s*=0.55 at tier-1 makes the Isolation Forest more conservative, reducing the number of packets passed to the Autoencoder for costly deep scanning — this minimises computational overhead","A lower threshold at tier-1 increases RECALL (TPR) at the cost of higher FPR — it is acceptable to pass MORE false positives to tier-2 because tier-2 (Autoencoder) can handle them with its superior precision (0.6% FPR). The goal of tier-1 is to ensure NO true attack bypasses the entire system (recall-first design). Tier-2 optimises PRECISION to reject false positives. Tier-3 (Analyst) optimises INSIGHT to confirm remaining uncertainties","A lower threshold at tier-1 is needed to compensate for the Autoencoder's slower processing speed — by passing fewer packets (via tighter threshold), the Autoencoder can process each one more slowly and more accurately","The threshold at tier-1 must match the threshold at tier-2 exactly; the '0.55 at tier-1 vs 0.60 as optimal' distinction is purely notational, referring to the same threshold applied at different stages"],
+   ans:1,exp:"Tiered detection design: tier-1 optimises RECALL (catch everything suspicious), tier-2 optimises PRECISION (eliminate false positives). With s*=0.55 at tier-1: slightly more normal packets are flagged (some false positives passed to tier-2) — but essentially NO attack misses tier-1 screening. Tier-2 (AE) then rejects the false positives with its superior 0.6% FPR. Net result: near-perfect recall from tier-1 + near-perfect precision from tier-2. This is the classic detection funnel (high sensitivity → high specificity) used in medical screening and airport security."},
+  {q:"Network traffic features include src_bytes, dst_bytes, and connection_count. When training an Autoencoder on these features, what preprocessing step is ESSENTIAL, and what catastrophic failure occurs if it is omitted?",
+   opts:["Categorical encoding of the protocol type feature; without it the Autoencoder cannot process non-numeric inputs and produces runtime errors","Z-score normalisation (or min-max scaling) of all features. Without normalisation: src_bytes ranges from 0 to 1,000,000+ bytes while connection_count ranges from 0 to 100. The MSE loss is dominated by the high-variance src_bytes feature (squared error up to 10^12) while connection_count (squared error up to 10^4) contributes negligibly. The Autoencoder learns to reconstruct src_bytes accurately while ignoring connection_count — destroying the anomaly detection signal for connection-count-based attacks (like SYN floods)","Batch normalisation within the Autoencoder hidden layers; without this the training gradient explodes after 5-10 epochs, making convergence impossible for deep architectures","Principal Component Analysis to reduce the 41 features to 10 components before training; without this dimensionality reduction the Autoencoder is computationally infeasible to train on 500K samples"],
+   ans:1,exp:"Feature scale dominance: MSE loss (src_bytes - src_bytes_hat)² vs (count - count_hat)². A 1000-byte reconstruction error in src_bytes contributes 10^6 to the loss, while a 10-unit error in connection_count contributes only 100. The gradient update overwhelmingly reflects src_bytes, leaving connection_count essentially unlearned. A SYN flood with connection_count=10,000 (anomalous) but normal src_bytes will have low reconstruction error despite being an obvious attack — completely defeating the autoencoder's ability to detect rate-based attacks. Z-score normalisation puts all features on the same scale, ensuring each contributes equally to the anomaly score."},
+  {q:"The Robust variant of covariance estimation (Minimum Covariance Determinant / MCD) is recommended over the standard sample covariance Σ for Mahalanobis-based anomaly detection. Why is the STANDARD sample covariance Σ problematic for anomaly detection specifically?",
+   opts:["Standard Σ is computationally too expensive for large datasets — it requires O(N×d²) operations, making it infeasible for N=500K packets with d=41 features","The standard sample covariance Σ = (1/N)ΣX^TX is computed using ALL N data points, including the anomalies the system is trying to detect. Anomalous points pull the estimated μ and Σ toward themselves, inflating variance in the anomalous direction. The resulting Mahalanobis distance paradoxically assigns LOWER distances to true anomalies (because Σ now accounts for them) — the very data points that should have high D_M make D_M smaller. MCD fits Σ to only the central 50% of data, excluding anomalies from the covariance estimate","Standard Σ is symmetric but not positive definite when d > N, requiring regularisation that introduces bias. For anomaly detection, this bias systematically under-scores the most dangerous anomalies at the extreme tails of the distribution","Standard Σ assumes feature independence (diagonal matrix) — using the full Σ introduces off-diagonal terms that cause the Mahalanobis distance to oscillate unstably during threshold selection"],
+   ans:1,exp:"The fundamental contamination problem: if 3.6% of the 500K training packets are attacks, and we compute standard Σ over all 500K, the anomalous packets contribute to Σ. For DoS packets with tiny src_bytes, they pull the estimated mean μ lower and inflate variance in the src_bytes direction. The resulting Σ 'expects' some very small src_bytes as normal, reducing D_M for DoS attacks below threshold. MCD finds the smallest-volume ellipsoid covering 50% of data — these 250K 'most central' points are unlikely to include many attacks, giving a clean estimate of normal data covariance."},
+  {q:"A lateral movement attack creates a FIRST-TIME connection between workstation A and database server B. The network graph anomaly detector flags this with 95.8% recall on lateral movement. Two additional attributes improve detection further. What are they, and what specific attack type evades the first-time-edge heuristic?",
+   opts:["Authentication protocol (NTLM vs Kerberos) and packet size distinguish lateral movement; domain generation algorithm (DGA) attacks evade first-time-edge detection by using multiple legitimate-looking domain names","Data transfer volume and port number improve detection; C2 beaconing with constant inter-arrival time evades the heuristic because it mimics regular scheduled tasks","Time-of-day of first-time connection (off-hours increases suspicion) and authentication event type (pass-the-hash shows as Kerberos ticket anomaly). DGA-based C2 evades the heuristic: each beacon uses a different algorithmically generated domain, meaning each connection IS to a 'first-time' domain but no single domain is seen repeatedly — the pattern of MANY different first-time external connections is the real signature","Port scanning activity and SMB connection count detect lateral movement; ARP poisoning evades detection by operating at Layer 2 and never creating TCP connections visible to the graph anomaly detector"],
+   ans:2,exp:"Time-of-day: a first-time connection at 3am is much more suspicious than the same at 10am. Pass-the-Hash: generates Kerberos ticket requests with unusual source/target patterns that differ from normal SSO flows. DGA evasion: the attacker's malware generates a new domain name daily (e.g., xk4m19b.com, qzv82a.com...). Each connection goes to a different domain — all first-time — so no single domain triggers repeated-connection alerts. The DGA signature is the HIGH ENTROPY of daily external connections (many unique first-time domains per day vs normal users who re-visit the same small set of sites). Entropy score on DNS requests is the key feature to add."},
+  {q:"An analyst wants to explain WHY the Autoencoder flagged a specific network packet as anomalous (RE=0.412). Simply reporting 'high reconstruction error' is insufficient for Rules-of-Engagement compliance. What technique provides feature-level explanations for autoencoder anomalies?",
+   opts:["Retrain the Autoencoder with one feature removed at a time and measure which removal most reduces the RE — the removed feature that most reduces RE was most responsible for the anomaly","Compute the per-feature reconstruction error vector: RE_j = (x_j − x̂_j)² for each feature j = 1,...,d. The features with the largest RE_j drove the overall high RE. Supplement this with SHAP values applied to the RE as a function of input features, identifying which input features most caused the high reconstruction error — this gives analyst-readable justification: 'Flagged because src_bytes=1.2 (expected 3,000-8,000) and connection_count=14,832 (expected 1-50)'","Apply k-Means clustering to all high-RE packets and describe the cluster centroid as the explanation for why the individual packet was anomalous","The Autoencoder cannot be explained at the feature level because neural network weights are not interpretable — explainability requires switching to a Logistic Regression model which provides coefficient weights as natural explanations"],
+   ans:1,exp:"Per-feature RE_j = (x_j − x̂_j)² gives an immediate feature-level decomposition of the anomaly: which features were reconstructed poorly? For the DoS packet: src_bytes=1.2 → reconstructed as x̂_bytes=3,400 (the normal range); RE_bytes=(1.2-3400)²=11.56M (enormous). Connection_count=14,832 → reconstructed as x̂_count=8; RE_count=(14832-8)²=219M. These two features dominate the overall RE=0.412 (normalised) — the analyst immediately sees BOTH the packet byte size anomaly AND the connection rate anomaly. SHAP extends this to marginal contributions accounting for feature interactions."},
+  {q:"Contextual anomaly detection for insider threat uses a per-user baseline. User X has a normal login hour distribution: N(9.4h, 1.8h²). A login is observed at 2:17am (2.28h). At what Z-score does this fall, and what is the significance at α=0.001 threshold? What additional contextual feature would reduce false positives for users who legitimately work late occasionally?",
+   opts:["Z = (2.28-9.4)/1.8 = -3.96; significance: p < 0.001 (flag). Additional feature: the user's role/clearance level — senior analysts should never trigger anomaly alerts regardless of login time","Z = (2.28-9.4)/1.8 = -3.96; this falls beyond the α=0.001 threshold (|Z| > 3.29 for two-tailed 0.1%). Alone this is a strong anomaly flag. However, to reduce false positives for legitimate late workers: add a rolling 30-day baseline of after-hours logins (did User X work late 2+ times last month?). A one-time 2am login for a user who never works late = high anomaly. A 2am login for a user who regularly does weekend work = contextually normal","Z = (2.28-9.4)/1.8 = -3.96; significance: not significant because the normal distribution is symmetric and negative Z-scores cannot indicate anomalous behaviour — only unusually LATE logins (positive Z) are suspicious","Z = (9.4-2.28)/1.8 = +3.96; the sign should always be positive. Significance: p < 0.001 (flag). Additional feature: whether the user has logged a prior request for after-hours system access — approved requests should suppress the anomaly score"],
+   ans:1,exp:"Z = (2.28 - 9.4)/1.8 = -7.12/1.8 = -3.96. For a two-tailed test at α=0.001, critical value ≈ ±3.29. |Z|=3.96 > 3.29 → p < 0.001 → significant anomaly flag. Rolling baseline context: if User X logged in at 11pm three times last month and twice at 2am, their personal after-hours baseline needs to incorporate this — the INDIVIDUAL user's normal distribution should be fitted separately from the population. A 2am login for a user with zero after-hours baseline in 90 days is very different from one for a user with documented after-hours work patterns."},
+  {q:"The Autoencoder outperformed Isolation Forest on TPR (95.8% vs 91.4%) and AUROC (0.988 vs 0.976), but Isolation Forest was 6,400× faster at inference (0.002ms vs 0.04ms... wait: 0.002ms vs 0.04ms, actually 20× difference). For a national CERT processing 10 million packets per day, compute the TOTAL DAILY INFERENCE TIME for each method and explain which factors would tilt the operational choice toward Autoencoder despite its slower speed.",
+   opts:["IF: 10M × 0.002ms = 20 seconds/day. AE: 10M × 0.04ms = 400 seconds/day. Both feasible in real-time. Autoencoder is preferred if: (a) attack classes evolve rapidly and require high TPR on new attacks; (b) regulatory/ROE compliance requires feature-level explainability via per-feature RE; (c) the 4.4% TPR gap (95.8%-91.4%) represents 44,000 missed attacks per million attack packets — operationally unacceptable for the organisation","IF: 10M × 0.002ms = 200 seconds (~3.3 min)/day. AE: 10M × 0.04ms = 4,000 seconds (~67 min)/day. IF is marginal, AE is completely infeasible in real time — Autoencoder should never be used for packet-level screening","IF: 10M × 0.002ms = 20 seconds/day. AE: 10M × 0.04ms = 400 seconds/day. AE should always be preferred because 400 seconds is a trivial daily overhead that is vastly outweighed by the 4.1% TPR improvement which translates to 41,000 more attacks detected per million attack packets","IF inference for 10M packets: impossible without GPU — Isolation Forest requires specialised hardware not available in standard CERT infrastructure"],
+   ans:0,exp:"IF: 10,000,000 × 0.000002 s = 20 seconds/day — trivially real-time. AE: 10,000,000 × 0.00004 s = 400 seconds (~6.7 min)/day — also comfortably real-time (not 67 min). Both ARE feasible for 10M/day. The choice tilts to Autoencoder when: (a) 4.4% additional TPR matters (44K more attacks detected per 1M attack volume — significant for a national CERT); (b) per-feature RE explanation is required for incident reports and ROE; (c) an attack type (like U2R root exploits with TPR=98.4% vs IF's weaker performance) is the priority threat. The 3-tier remains best: IF first-screen at 0.002ms, AE deep-scan only flagged packets (small fraction of 10M), making total AE load << 400 sec."},
+  {q:"Zero-day threat detection is cited as a key advantage of anomaly detection over supervised classification. An adversary deploys a novel APT (Advanced Persistent Threat) using a NEVER-BEFORE-SEEN attack vector. Which statement BEST captures why the Autoencoder detects it while a supervised Random Forest (trained on KDD Cup attack labels) fails?",
+   opts:["The Autoencoder uses deep learning which is inherently more powerful than Random Forest and therefore detects any attack type regardless of whether it appeared in training","The supervised Random Forest learned a discriminant boundary between KNOWN attack classes (DoS, Probe, R2L, U2R) and normal traffic. The novel APT doesn't match any of these learned patterns — it falls into the 'normal' region of the Random Forest's decision space because it was never seen during training. The Autoencoder, trained only on normal traffic, flags ANY deviation from normal — it doesn't need to recognise the attack type, only that the packet is UNLIKE normal traffic. The APT's unusual feature combination creates high reconstruction error regardless of whether it was a known or unknown attack type","The Autoencoder detects zero-day threats because it performs implicit Bayesian inference over the space of all possible attack types, while Random Forest is limited to frequentist statistical boundaries between training classes","Random Forest fails on novel APTs because it was trained on KDD Cup data from 1999 — its training data is simply too outdated, not because of any fundamental algorithmic limitation"],
+   ans:1,exp:"This is the fundamental algorithmic reason: supervised classification learns 'what attacks look like' (positive class) vs 'what normal looks like' (negative class). A novel attack that doesn't resemble any training attack class gets classified as 'normal' — supervised models have no mechanism to flag unknown unknowns. Anomaly detection learns ONLY 'what normal looks like' and flags everything else. The key insight: the Autoencoder's high RE for the novel APT comes purely from the fact that the APT's packet features are unlike the normal training data — it needs zero information about the attack itself. This makes anomaly detection the correct first-line defence for zero-day threats."}
+];
+
+let currentQ=0,score=0,timer=null,answered=false;
+const TOTAL_TIME=40,DASH=2*Math.PI*20;
+const $=id=>document.getElementById(id);
+function startQuiz(){$('intro').style.display='none';$('quiz').style.display='flex';loadQuestion();}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered=false;const q=Qs[currentQ];
+  $('qnum').textContent=`Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('progressFill').style.width=`${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent=`Score: ${score.toFixed(2)}`;
+  const optDiv=$('options');optDiv.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const d=document.createElement('div');d.className='opt';d.id=`opt${i}`;
+    d.innerHTML=`<div class="opt-key">${k}</div><div class="opt-text">${q.opts[i]}</div>`;
+    optDiv.appendChild(d);
+  });
+  renderMath(optDiv);
+  startTimer();
+}
+function startTimer(){
+  let remaining=TOTAL_TIME;
+  const circle=$('timerCircle'),numEl=$('timerNum');
+  circle.style.stroke='#C0392B';circle.style.strokeDashoffset=0;numEl.textContent=TOTAL_TIME;
+  timer=setInterval(()=>{
+    remaining--;numEl.textContent=remaining;
+    circle.style.strokeDashoffset=DASH*(1-remaining/TOTAL_TIME);
+    if(remaining<=10)circle.style.stroke='#E05218';
+    else if(remaining<=20)circle.style.stroke='#C98A12';
+    if(remaining<=0){clearInterval(timer);revealAnswer(-1);}
+  },1000);
+}
+function revealAnswer(chosen){
+  if(answered)return;answered=true;clearInterval(timer);
+  const q=Qs[currentQ];
+  if(chosen===q.ans)score+=1;else if(chosen>=0)score-=0.25;
+  q.opts.forEach((_,i)=>{
+    const el=$(`opt${i}`);
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===chosen&&chosen!==q.ans)el.classList.add('wrong');
+  });
+  setTimeout(advance,2500);
+}
+function advance(){currentQ++;if(currentQ>=Qs.length){showEnd();return;}loadQuestion();}
+function showEnd(){
+  $('quiz').style.display='none';$('end').style.display='flex';
+  const s=parseFloat(score.toFixed(2));$('finalScore').textContent=s;
+  let g='';
+  if(s>=12)g='🏆 Outstanding (≥12/15)';
+  else if(s>=9)g='⭐ Proficient (9–11/15)';
+  else if(s>=6)g='📚 Developing (6–8/15)';
+  else g='🔄 Needs Review (<6/15)';
+  $('finalGrade').textContent=g;
+}
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

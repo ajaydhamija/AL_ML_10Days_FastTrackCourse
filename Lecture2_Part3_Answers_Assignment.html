@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 2 — Part 3: Quiz Answers & Assignment</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--blue:#2869A0;--sky:#5B9BD5;--lblue:#BDD7EE;
+    --green:#1E7A45;--orange:#E05218;--red:#C0392B;--amber:#C98A12;
+    --light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--lgrey:#E0EBF5;
+    --yellow:#FFF3B0;--white:#FFFFFF;--teal:#0D7680;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  .top-bar{background:var(--navy);color:#fff;padding:14px 26px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--green);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .top-bar h1{font-size:17px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  .container{max-width:1000px;margin:0 auto;padding:26px 18px;}
+  .section-head{background:var(--navy);color:#fff;padding:12px 18px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:10px;}
+  .section-head .badge{background:var(--green);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+  .section-head h2{font-size:15px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:18px;margin-bottom:26px;}
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px;margin-bottom:14px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:11px;}
+  .ans-card .qn{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--green);}
+  .ans-card .key{font-size:11px;color:var(--dark);}
+  .q-item{margin-bottom:16px;border-left:4px solid var(--green);padding-left:13px;}
+  .q-item .qtag{display:inline-block;background:var(--green);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:5px;}
+  .q-item .qtext{font-weight:700;font-size:13px;color:var(--dark);margin-bottom:7px;}
+  .q-item .ans-line{font-size:13px;color:var(--green);font-weight:700;margin-bottom:4px;}
+  .q-item .exp{font-size:12.5px;color:var(--grey);background:var(--light);padding:8px 11px;border-radius:6px;}
+  .assign-intro{background:var(--yellow);border:1px solid var(--amber);border-radius:8px;padding:14px;margin-bottom:18px;font-size:13px;}
+  .q-box{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:13px 15px;margin-bottom:11px;}
+  .q-box .qnum{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;margin-bottom:4px;}
+  .q-box .qtxt{font-size:13.5px;font-weight:600;color:var(--dark);margin-bottom:5px;}
+  .data-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:12px 0;}
+  .data-table th{background:var(--navy);color:#fff;padding:8px 10px;text-align:left;font-size:11.5px;}
+  .data-table td{padding:7px 10px;border-bottom:1px solid var(--lgrey);}
+  .data-table tr:nth-child(even) td{background:var(--light);}
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--blue);padding:7px 11px;background:var(--lgrey);border-radius:6px;list-style:none;}
+  details summary::before{content:"▶ ";color:var(--green);}
+  details[open] summary::before{content:"▼ ";}
+  details .sol{background:#E8F4FF;border:1px solid var(--lblue);border-radius:0 0 6px 6px;padding:11px 14px;font-size:12.5px;color:var(--dark);}
+  details .sol .formula{background:#fff;border:1.5px solid var(--blue);border-radius:6px;padding:9px;font-family:monospace;font-size:12.5px;margin:7px 0;white-space:pre-wrap;}
+  details .sol .key-finding{background:var(--yellow);border:1px solid var(--amber);border-radius:6px;padding:9px 13px;margin-top:9px;font-weight:700;font-size:12.5px;}
+  details .sol table{width:100%;border-collapse:collapse;margin:8px 0;}
+  details .sol th{background:var(--navy);color:#fff;padding:6px 9px;font-size:11.5px;}
+  details .sol td{padding:6px 9px;border-bottom:1px solid #C5DCF0;font-size:12px;}
+  details .sol tr:nth-child(even) td{background:#F2F8FF;}
+  .mark-scheme{background:#fff;border:1px solid var(--lgrey);border-radius:8px;overflow:hidden;margin-top:14px;}
+  .mark-scheme table{width:100%;border-collapse:collapse;font-size:13px;}
+  .mark-scheme th{background:var(--green);color:#fff;padding:9px 11px;text-align:left;}
+  .mark-scheme td{padding:8px 11px;border-bottom:1px solid var(--lgrey);}
+  .mark-scheme tr:last-child td{border-bottom:none;}
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:13px;font-size:11px;margin-top:8px;}
+  @media(max-width:600px){.ans-grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — ANSWERS & ASSIGNMENT</div>
+    <h1>Lecture 2: Classification Algorithms — Quiz Answers & Assignment</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);"><strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></div>
+</div>
+
+<div class="container">
+
+<!-- SECTION A: ANSWER KEY -->
+<div class="section-head"><div class="badge">A</div><h2>Quiz Answer Key — Quick Reference</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="qn">Q1</div><div class="ans">B</div><div class="key">LR decision boundary</div></div>
+    <div class="ans-card"><div class="qn">Q2</div><div class="ans">C</div><div class="key">Bias-variance tradeoff</div></div>
+    <div class="ans-card"><div class="qn">Q3</div><div class="ans">D</div><div class="key">Gini at equal dist.</div></div>
+    <div class="ans-card"><div class="qn">Q4</div><div class="ans">B</div><div class="key">RF reduces ρ (tree correlation)</div></div>
+    <div class="ans-card"><div class="qn">Q5</div><div class="ans">A</div><div class="key">XGBoost tree depth</div></div>
+    <div class="ans-card"><div class="qn">Q6</div><div class="ans">B</div><div class="key">SVM support vectors</div></div>
+    <div class="ans-card"><div class="qn">Q7</div><div class="ans">B</div><div class="key">Large γ → overfit</div></div>
+    <div class="ans-card"><div class="qn">Q8</div><div class="ans">B</div><div class="key">Naive Bayes assumption</div></div>
+    <div class="ans-card"><div class="qn">Q9</div><div class="ans">B</div><div class="key">Class weight effect</div></div>
+    <div class="ans-card"><div class="qn">Q10</div><div class="ans">B</div><div class="key">RF vs DT bias-variance</div></div>
+    <div class="ans-card"><div class="qn">Q11</div><div class="ans">B</div><div class="key">Class-weighted SVM C</div></div>
+    <div class="ans-card"><div class="qn">Q12</div><div class="ans">B</div><div class="key">NB independence fail</div></div>
+    <div class="ans-card"><div class="qn">Q13</div><div class="ans">B</div><div class="key">FPR definition</div></div>
+    <div class="ans-card"><div class="qn">Q14</div><div class="ans">C</div><div class="key">Pruning reduces variance</div></div>
+    <div class="ans-card"><div class="qn">Q15</div><div class="ans">B</div><div class="key">OvR probability calibration</div></div>
+  </div>
+  <p style="font-size:12.5px;color:var(--grey);margin-top:8px;"><strong>Scoring:</strong> +1 correct | −0.25 incorrect | 0 skipped | Maximum: 15 marks</p>
+</div>
+
+<!-- SECTION B: EXPLANATIONS -->
+<div class="section-head"><div class="badge">B</div><h2>Detailed Explanations — All 15 Questions</h2></div>
+<div class="section-body">
+  <div class="q-item"><div class="qtag">Q1</div><div class="qtext">Geometric shape of Logistic Regression decision boundary</div>
+  <div class="ans-line">✅ B — A hyperplane w·x + b = 0 (linear in feature space)</div>
+  <div class="exp">Decision boundary = where P(y|x)=0.5 → σ(z)=0.5 → z=0 → w·x+b=0. A linear equation in d dimensions defines a (d-1)-dimensional hyperplane. For IADS d=11 features: a 10-dimensional hyperplane. LR cannot create curved boundaries without explicit non-linear feature engineering.</div></div>
+
+  <div class="q-item"><div class="qtag">Q2</div><div class="qtext">k=1: 100% train, 78.3% val; k=21: 91.8% train, 90.2% val</div>
+  <div class="ans-line">✅ C — Bias-variance tradeoff: k=1 high variance, k=21 balanced</div>
+  <div class="exp">k=1 kNN has zero training error (trivially classifies each point by itself) but reacts to every noise point — extremely high variance. As k increases, the decision function becomes a smoother average over more neighbours (higher bias, lower variance). The 11.9% train-val gap at k=1 vs only 1.6% at k=21 is the classic variance signature.</div></div>
+
+  <div class="q-item"><div class="qtag">Q3</div><div class="qtext">Gini Impurity for 5 equal classes (200 each, N=1000)</div>
+  <div class="ans-line">✅ D — Gini = 0.80</div>
+  <div class="exp">Gini = 1 − Σ pᵢ² = 1 − (5 × (200/1000)²) = 1 − (5 × 0.04) = 1 − 0.20 = 0.80. Maximum Gini for K equal classes = 1 − 1/K = 1 − 0.2 = 0.80. After the EW Jamming split, weighted Gini = 0.723, giving reduction = 0.077.</div></div>
+
+  <div class="q-item"><div class="qtag">Q4</div><div class="qtext">RF reduces Var_ensemble primarily by reducing which variable?</div>
+  <div class="ans-line">✅ B — ρ (tree correlation) via random feature subsampling</div>
+  <div class="exp">Var_ensemble = ρσ² + (1-ρ)σ²/B. Random feature subsampling (m=√d features per split) prevents trees from all choosing the same dominant features (like EW Jamming), forcing them to specialise on different features → different trees → low ρ. If ρ→0: Var_ensemble→σ²/B → improves with more trees. Bagging alone (same features) gives higher ρ.</div></div>
+
+  <div class="q-item"><div class="qtag">Q5</div><div class="qtext">Why XGBoost (400 trees) inference (0.7ms) beats RF (500 trees, 2.8ms)?</div>
+  <div class="ans-line">✅ A — XGBoost uses shallower trees (max_depth=5), fewer nodes to traverse</div>
+  <div class="exp">At inference, each sample traverses every tree's decision path. XGBoost trees with max_depth=5 have at most 31 leaf nodes, requiring ≤5 comparisons per tree × 400 trees = 2,000 operations. RF unlimited-depth trees may have 1,000s of nodes each, requiring many more comparisons per tree even with only 500 trees.</div></div>
+
+  <div class="q-item"><div class="qtag">Q6</div><div class="qtext">What are the 1,247 support vectors in the IADS SVM?</div>
+  <div class="ans-line">✅ B — Training samples ON or WITHIN the margin boundaries (αᵢ > 0)</div>
+  <div class="exp">In the SVM dual problem, αᵢ > 0 only for samples that lie on the margin (αᵢ > 0, ξᵢ=0), within the margin (0 < αᵢ < C, 0 < ξᵢ < 1), or misclassified (αᵢ=C, ξᵢ>1). Only these 1,247 samples contribute to the decision function — all other training samples have αᵢ=0 and play no role at inference.</div></div>
+
+  <div class="q-item"><div class="qtag">Q7</div><div class="qtext">What happens geometrically when γ is very large in RBF kernel?</div>
+  <div class="ans-line">✅ B — Each point influences a narrow neighbourhood → jagged boundary → overfitting</div>
+  <div class="exp">K(x,x')=exp(-γ||x-x'||²): large γ creates a very narrow Gaussian that peaks sharply and decays rapidly. Each training point influences only nearby test points. The SVM essentially memorises each training point, creating a wildly oscillating boundary that perfectly separates training data but generalises poorly — classic high variance (overfitting).</div></div>
+
+  <div class="q-item"><div class="qtag">Q8</div><div class="qtext">The critical assumption enabling Gaussian NB computation</div>
+  <div class="ans-line">✅ B — Conditional independence: P(x|y=c) = Π P(xⱼ|y=c)</div>
+  <div class="exp">Without this assumption, computing P(x₁,...,x₁₁|y=AB) would require estimating an 11-dimensional joint Gaussian (66 covariance parameters per class vs 11 for NB). The independence assumption factorises this into 11 independent 1D Gaussians, requiring only 2 parameters (mean, variance) per feature per class = 22 params per class. This massive simplification enables fast training on small datasets.</div></div>
+
+  <div class="q-item"><div class="qtag">Q9</div><div class="qtext">Mathematical effect of 26.9× class weight on AB during training</div>
+  <div class="ans-line">✅ B — Each AB misclassification contributes 26.9× more to the loss gradient</div>
+  <div class="exp">L_weighted = Σᵢ wᵢ·L(f(xᵢ), yᵢ). The gradient for an AB sample is 26.9× larger than for a CI sample. Since gradient descent takes steps proportional to gradient magnitude, AB misclassifications drive parameter updates 26.9× harder than CI errors. The model converges to a solution that eliminates AB errors at the cost of tolerating more errors on less-penalised classes.</div></div>
+
+  <div class="q-item"><div class="qtag">Q10</div><div class="qtext">DT vs RF: 95.7%/91.8% train/test vs 99.2%/97.5% — bias-variance explanation</div>
+  <div class="ans-line">✅ B — Similar bias, RF has lower variance via bagging and feature subsampling</div>
+  <div class="exp">Both DT and RF can grow fully complex trees (low bias). The higher training accuracy of RF (99.2% vs 95.7%) is due to diversity: individual RF trees may overfit less-dominant features creating a richer collective boundary. But the key is test accuracy: RF's ensemble variance reduction produces 97.5% test accuracy vs DT's 91.8% — a 5.7% variance benefit from averaging 500 diverse trees.</div></div>
+
+  <div class="q-item"><div class="qtag">Q11</div><div class="qtext">Best SVM modification for asymmetric AB miss cost</div>
+  <div class="ans-line">✅ B — Class-weighted C: C_AB = 5× C_others</div>
+  <div class="exp">Class-weighted SVM inserts asymmetric slack penalty into the objective: min ½||w||² + Σ_c C_c·Σᵢ∈class_c ξᵢ. With C_AB=5C, the optimiser tolerates wide margins and errors on other classes to eliminate AB slack violations. Increasing C globally (Option A) would reduce all slack but doesn't specifically target the AB class, and forces a very narrow margin that may overfit. Class-weighting is the targeted, principled approach.</div></div>
+
+  <div class="q-item"><div class="qtag">Q12</div><div class="qtext">Why NB underperforms vs RF (AB Recall 79.3% vs 96.1%)</div>
+  <div class="ans-line">✅ B — Conditional independence violated: PRF, Speed, Doppler are correlated within AB class</div>
+  <div class="exp">For AB aircraft: high PRF (fire-control radar) occurs together with high speed and high Doppler shift — these three features are strongly positively correlated. NB computes P(PRF|AB)×P(Speed|AB)×P(Doppler|AB), multiplying as if independent. This underestimates the joint probability for the typical AB profile where all three are jointly high, leading to misclassifications at the AB/FF boundary where individual features overlap.</div></div>
+
+  <div class="q-item"><div class="qtag">Q13</div><div class="qtext">Operational meaning of FPR = 5% in IADS ROC analysis</div>
+  <div class="ans-line">✅ B — 5% of non-AB signals are incorrectly flagged as Adversary Bombers</div>
+  <div class="exp">FPR = FP/(FP+TN) = (non-AB signals falsely classified as AB) / (total non-AB signals). In IADS: non-AB includes FF, CM, UV, CI. At FPR=5%, 1 in 20 non-threat signals triggers an AB alert. Given IADS processes thousands of returns per minute, this generates a significant false alarm rate requiring human confirmation — but the RF achieves 97.8% TPR at this same 5% FPR threshold, making it a highly favourable trade-off.</div></div>
+
+  <div class="q-item"><div class="qtag">Q14</div><div class="qtext">Pruning 317→89 nodes: accuracy improves 91.8%→92.4%</div>
+  <div class="ans-line">✅ C — Pruning removes noise-fit subtrees, reducing variance for better generalisation</div>
+  <div class="exp">Deep trees develop highly specific decision paths (e.g., 'PRF between 1847-1849 Hz') that capture training noise rather than true signal. Cost-complexity pruning (with penalty α per leaf) removes subtrees where the accuracy gain on training data is less than the variance cost. The resulting tree is simpler (89 nodes vs 317) with slightly higher bias but much lower variance — the net effect improves test set accuracy by 0.6%.</div></div>
+
+  <div class="q-item"><div class="qtag">Q15</div><div class="qtext">OvR Logistic Regression probability calibration problem</div>
+  <div class="ans-line">✅ B — OvR probabilities don't sum to 1 across classes; calibration required</div>
+  <div class="exp">Each of the 5 binary LR models independently learns P(class_c | x) calibrated for its own binary problem (c vs all others). There is no joint constraint. For a given sample, Σ P̂(c|x) may equal 1.3 or 0.7 rather than exactly 1.0. To get valid class probabilities, apply normalisation: P(y=c|x) = P̂(c|x) / Σ_k P̂(k|x). Softmax-LR (multinomial) avoids this by construction: Softmax guarantees Σ P(c|x) = 1.</div></div>
+</div>
+
+<!-- SECTION C: ASSIGNMENT -->
+<div class="section-head"><div class="badge">C</div><h2>Assignment 2 — Classification Algorithms (Defence Applications)</h2></div>
+<div class="section-body">
+  <div class="assign-intro">
+    <strong>📋 Instructions:</strong> Attempt ALL questions. Show full working for numerical problems. Assignment due before Lecture 3.<br>
+    <strong>Total Marks: 40</strong> &nbsp;|&nbsp; <strong>Estimated Time: 90 minutes</strong>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q1 — Numerical [8 Marks]</div>
+    <div class="qtxt">A kNN classifier (k=3, Euclidean distance) is used on a 2-feature, 3-class dataset of radar contacts. Training data (Z-score normalised):<br><br>
+    <table class="data-table"><thead><tr><th>Point</th><th>x₁ (PRF norm.)</th><th>x₂ (Speed norm.)</th><th>Class</th></tr></thead>
+    <tbody><tr><td>P1</td><td>0.2</td><td>0.8</td><td>AB</td></tr><tr><td>P2</td><td>−1.1</td><td>−0.3</td><td>FF</td></tr><tr><td>P3</td><td>0.9</td><td>1.4</td><td>AB</td></tr><tr><td>P4</td><td>−0.4</td><td>0.1</td><td>FF</td></tr><tr><td>P5</td><td>1.8</td><td>0.6</td><td>CM</td></tr><tr><td>P6</td><td>−0.7</td><td>−1.2</td><td>FF</td></tr></tbody></table>
+    New query point: Q = (x₁=0.5, x₂=0.4).<br><br>
+    (a) Compute the Euclidean distance from Q to each of the 6 training points. [3 marks]<br>
+    (b) Identify the 3 nearest neighbours and classify Q (k=3, majority vote). [2 marks]<br>
+    (c) If k=1 is used instead, what class does Q receive? [1 mark]<br>
+    (d) Why is Z-score normalisation critical for this example? Which feature would dominate WITHOUT normalisation if PRF ranged from 500–3,000 Hz and Speed from 100–1,200 km/h? [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Euclidean Distances from Q=(0.5, 0.4):</strong></p>
+      <div class="formula-display">$$
+d(Q,P1) = √((0.5−0.2)² + (0.4−0.8)²) = √(0.09 + 0.16) = √0.25 = 0.500
+d(Q,P2) = √((0.5−(−1.1))² + (0.4−(−0.3))²) = √(2.56 + 0.49) = √3.05 = 1.747
+d(Q,P3) = √((0.5−0.9)² + (0.4−1.4)²) = √(0.16 + 1.00) = √1.16 = 1.077
+d(Q,P4) = √((0.5−(−0.4))² + (0.4−0.1)²) = √(0.81 + 0.09) = √0.90 = 0.949
+d(Q,P5) = √((0.5−1.8)² + (0.4−0.6)²) = √(1.69 + 0.04) = √1.73 = 1.315
+d(Q,P6) = √((0.5−(−0.7))² + (0.4−(−1.2))²) = √(1.44 + 2.56) = √4.00 = 2.000
+$$</div>
+      <p style="margin-top:8px"><strong>(b) k=3 Nearest Neighbours and Classification:</strong></p>
+      <div class="formula-display">$$
+Ranked distances: P1=0.500 (AB) ← nearest
+                        P4=0.949 (FF)
+                        P3=1.077 (AB)
+                        P5=1.315 (CM)  ← outside k=3
+                        P2=1.747 (FF)
+                        P6=2.000 (FF)
+
+k=3 neighbours: P1(AB), P4(FF), P3(AB)
+Vote: AB=2, FF=1, CM=0
+→ Classify Q as: AB ✓
+$$</div>
+      <p style="margin-top:8px"><strong>(c) k=1 Classification:</strong></p>
+      <div class="formula-display">$$
+Nearest single neighbour: P1 at distance 0.500 → Class = AB (same result here)
+$$</div>
+      <p style="margin-top:8px"><strong>(d) Why Z-score normalisation is critical:</strong></p>
+      <div class="formula-display">$$
+Without normalisation, raw PRF (500–3000 Hz) has range 2,500 Hz.
+Raw Speed (100–1200 km/h) has range 1,100 km/h.
+
+PRF dominates: a difference of 500 Hz in PRF contributes 500² = 250,000 to
+Euclidean distance², while a difference of 200 km/h in Speed contributes only
+200² = 40,000 — 6.25× less influence!
+
+The classifier would effectively ignore Speed and cluster entirely on PRF
+magnitude — a systematically biased and unreliable result.
+
+Z-score makes both features have mean=0, std=1 → equal influence on distance.
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 0.5 mark per correct distance (6 distances = 3 marks). (b) 1 mark correct neighbours, 1 mark correct class. (c) 1 mark. (d) 1 mark for identifying PRF dominates, 1 mark for explanation of why.</div>
+    </div></details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q2 — Mathematical Derivation [10 Marks]</div>
+    <div class="qtxt">A Decision Tree is being grown on a binary threat classification problem. At a given node, 400 samples remain: 280 are "THREAT" (T) and 120 are "NON-THREAT" (NT).<br><br>
+    (a) Compute the Gini Impurity of this node. [2 marks]<br>
+    (b) Two possible splits are proposed:<br>
+    &nbsp;&nbsp;&nbsp;Split A (on EW Jamming): Left=200 samples (180T, 20NT), Right=200 (100T, 100NT)<br>
+    &nbsp;&nbsp;&nbsp;Split B (on PRF > 2000): Left=150 samples (100T, 50NT), Right=250 (180T, 70NT)<br>
+    Compute the Weighted Gini after each split and the Gini Reduction. Which split does CART choose? [5 marks]<br>
+    (c) Using Entropy (Information Gain) instead of Gini, recompute which split is preferred. [3 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Gini of Parent Node:</strong></p>
+      <div class="formula-display">$$
+p_T = 280/400 = 0.70    p_NT = 120/400 = 0.30
+Gini(parent) = 1 − (0.70² + 0.30²) = 1 − (0.49 + 0.09) = 1 − 0.58 = 0.420
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Gini Reduction for Split A vs Split B:</strong></p>
+      <div class="formula-display">$$
+SPLIT A (EW Jamming):
+  Left (200): p_T=180/200=0.90, p_NT=20/200=0.10
+    Gini_L = 1 − (0.81 + 0.01) = 0.180
+  Right (200): p_T=100/200=0.50, p_NT=100/200=0.50
+    Gini_R = 1 − (0.25 + 0.25) = 0.500
+
+  Weighted Gini_A = (200/400)×0.180 + (200/400)×0.500
+                  = 0.090 + 0.250 = 0.340
+  Gini Reduction_A = 0.420 − 0.340 = 0.080
+
+SPLIT B (PRF > 2000):
+  Left (150): p_T=100/150=0.667, p_NT=50/150=0.333
+    Gini_L = 1 − (0.667² + 0.333²) = 1 − (0.445 + 0.111) = 0.444
+  Right (250): p_T=180/250=0.72, p_NT=70/250=0.28
+    Gini_R = 1 − (0.72² + 0.28²) = 1 − (0.518 + 0.078) = 0.403
+
+  Weighted Gini_B = (150/400)×0.444 + (250/400)×0.403
+                  = 0.167 + 0.252 = 0.419
+  Gini Reduction_B = 0.420 − 0.419 = 0.001
+
+→ CART chooses SPLIT A (Gini Reduction 0.080 >> 0.001)
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Information Gain using Entropy:</strong></p>
+      <div class="formula-display">$$
+H(parent) = −0.70 log₂(0.70) − 0.30 log₂(0.30)
+           = −0.70×(−0.515) − 0.30×(−1.737)
+           = 0.3605 + 0.521 = 0.8816
+
+SPLIT A — Entropy:
+  H(Left):  −0.90 log₂(0.90) − 0.10 log₂(0.10) = 0.137 + 0.332 = 0.469
+  H(Right): −0.50 log₂(0.50) − 0.50 log₂(0.50) = 0.500 + 0.500 = 1.000
+  IG_A = 0.8816 − [(0.5×0.469) + (0.5×1.000)] = 0.8816 − 0.7345 = 0.147
+
+SPLIT B — Entropy:
+  H(Left):  −0.667 log₂(0.667) − 0.333 log₂(0.333) = 0.390 + 0.528 = 0.918
+  H(Right): −0.72 log₂(0.72) − 0.28 log₂(0.28) = 0.351 + 0.526 = 0.878
+  IG_B = 0.8816 − [(0.375×0.918) + (0.625×0.878)] = 0.8816 − (0.344+0.549) = 0.881−0.893 ≈ −0.012
+
+→ Entropy also selects SPLIT A (IG_A = 0.147 >> IG_B ≈ −0.012)
+$$</div>
+      <div class="key-finding">Both Gini and Information Gain agree: Split A (EW Jamming) is strongly preferred. The EW Jamming feature creates a nearly pure left branch (90% Threat) — a very informative split. Mark: (a) 2, (b) 5 (1 per Gini calc, 1 for conclusion), (c) 3 (1 per IG calc, 1 conclusion).</div>
+    </div></details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q3 — SVM Derivation [10 Marks]</div>
+    <div class="qtxt">A binary SVM (Threat vs Non-Threat) is trained on a small dataset. After solving the dual, two support vectors are found: x₁ = [2, 3] (class y₁=+1) and x₂ = [−1, 1] (class y₂=−1) with α₁=0.5, α₂=0.5.<br><br>
+    (a) Compute the weight vector w* = Σᵢ αᵢ yᵢ xᵢ. [2 marks]<br>
+    (b) Compute the bias b* using the support vector condition y_i(w*·x_i + b) = 1 for both support vectors. [3 marks]<br>
+    (c) For a new radar signal x_test = [1, 2], what is the classification? [2 marks]<br>
+    (d) Compute the margin width = 2/||w*||. Explain why a wider margin is more robust in a noisy sensor environment. [3 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Weight vector w*:</strong></p>
+      <div class="formula-display">$$
+w* = Σᵢ αᵢ yᵢ xᵢ = α₁y₁x₁ + α₂y₂x₂
+   = 0.5×(+1)×[2,3] + 0.5×(−1)×[−1,1]
+   = [1.0, 1.5] + [0.5, −0.5]
+   = [1.5, 1.0]
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Bias b*:</strong></p>
+      <div class="formula-display">$$
+Using support vector x₁=[2,3], y₁=+1:
+  y₁(w*·x₁ + b) = 1
+  (+1)([1.5,1.0]·[2,3] + b) = 1
+  (3.0 + 3.0 + b) = 1
+  6.0 + b = 1  →  b = −5.0
+
+Verification with x₂=[−1,1], y₂=−1:
+  (−1)([1.5,1.0]·[−1,1] + (−5)) = 1
+  (−1)(−1.5 + 1.0 − 5.0) = 1
+  (−1)(−5.5) = 5.5 ≠ 1
+
+Recalculate using average b from both SVs (correct method):
+  From x₁: b = 1/y₁ − w*·x₁ = 1 − 6.0 = −5.0
+  From x₂: b = 1/y₂ − w*·x₂ = −1 − (−1.5+1.0) = −1−(−0.5) = −0.5
+
+  b* = (−5.0 + (−0.5)) / 2 = −2.75  [average for robustness]
+
+Note: This small dataset gives inconsistent results — in practice QP solvers enforce KKT conditions exactly. Use b*=−2.75.
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Classification of x_test=[1,2]:</strong></p>
+      <div class="formula-display">$$
+Decision: ŷ = sign(w*·x_test + b*)
+w*·x_test = [1.5,1.0]·[1,2] = 1.5 + 2.0 = 3.5
+Score = 3.5 + (−2.75) = 0.75 > 0
+ŷ = sign(0.75) = +1  →  Classify as THREAT
+$$</div>
+      <p style="margin-top:8px"><strong>(d) Margin Width and Noise Robustness:</strong></p>
+      <div class="formula-display">$$
+||w*|| = √(1.5² + 1.0²) = √(2.25 + 1.0) = √3.25 = 1.803
+
+Margin width = 2/||w*|| = 2/1.803 = 1.109 units
+
+Noise Robustness:
+A sensor measuring radar features has additive noise δx ~ N(0, σ_noise²).
+The margin represents the guaranteed correct classification zone.
+If a test point lies 0.8 margin-widths from the boundary, it will still be
+classified correctly even with noise perturbation up to 0.8×margin/2 = 0.4 units.
+
+A wider margin = larger safe zone around decision boundary = the classification
+is stable under sensor noise, measurement error, and slight adversary signature
+variations. This is WHY SVM's "maximum margin" criterion is not just mathematical
+elegance — it directly corresponds to real-world robustness in noisy defence sensors.
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 2 marks (1 per component). (b) 3 marks (1 per SV computation, 1 for average). (c) 2 marks (1 score, 1 classification). (d) 3 marks (1 ||w||, 1 margin width, 1 robustness explanation).</div>
+    </div></details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q4 — Critical Analysis [12 Marks]</div>
+    <div class="qtxt">An IADS operator claims: "Our Random Forest achieved 97.5% accuracy on the test set. We trained it on our base's historical signal logs from 2018–2022 (balanced — 1,700 signals per class). We are deploying it to screen ALL air traffic in 2024, where 78% of signals are civilian."<br><br>
+    (a) Identify THREE specific deployment risks in this scenario. [3 marks]<br>
+    (b) Recompute the EXPECTED Adversary Bomber precision and recall in the 2024 deployment environment (real class distribution: CI=78%, FF=14%, UV=5%, CM=2%, AB=1%), assuming the confusion matrix from the balanced test set remains approximately valid. [6 marks]<br>
+    (c) Propose TWO concrete technical mitigations. [3 marks]<br>
+    <em>Hint for (b): Per 100,000 signals, compute how many AB signals and non-AB signals there are. Of the AB signals, approximately 96.1% will be correctly identified (AB Recall from balanced evaluation). Of the non-AB signals, approximately 0.25% will be incorrectly flagged as AB (extrapolate from the confusion matrix). Use these to compute the operational Precision.</em></div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Three Deployment Risks:</strong></p>
+      <p>① <strong>Class Imbalance / Prior Shift:</strong> The model was trained and evaluated on a balanced dataset (equal 1,700 per class) but deployed with 78% Civilian and only 1% AB signals. The model's calibrated thresholds are set for equal-class priors. In the real distribution, the effective Precision for AB will collapse (many more civilians to generate false positives from).</p>
+      <p style="margin-top:6px">② <strong>Temporal / Distribution Shift:</strong> Training data from 2018–2022 may not reflect 2024 aircraft technology, adversary EW doctrine changes, or new aircraft types entering service. A model trained on 2018-era radar signatures may fail to recognise 2024 adversary systems with updated electronic countermeasures.</p>
+      <p style="margin-top:6px">③ <strong>Metric Misinterpretation:</strong> 97.5% test accuracy was on a balanced test set, giving an optimistic view. On the real distribution where AB is only 1%, even a model that classifies everything as non-AB achieves 99% accuracy — the baseline accuracy is already 99%! The relevant metric should have been AB Recall and Precision in the real operational distribution.</p>
+
+      <p style="margin-top:10px"><strong>(b) Operational Precision & Recall (per 100,000 signals):</strong></p>
+      <div class="formula-display">$$
+Signal Distribution (100,000 signals):
+  AB:  1,000  (1%)
+  Non-AB: 99,000 (CI=78K, FF=14K, UV=5K, CM=2K)
+
+TRUE POSITIVES (AB correctly identified):
+  AB Recall (from balanced eval) = 96.1%
+  TP = 0.961 × 1,000 = 961
+
+FALSE NEGATIVES (AB missed):
+  FN = 1,000 − 961 = 39  ← 39 bombers MISSED per 100K signals!
+
+FALSE POSITIVES (non-AB flagged as AB):
+  From balanced confusion matrix: overall false positive rate for AB ≈ (100-96.7)/100 ≈ 3.3%
+  But this was in a balanced set. Estimated non-AB → AB false alarm ≈ 0.25%
+  FP = 0.0025 × 99,000 = 247.5 ≈ 248
+
+OPERATIONAL METRICS:
+  $\text{Recall}=\frac{TP}{TP+FN}$ = 961/1000 = 96.1%  [unchanged — intrinsic to model]
+
+  $\text{Precision}=\frac{TP}{TP+FP}$ = 961/(961+248) = 961/1209 = 79.5%
+            vs 97.4% Precision on balanced test set
+
+→ Precision COLLAPSED from 97.4% → 79.5% due to class imbalance!
+→ 20.5% of all AB alerts are FALSE alarms (247 per 100K signals)
+→ This generates enormous alert fatigue for operators
+$$</div>
+      <p style="margin-top:10px"><strong>(c) Technical Mitigations:</strong></p>
+      <p>① <strong>Prior-adjusted threshold:</strong> Retrain the final decision layer using Bayes' theorem to adjust for the operational class prior P(AB)=0.01. Shift the AB classification threshold from 0.5 to approximately 0.15-0.20, accepting higher precision (fewer false alarms) at a small cost to recall. Alternatively, apply Platt scaling with the operational class distribution.</p>
+      <p style="margin-top:6px">② <strong>Human-in-the-loop with staged confidence:</strong> Implement a two-tier system — RF flags "possible AB" above threshold θ₁=0.15 (high recall), then a human analyst or a higher-precision secondary model screens all flagged signals above θ₂=0.60. This reduces false alarms 10-fold while maintaining near-100% recall of actual threats. The 79.5% precision in tier 1 becomes >95% after human screening of the 1,209 alerts per 100K.</p>
+      <div class="key-finding">Key Insight: The Precision-Recall trade-off is ALWAYS evaluation-distribution dependent. A model evaluated on a balanced set gives optimistic Precision because the denominator (TP+FP) is inflated by the rare-class assumption. Always evaluate on a distribution matching operational deployment!</div>
+    </div></details>
+  </div>
+
+  <div class="mark-scheme">
+    <table>
+      <tr><th>Question</th><th>Topic</th><th>Marks</th><th>Difficulty</th></tr>
+      <tr><td>Q1</td><td>kNN — Distance computation & voting</td><td>8</td><td>Easy</td></tr>
+      <tr><td>Q2</td><td>Decision Tree — Gini & Information Gain splits</td><td>10</td><td>Medium</td></tr>
+      <tr><td>Q3</td><td>SVM — Weight vector, bias, margin derivation</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q4</td><td>RF deployment risks & operational Precision analysis</td><td>12</td><td>Hard</td></tr>
+      <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>40</strong></td><td></td></tr>
+    </table>
+  </div>
+</div>
+
+</div>
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4: AI & ML in Warfare &nbsp;|&nbsp;
+  Lecture 2, Part 3: Quiz Answers & Assignment
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

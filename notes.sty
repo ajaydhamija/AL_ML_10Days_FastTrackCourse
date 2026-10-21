@@ -1,0 +1,32 @@
+\ProvidesPackage{notes}
+\RequirePackage[a4paper,margin=2.3cm,headheight=14pt]{geometry}
+\RequirePackage{amsmath,amssymb,mathtools,bm}
+\RequirePackage{xcolor,graphicx,booktabs,tabularx,array,colortbl,enumitem}
+\RequirePackage{tikz,pgfplots}\pgfplotsset{compat=1.16}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,decorations.pathreplacing}
+\usepgfplotslibrary{fillbetween}
+\RequirePackage[expansion=false]{microtype}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage{fancyhdr,titlesec}
+\RequirePackage[colorlinks=true,linkcolor=NavyN,urlcolor=NavyN,citecolor=NavyN]{hyperref}
+\definecolor{NavyN}{HTML}{1B3A5E}\definecolor{AccN}{HTML}{E05218}\definecolor{GrnN}{HTML}{1E7A45}
+\definecolor{RedN}{HTML}{C0392B}\definecolor{AmbN}{HTML}{C98A12}\definecolor{BluN}{HTML}{2869A0}\definecolor{GreyN}{HTML}{6A7A8A}
+\setlength{\parskip}{4pt}\setlength{\parindent}{0pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\color{NavyN}\leftmark}\fancyhead[R]{\small\color{GreyN}AI \& ML in Warfare --- Reference Text}
+\fancyfoot[L]{\small\color{GreyN}AK DHAMIJA, Researcher \& Instructor, AI \& Machine Learning}\fancyfoot[R]{\small\thepage}
+\titleformat{\section}{\Large\bfseries\color{NavyN}}{\thesection}{0.6em}{}[{\color{AccN}\titlerule[1pt]}]
+\titleformat{\subsection}{\large\bfseries\color{NavyN}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{AccN}}{\thesubsubsection}{0.6em}{}
+\tcbset{nb/.style={enhanced,breakable,boxrule=0.7pt,arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt,fonttitle=\bfseries\small,before skip=8pt,after skip=8pt}}
+\newtcolorbox{definition}[1]{nb,colback=BluN!5,colframe=BluN,title={Definition --- #1}}
+\newtcolorbox{example}[1]{nb,colback=GrnN!5,colframe=GrnN,title={Worked example --- #1}}
+\newtcolorbox{pitfall}[1]{nb,colback=RedN!5,colframe=RedN,title={Pitfall --- #1}}
+\newtcolorbox{keypoint}{nb,colback=AmbN!8,colframe=AmbN,title={Key point}}
+\newtcolorbox{defence}[1]{nb,colback=NavyN!5,colframe=NavyN,title={Defence \& wargaming application --- #1}}
+\newtcolorbox{derivation}[1]{nb,colback=white,colframe=GreyN,title={Derivation --- #1}}
+\newtcolorbox{question}[1]{nb,colback=white,colframe=AccN,title={Check your understanding --- #1}}
+\setlist{itemsep=2pt,topsep=3pt}
+\tikzset{nd/.style={draw=NavyN,fill=white,rounded corners=2pt,align=center,font=\small,inner sep=4pt},arr/.style={-{Stealth[length=4pt]},thick,draw=NavyN}}
+\newcommand{\titlepg}[3]{\begin{titlepage}\centering\vspace*{2.5cm}{\color{AccN}\large\bfseries LECTURE #1\par}\vspace{0.6cm}{\color{NavyN}\Huge\bfseries #2\par}\vspace{0.6cm}{\color{AccN}\rule{0.7\textwidth}{1.5pt}}\par\vspace{0.6cm}{\Large Reference Text\par}\vspace{0.3cm}{\large #3\par}\vspace{2.5cm}{\large AK DHAMIJA, Researcher \& Instructor, AI \& Machine Learning\par}\vspace{0.2cm}{\normalsize \href{mailto:dhamija.ak@gmail.com}{dhamija.ak@gmail.com} \quad\textbullet\quad 9811453163\par}\vspace{0.3cm}{Unit 4: Simulation Strategies in Warfare --- AI \& Machine Learning in Warfare\par}\vfill{\small\color{GreyN}This reference text expands every slide of the lecture into full explanations, derivations, worked examples and figures. Read it alongside the slides; work the ``check your understanding'' boxes before looking at the answers.\par}\end{titlepage}}
+\endinput

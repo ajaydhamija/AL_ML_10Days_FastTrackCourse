@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 7 Quiz — Policy Gradient Methods</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--fg:#1B7A5E;--fg2:#2AA87E;--lblue:#BDD7EE;
+    --green:#1E7A45;--red:#C0392B;--amber:#C98A12;
+    --white:#FFFFFF;--light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--yellow:#FFF2A0;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+  #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px 18px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#041810 100%);}
+  #intro .badge{background:var(--fg);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:16px;}
+  #intro h1{font-size:clamp(20px,4.5vw,32px);font-weight:800;line-height:1.2;margin-bottom:10px;}
+  #intro .sub{font-size:clamp(12px,2.5vw,15px);color:var(--lblue);margin-bottom:26px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:11px;max-width:620px;width:100%;margin:0 auto 24px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:11px;padding:12px;text-align:center;}
+  .info-card .val{font-size:clamp(20px,4.5vw,28px);font-weight:800;color:var(--fg2);}
+  .info-card .lbl{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:11px;padding:14px 18px;max-width:580px;width:100%;margin:0 auto 24px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:13px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:12.5px;color:#D0E8F5;margin-bottom:5px;list-style:none;padding-left:16px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:var(--fg2);}
+  .btn-start{background:var(--fg);color:#fff;border:none;padding:13px 44px;border-radius:28px;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s;}
+  .btn-start:hover{transform:scale(1.04);}
+  .footer-info{margin-top:20px;font-size:11px;color:var(--grey);}
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--fg);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:var(--fg2);stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+  .qbody{flex:1;display:flex;flex-direction:column;padding:20px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+  .qtext{font-size:clamp(14px,2.6vw,18px);font-weight:700;color:var(--dark);line-height:1.45;margin-bottom:18px;padding:14px 16px;background:#fff;border-left:5px solid var(--fg);border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+  .options{display:grid;gap:10px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 5px rgba(0,0,0,0.04);cursor:pointer;}
+  .opt-key{min-width:27px;height:27px;border-radius:50%;background:var(--fg);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+  .opt-text{font-size:13px;color:var(--dark);line-height:1.4;padding-top:4px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;}.opt.correct .opt-key{background:var(--green);}
+  .opt.wrong{border-color:var(--red);background:#FDE8E8;}.opt.wrong .opt-key{background:var(--red);}
+  .qfooter{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 16px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--fg);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:26px 16px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#041810 100%);}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid var(--fg2);border-radius:16px;padding:20px 36px;margin:14px 0 20px;}
+  .score-box .score-val{font-size:50px;font-weight:800;color:var(--fg2);}
+  .score-box .score-max{font-size:16px;color:var(--lblue);}
+  .score-box .score-grade{font-size:18px;color:var(--yellow);margin-top:6px;font-weight:700;}
+  .btn-restart{background:var(--fg);color:#fff;border:none;padding:11px 32px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;}
+  @media(max-width:600px){.options{grid-template-columns:1fr;}.info-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div id="intro">
+  <div class="badge">LECTURE 7 QUIZ</div>
+  <h1>Policy Gradient Methods:<br>REINFORCE · PPO · SAC</h1>
+  <p class="sub">RL Part 2 — Continuous Control for Autonomous Drones — Unit 4</p>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong</div></div>
+  </div>
+  <div class="rules">
+    <h3>Instructions</h3>
+    <ul>
+      <li>Auto-advances at <strong>40 seconds</strong> — negative marking applies</li>
+      <li>Covers: Policy Gradient Theorem · REINFORCE · Baselines · Actor-Critic · PPO · Continuous Gaussian Policy · SAC</li>
+      <li>Maximum: <strong>15 marks</strong></li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+<div id="quiz">
+  <div class="qheader">
+    <div><div class="qtag">LECTURE 7 QUIZ</div><div class="qcourse">Policy Gradient Methods</div></div>
+    <div class="timer-circle"><svg width="48" height="48" viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"/><circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/></svg><div class="timer-text" id="timerNum">40</div></div>
+  </div>
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+<div id="end">
+  <h2>Quiz Complete!</h2>
+  <p style="color:var(--lblue);font-size:14px;margin-bottom:4px;">Lecture 7 — Policy Gradient Methods</p>
+  <div class="score-box"><div class="score-val" id="finalScore">0</div><div class="score-max">out of 15 marks</div><div class="score-grade" id="finalGrade"></div></div>
+  <p style="color:var(--lblue);font-size:14px;">Full answers in <strong>Lecture 7 — Part 3</strong></p>
+  <button class="btn-restart" onclick="location.reload()">↺ Restart</button>
+  <p style="margin-top:14px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+<script>
+const Qs=[
+  {q:"The Policy Gradient Theorem states: $\nabla_\theta J(\theta)=\mathbb{E}_\pi[\nabla_\theta\log\pi_\theta(a|s)\cdot G_t]$. DQN uses argmax_a Q(s,a;θ) as the policy. Why does this argmax approach FAIL for a continuous drone thrust space a ∈ [-100N, +100N]³?",
+   opts:["argmax over a continuous space requires evaluating Q at every possible thrust vector — infinitely many — which is computationally impossible at the millisecond inference timescale required for real-time drone control. Policy Gradient avoids this: instead of computing Q for all a and finding the max, it directly outputs the action distribution π(a|s), sampling one action in O(1)","The argmax fails because Q-networks cannot process continuous inputs — they require discretised state representations, so thrust vectors must be binned into 1N increments, creating 200³ = 8 million bins per drone, which exceeds GPU memory","argmax fails because the DQN's Q-network is not differentiable with respect to the action a — it is only differentiable with respect to θ. Without ∂Q/∂a, the argmax cannot be computed by gradient ascent","The argmax fails only when the drone operates at high altitude (>500m) where the continuous action space becomes non-convex due to atmospheric effects — at sea level, DQN with binned thrust works fine"],
+   ans:0,exp:"argmax over a continuous space is an inner optimisation problem: max_a Q(s,a;θ) requires gradient ascent over a for each state s at inference time. For real-time control, this is impractical (dozens of gradient steps per action selection). Policy Gradient sidesteps this by directly parameterising the policy: output μ_θ(s) as the continuous action, eliminating the argmax entirely. Note: DDPG/TD3 use a deterministic actor network μ_θ(s) to approximate the argmax — a value-based method that CAN handle continuous actions, but less stable than SAC."},
+  {q:"The REINFORCE gradient estimate is $\nabla J\approx\frac{1}{T}\sum_t G_t\nabla_\theta\log\pi_\theta(a_t|s_t)$, where G_t = Σ_{k≥t} γ^{k-t} r_{k+1}. The drone case study showed variance ±84.6 without a baseline. What is the fundamental source of this high variance?",
+   opts:["The variance comes from the log π_θ term, which has a singularity when π_θ(a|s)→0 for rarely-chosen actions, causing unbounded gradient magnitudes for exploratory actions","G_t is a MONTE CARLO estimate of Q(sₜ,aₜ): it sums ALL rewards from time t onwards, including rewards from actions taken AFTER t that have nothing to do with aₜ itself. In a 50-step episode, G₀ includes the consequences of 50 different actions — the signal attributing credit to action a₀ is swamped by the noise from all subsequent random actions. Every sample G_t is an unbiased but very high-variance estimate of the true Q*(sₜ,aₜ)","The variance comes from the neural network's random weight initialisation, which causes different random seeds to produce different gradient estimates. Fixing the random seed eliminates this variance entirely","Variance is caused by the γ discount factor, which amplifies rewards received early in the episode by γ^0=1.0 while suppressing later rewards — this selective amplification creates artificially large gradient magnitudes for early-episode actions"],
+   ans:1,exp:"Credit assignment problem: G_t = r_{t+1} + γr_{t+2} + ... + γ^{T-t-1}r_T. When we want to know 'how good was action a_t?', G_t includes noise from all subsequent actions a_{t+1},...,a_T. Even if a_t was excellent, a bad a_{t+3} might make G_t low — misleading the update to decrease a_t's probability. This is the Monte Carlo variance problem. With T=50 and stochastic transitions, G_t varies enormously across episodes despite identical a_t. The baseline V(s) subtracts the 'mean episode value', leaving only the signal specific to a_t."},
+  {q:"Subtracting a baseline b(sₜ) from G_t does not bias the gradient: $\mathbb{E}[\nabla_\theta\log\pi_\theta(a|s)\cdot b(s)]=0$. Which mathematical identity guarantees this?",
+   opts:["E[∇ log π · b(s)] = b(s) × E_a[∇_θ log π_θ(a|s)] = b(s) × 0, because E_a[∇_θ log π_θ(a|s)] = ∇_θ Σ_a π_θ(a|s) = ∇_θ 1 = 0. The gradient of a normalised probability distribution sums to zero — this is the score function identity, and it holds for ANY b(s) that doesn't depend on a","E[∇ log π · b(s)] = 0 because log π_θ(a|s) is always negative (log of a probability ≤ 1), and b(s) is always non-negative (value function is a reward and rewards are non-negative), so their product integrates to zero by sign cancellation","The identity holds only when b(s) = V^π(s) specifically — the value function. For any other choice of baseline, the gradient is biased. The proof requires the Bellman equation to hold exactly","E[∇ log π · b(s)] = 0 follows from the policy gradient theorem only when the action space is continuous — for discrete actions, baselines introduce a small but acceptable bias that must be corrected by importance sampling weights"],
+   ans:0,exp:"Score function identity: ∇_θ log π_θ(a|s) = ∇_θ π_θ(a|s) / π_θ(a|s). E_a[∇_θ log π_θ(a|s)] = Σ_a π_θ(a|s) × ∇_θ π_θ(a|s)/π_θ(a|s) = Σ_a ∇_θ π_θ(a|s) = ∇_θ Σ_a π_θ(a|s) = ∇_θ 1 = 0. This holds for ANY fixed function b(s) not depending on a, regardless of its sign or whether it equals V^π. Therefore E[∇ log π · b(s)] = b(s) × E[∇ log π] = b(s) × 0 = 0 — zero bias for ANY baseline!"},
+  {q:"The TD advantage estimate $\hat{A}(s_t,a_t)=r_t+\gamma V_\phi(s_{t+1})-V_\phi(s_t)$ is called a 'one-step bootstrap estimate'. How does it reduce variance compared to G_t, and what bias does it introduce?",
+   opts:["Bootstrap replaces G_t (sum of T-t future rewards, high variance) with a ONE-STEP look-ahead: actual reward r_t plus the ESTIMATED future value γV_φ(s_{t+1}). Instead of summing 50 stochastic rewards, we use 1 actual reward + 1 value estimate. Variance is dramatically reduced (one random variable vs 50). Bias comes from V_φ's approximation error: if V_φ is imperfect (which it always is early in training), the TD advantage is systematically biased toward V_φ's errors","Bootstrap increases variance compared to G_t because V_φ is a noisy neural network estimate — two independent noise sources (r_t and V_φ) combine multiplicatively, exceeding the single-source noise of G_t","Bootstrap introduces no bias because V^π(s_{t+1}) is the true value function and the TD advantage is therefore an exact calculation of the advantage without approximation error","The TD advantage has lower variance than G_t because it divides G_t by the number of future timesteps T-t, normalising the magnitude of the gradient update across different episode positions"],
+   ans:0,exp:"G_t = r_t + γr_{t+1} + ... + γ^{T-t-1}r_T involves T-t stochastic reward terms (T-t random variables summed). Â = r_t + γV_φ(s_{t+1}) - V_φ(s_t) involves ONE stochastic reward r_t plus a deterministic (but approximate) network output. The variance of Â is approximately Var(r_t) + γ²Var(V_φ) << Var(Σ T-t rewards). Bias: V_φ is a neural network approximation. If V_φ(s') overestimates the true value (common early in training), Â is biased upward — all actions in state s appear better than they actually are. This V_φ approximation error is the price paid for reduced variance."},
+  {q:"In A2C with N=4 parallel workers, each worker runs its own copy of the drone environment and collects experience independently. What specific statistical benefit does parallel collection provide compared to a single worker collecting N times as many episodes sequentially?",
+   opts:["Parallel workers provide N× faster wall-clock training with the same statistical quality as sequential — the only benefit is speed, not sample diversity","Parallel workers provide DIVERSITY of experience that sequential collection cannot: each worker starts from a different initial state, encounters different random events (wind, obstacle positions), and follows slightly different policies (due to different neural network random seeds). This diversity decorrelates the mini-batch within a single update step. Sequential collection: N episodes from one worker are temporally correlated (same policy, same environment seed pattern). Parallel: N simultaneous trajectories from N different environment instances are statistically independent samples from π_θ","A2C parallel workers allow using N different random seeds simultaneously, which eliminates the variance from random initialisation that plagues single-worker training — convergence is deterministic with N≥4 workers","Parallel workers improve performance because the GPU can simultaneously process all N workers' state vectors in one forward pass, reducing per-sample computation cost by N× — the statistical properties of the gradient estimate are unchanged"],
+   ans:1,exp:"Variance of sample mean with N samples: Var(mean) = σ²/N. But this requires INDEPENDENT samples. Sequential collection of N episodes from one worker: consecutive episodes are correlated (same policy, same environment instance, temporally close). Parallel collection: N workers in N independent environment instances produce statistically independent trajectories. The gradient estimate variance reduction from parallel workers is thus: Var_parallel ≈ σ²/N (full reduction) vs Var_sequential ≈ σ²/N_eff where N_eff < N (partial reduction due to correlation). A2C's synchronous collection maximises this benefit."},
+  {q:"PPO's clipped objective L_CLIP = E[min(r_t Â_t, clip(r_t, 1-ε, 1+ε) Â_t)] with ε=0.2. An action had Â_t = −3.5 (bad action). The old policy gave π_old(a|s)=0.15, the new policy gives π_new(a|s)=0.08. Compute r_t and the clipped objective value.",
+   opts:["r_t = 0.08/0.15 = 0.533. Â_t < 0 and r_t < 1: clip(0.533, 0.8, 1.2) = 0.8. min(0.533×(-3.5), 0.8×(-3.5)) = min(-1.867, -2.8) = -1.867. The objective is -1.867 — unclipped wins because the decrease in probability is MORE than PPO's 20% limit, and taking the less-negative (higher) value means PPO rewards less-aggressive probability decrease","r_t = 0.15/0.08 = 1.875. The objective is -1.875×3.5 = -6.56 (unclipped). PPO does not clip when the probability decreases for a bad action","r_t = 0.533. The min function always returns the clipped value: -2.8. PPO uses the clipped value to penalise all probability changes regardless of direction","r_t = 0.533. Since Â < 0, the gradient should increase r_t back above 1.0 — PPO corrects for suboptimal actions by reversing their effect"],
+   ans:0,exp:"r_t = π_new/π_old = 0.08/0.15 = 0.533. Â_t = −3.5 (bad action — want to make less likely, i.e., decrease π_new → decrease r_t → r_t < 1). clip(0.533, 0.8, 1.2) = 0.8 (r_t=0.533 < 0.8 = 1-ε, so clip to 0.8). Unclipped: 0.533 × (−3.5) = −1.867. Clipped: 0.8 × (−3.5) = −2.8. min(−1.867, −2.8) = −1.867. Interpretation: PPO prevents the policy from decreasing this action's probability too fast. The 'min' for Â<0 picks the LESS negative value — penalising overly aggressive probability reduction. The agent cannot make bad actions more than ~20% less likely per update."},
+  {q:"Why does SAC's maximum entropy objective J(π) = E[Σ γᵗ(rₜ + α H(π(·|sₜ)))] make the learned drone controller MORE ROBUST to 30% wind disturbance at deployment compared to PPO?",
+   opts:["SAC uses two Q-networks (taking min) instead of one, which eliminates Q-value overestimation and therefore produces better value estimates — the accuracy of value estimates is what determines robustness to disturbances","The entropy bonus α H(π(·|s)) encourages maintaining a distribution over actions rather than converging to a single deterministic action. A high-entropy policy in state s tries MULTIPLE possible thrust vectors each time. When unexpected wind shifts s to a slightly different state, a high-entropy policy has already 'seen' similar states in its distribution — it doesn't commit fully to one narrow action. A low-entropy (near-deterministic) policy from PPO has memorised the specific optimal thrust for each exact state; with wind perturbations the state shifts outside the memorised map, and the policy degrades significantly","SAC is more robust because it uses off-policy learning from a replay buffer — previous experiences with different wind conditions are automatically included in the buffer, providing natural domain randomisation during training","SAC's robustness comes entirely from its adaptive temperature parameter α — as α increases when the policy becomes uncertain (in wind disturbance), the agent automatically switches to a more exploratory strategy"],
+   ans:1,exp:"Entropy regularisation forces the policy to maintain uncertainty over actions. In PPO (lower entropy), the converged policy learns near-deterministic: 'In state s_x, apply exactly Fx=42.3N, Fy=18.1N, Fz=-9.8N.' Wind shifts the drone to state s_x+Δ not in the training distribution — the deterministic policy has no guidance. SAC's high-entropy policy: 'In state s_x, apply Fx ~ N(42.3, 8.2²).' The spread of 8.2N around the optimal means the policy already covers nearby states — when wind pushes to s_x+Δ, the action distribution still has non-trivial probability mass on good actions. This implicit multi-hypothesis coverage IS robustness."},
+  {q:"The Gaussian policy π_θ(a|s) = N(μ_θ(s), σ_θ(s)²) uses the reparameterisation trick: a = μ_θ(s) + σ_θ(s) · ε, ε ~ N(0,I). Why is this reparameterisation necessary for the SAC loss to be differentiable with respect to θ?",
+   opts:["Without reparameterisation, the sampling operation a ~ N(μ,σ²) is a discrete operation in GPU memory, which cannot propagate gradients. Reparameterisation converts it to floating-point arithmetic, enabling CUDA gradient computation","Without reparameterisation: a is sampled stochastically from N(μ_θ(s),σ_θ(s)²). The value of a depends on a RANDOM variable — ∂a/∂θ requires differentiating through the sampling, which is not defined for a non-deterministic function. With reparameterisation a = μ_θ(s) + σ_θ(s)·ε where ε is a FIXED sample (ε is sampled BEFORE the computation), a is now a DETERMINISTIC function of θ given ε. Therefore ∂a/∂θ = ∂μ_θ(s)/∂θ + ε · ∂σ_θ(s)/∂θ — fully differentiable via chain rule!","Reparameterisation is needed only for the actor network's policy loss — the critic's Q-network loss does not require reparameterisation because it directly receives the action a as input rather than sampling from a distribution","The reparameterisation trick converts the Gaussian distribution to a uniform distribution, which has bounded gradients — without this conversion, the log π term can produce infinite gradients near the tails of the Gaussian"],
+   ans:1,exp:"The core issue: the sampling operation a~N(μ,σ²) is a STOCHASTIC computation. ∂(random sample)/∂μ is undefined — you can't differentiate 'pick a random number from N(μ,σ²)' with respect to μ in the PyTorch autograd sense. Reparameterisation: a = μ + σ·ε. ε~N(0,1) is sampled ONCE and treated as a constant (no gradient flows through ε). Now a is a deterministic function of {θ, ε}. ∂a/∂θ: when θ changes μ and σ, a changes deterministically via the formula. Autograd can backpropagate through the multiplication and addition. This is how VAE training and SAC both work — reparameterisation turns stochastic nodes into deterministic functions of separable noise."},
+  {q:"A2C uses the entropy bonus −c₂ H(π_θ) in the combined loss L = L_actor + c₁L_critic − c₂H(π_θ). The minus sign means the entropy is SUBTRACTED from the loss (i.e., entropy is MAXIMISED since we minimise the total loss). During drone training, entropy starts high (H≈2.8) and typically decays as the policy converges. What happens if entropy collapses to near-zero (H≈0.01) too early?",
+   opts:["Entropy near-zero means all drones fly identical deterministic trajectories — if this happens early in training when the policy is still suboptimal, the near-deterministic policy gets stuck in a LOCAL OPTIMUM. There is no exploration to discover better waypoint paths or formation strategies. The agent can't escape the local optimum because all random actions are suppressed. The c₂H term prevents premature commitment to any suboptimal deterministic policy","Near-zero entropy means the policy has converged to the optimal solution — low entropy is always desirable and indicates successful training. The c₂ coefficient should be set to 0 to allow natural entropy collapse once the agent's performance plateaus","Near-zero entropy causes GPU gradient overflow in the log π term (log of near-zero probability → -∞ × gradient = NaN), causing the entire training to crash. Entropy clipping must be applied as a numerical safeguard","Entropy collapse near-zero increases the effective learning rate because all gradient mass concentrates on the most probable action, leading to faster but potentially unstable convergence"],
+   ans:0,exp:"Early entropy collapse = premature exploitation. Consider a drone that discovers 'fly straight to waypoint at full thrust' early in training — this deterministic policy gives moderate reward but misses the formation coordination bonus (requires exploration to discover). With H≈0.01, all actions converge to one thrust vector — the agent never explores the cooperation strategy. Entropy regularisation (c₂>0) prevents this: it penalises H→0 in the loss, maintaining H at a floor value that keeps the policy exploratory. Only late in training, when performance plateaus near-optimal, should H be allowed to decay. SAC's automatic α adjustment handles this gracefully."},
+  {q:"PPO achieves 94.3% waypoint success on the drone task with ε=0.2. A researcher proposes using ε=0.8 (much larger clipping range) to 'allow faster learning.' What specific failure mode does ε=0.8 reintroduce?",
+   opts:["ε=0.8 allows the policy to change too slowly — with a clip of 80%, updates are extremely conservative and the drone cannot learn new manoeuvres in fewer than 100,000 episodes","ε=0.8 clip(r, 0.2, 1.8) allows the policy probability to increase by 80% or decrease by 80% per update. This re-introduces the TRPO problem that PPO was designed to solve: large policy changes can cause catastrophic collapse. If the policy changes too much in one update (e.g., thrust vector changes by 80% in one gradient step), it may enter a low-reward region. Recovering from collapse requires thousands of episodes — exactly the instability seen in vanilla policy gradient","ε=0.8 is actually the correct hyperparameter for drone control — the literature shows ε=0.2 is designed for Atari games, not continuous control. Larger ε is required for physical systems with continuous action spaces","ε=0.8 causes the critic's value estimates V_φ to lag behind the rapidly-changing policy — the advantage estimates become stale, introducing bias that increases as ε increases"],
+   ans:1,exp:"PPO's clipping prevents the policy ratio r_t from leaving [1−ε, 1+ε]. With ε=0.2: r_t ∈ [0.8, 1.2] — max 20% probability change per update. With ε=0.8: r_t ∈ [0.2, 1.8] — max 80% change. For a good action (Â>0) with r_t=1.8 allowed: if noise suggests increasing probability by 80%, the policy takes a huge step. The new policy's first rollouts with 80%-modified actions may crash drones into obstacles, giving −100 reward. The next gradient step then tries to reverse the 80% change — perpetual oscillation. This is exactly the 'aggressive update → crash → recovery cycle' that TRPO and PPO were designed to break. ε=0.2 is empirically validated across many domains."},
+  {q:"Domain Randomisation (DR) was applied during PPO training (random wind ±5m/s, sensor noise ±2m). This improved real-world transfer from 78% to 88%. What is the theoretical mechanism by which DR improves sim-to-real transfer?",
+   opts:["Domain Randomisation improves transfer by making the training environment harder — the agent must work against wind resistance, which strengthens its thrust outputs, making it more powerful in real flight","DR forces the policy to find a ROBUST solution that works across a FAMILY of environments (not just the single nominal simulation). The optimal policy under DR = π* = argmax_π E_{ξ~p(ξ)}[J(π, Mξ)] where ξ represents domain parameters (wind, noise, friction) and p(ξ) is their distribution. A policy optimal under DR cannot be too specialised to any single wind condition — it must handle all of them. The real world is one sample from this family. If the real wind conditions fall within the randomisation range, the robust DR policy handles them competently","Domain Randomisation works by automatically identifying which features of the simulation are least important (wind, noise) and removing them from the state representation, simplifying the policy's task","DR improves transfer by averaging multiple independent simulation runs, reducing the Monte Carlo estimation variance of the policy gradient — the mechanism is purely statistical, not related to the physical sim-to-real gap"],
+   ans:1,exp:"The sim-to-real gap exists because the simulation M_sim ≠ real world M_real. Any policy π* tuned to M_sim specifically will fail when M_sim's assumptions are violated in M_real. DR trains on a DISTRIBUTION of MDPs {M_ξ: ξ~p(ξ)} where ξ varies mass, wind, friction, sensor noise. The optimal policy under this distribution must generalise across all MDPs in the family. If p(ξ) covers the real world (i.e., ξ_real is within the support of p(ξ)), then the robust policy already handles the real world. This is formalised as a minimax problem: find π minimising worst-case regret over the family — the DR policy is exactly this robustly optimal policy."},
+  {q:"REINFORCE with baseline achieved 72.1% waypoint success and ±41.2 variance; A2C achieved 83.2% with ±28.4 variance. Beyond N=4 parallel workers, A2C offers another architectural advantage over REINFORCE+baseline. What is it, and why does the Drone task benefit from it?",
+   opts:["A2C uses a deeper neural network (4 layers vs 2 layers in REINFORCE), giving it more representational capacity to model the 80-dimensional drone state space","A2C uses bootstrapped (one-step TD) advantage estimates Â = r + γV(s') − V(s) rather than full Monte Carlo returns G_t. For the drone task with T≈50 steps and γ=0.95: Monte Carlo G_t requires summing 50 discounted rewards — high variance. TD advantage uses ONE actual reward step then bootstraps from V(s') — much lower variance. The trained critic V_φ provides a stable, low-variance estimate of future value, replacing 49 stochastic future rewards with one deterministic network output","A2C's advantage over REINFORCE+baseline is purely computational: A2C can use GPU batching for the actor and critic simultaneously, while REINFORCE+baseline requires sequential forward passes. The improvement from 72.1% to 83.2% is entirely a parallelism benefit","A2C introduces a momentum term in the Adam optimiser (β₁=0.95 vs β₁=0.9 in REINFORCE) that smooths gradient estimates across timesteps — this momentum is what reduces variance from ±41.2 to ±28.4"],
+   ans:1,exp:"REINFORCE+baseline uses G_t - b(s_t) as the advantage signal. G_t is still the full Monte Carlo return (sum of all future rewards) — the baseline only subtracts a constant per state, reducing variance without eliminating it. A2C uses Â_t = r_t + γV_φ(s_{t+1}) - V_φ(s_t) — a one-step bootstrap. The variance of Â_t ≈ Var(r_t) + (γ)² Var(V_φ error) << Var(G_t - V_φ(s)) = Var(full trajectory tail). For the drone task with T=50 steps: G_t - V(s) still sums 50 stochastic rewards minus one estimated mean. Â_t uses ONE reward plus one V_φ evaluation. This additional bootstrapping (not just subtracting a baseline) is A2C's key advantage over REINFORCE with baseline."},
+  {q:"SAC's dual Q-network (taking min of Q_φ1 and Q_φ2 for the target) addresses overestimation bias. In the standard actor update for SAC, the actor maximises: E_a~π[Q_φ(s,a) − α log π_θ(a|s)]. Why is the −α log π term essential for maintaining exploration, and what degenerate behaviour occurs without it?",
+   opts:["Without −α log π, the SAC actor update becomes identical to the PPO update — the log π term is what distinguishes SAC from PPO architecturally. Its removal transforms SAC into a policy gradient method equivalent to A2C","Without −α log π: the actor maximises Q only → the policy collapses to the mode of Q (a near-deterministic policy that always picks the action with the highest Q-value). This eliminates exploration and makes the policy fragile to Q estimation errors. If Q_φ overestimates a suboptimal action, the policy commits to it entirely. With −α log π: the policy maximises Q while penalising low-entropy distributions — the optimal policy explicitly balances high Q-value actions with maintaining broad exploration distribution. The SAC optimal policy π*(a|s) = softmax(Q*(s,a)/α): exponential in Q values, maintaining probability for all actions","Without −α log π, the dual Q-network comparison (taking min of Q1,Q2) becomes numerically unstable — the policy gradient NaN-crashes without the log regularisation term to bound gradient magnitudes","The −α log π term is only needed during early training when the Q-network is inaccurate. After 50K training steps, α should be set to 0 so the policy can converge to a deterministic optimal action for deployment"],
+   ans:1,exp:"The SAC objective per-state: max_π E_a~π[Q(s,a)] − α H(π(·|s)) = max_π E_a~π[Q(s,a) + α log π(a|s)]. The optimal π*(a|s) satisfies: π*(a|s) ∝ exp(Q(s,a)/α). This is a softmax distribution over Q-values — every action has non-zero probability proportional to exp(Q/α). Without the entropy term (α=0): the optimal policy is the Dirac delta at argmax_a Q(s,a) — fully deterministic. Any Q estimation error at the argmax immediately causes the policy to exploit the error fully. With α>0: policy spreads mass across actions weighted by Q-value. Q overestimation of one action → that action gets more mass, but others still have mass → policy more robust to estimation errors."},
+  {q:"The sim-to-real gap for PPO was 94%→78% (16% drop) without DR, and 94%→88% (6% drop) with DR. A defence procurement officer asks: 'Can this drone controller be deployed operationally at 88% waypoint success?' What are the TWO most critical operational factors to evaluate beyond the raw success rate?",
+   opts:["The officer should check whether 88% success was tested at night (night operations require a separate training regime) and whether the waypoints were tested in the correct military grid reference system (MGRS)","(i) FAILURE MODE ANALYSIS: What happens in the 12% failure cases? If failures are graceful (drone returns to base) vs catastrophic (drone crashes into civilians or own troops), 88% may be acceptable or unacceptable depending on the mission. A 12% crash rate in a populated area is operationally disastrous; a 12% abort-mission rate on a reconnaissance task may be tolerable. (ii) ADVERSARIAL ROBUSTNESS: Is the 88% tested against a passive environment or does it include adversarial jamming, spoofed GPS, and active OPFOR countermeasures? Real operational environments include a sophisticated adversary who will exploit the AI's known weaknesses — a static 88% in a benign test environment may collapse to 40% under active JAMOPS","The two critical factors are (i) whether the test was conducted in India's geographic terrain specifically (performance varies by country) and (ii) whether the drones carry offensive or defensive payloads, since payload weight affects the Gaussian policy's thrust distribution","The officer should evaluate (i) how the 88% compares to legacy human-piloted drone systems and (ii) the cost per flight hour reduction from using AI vs human pilots — if AI is 50% cheaper at 88% success, that may be operationally acceptable"],
+   ans:1,exp:"Two critical considerations beyond accuracy: (i) Failure modes: a 12% failure rate means 1 in 8 missions fail. For a reconnaissance drone this might mean lost intelligence; for a strike drone near civilians this is catastrophic. Reliability in safety-critical systems must be analysed by failure consequence, not just success rate. (ii) Adversarial robustness: the 88% result was from a non-adversarial environment (passive wind disturbance only). Real operations include JAMOPS, spoofed GPS signals, decoy targets, and reactive OPFOR who will observe and counter the drone's behavioural patterns. Testing in adversarial conditions (red team exercises) is essential before operational deployment. ROE compliance and the ability to abort/return-to-base gracefully are also critical."},
+  {q:"PPO's on-policy sampling means each experience batch is discarded after one gradient update. SAC's off-policy replay buffer reuses each transition ~320 times. The drone task required 800 episodes to 70% success (PPO) vs 1,500 episodes (SAC). Despite SAC's high replay efficiency, why does PPO converge in FEWER episodes?",
+   opts:["PPO converges faster in episodes because its clipping mechanism prevents catastrophically bad updates — each PPO update is a more reliable improvement than SAC's off-policy updates. Per-episode, PPO's on-policy data exactly reflects the CURRENT policy's performance, making each episode's gradient more actionable than SAC's potentially stale off-policy data from 100K steps ago","SAC uses more episodes because its dual Q-networks require 2× more training data to populate — the second Q-network needs separate experience to avoid the same overestimation bias it is trying to correct","SAC takes more episodes to 70% success specifically because of the entropy bonus: maintaining high entropy forces the drone to explore many suboptimal paths in early training before converging on the good ones. This exploration overhead adds episodes before performance improves","SAC uses a smaller neural network (fewer parameters) to ensure sample efficiency — the smaller network requires more gradient updates per unit of data, which despite the replay reuse translates to more episodes before reaching 70%"],
+   ans:0,exp:"On-policy data is FRESH: each PPO episode uses the current policy π_θ to collect data. The gradient estimate perfectly reflects what the CURRENT policy does and where it could improve. Off-policy data can be STALE: SAC replays a transition from 50,000 steps ago collected under a very different old policy π_{θ-old}. While importance sampling could correct for this, the practical mismatch degrades gradient quality. For a fast-moving training process (drone controller improves rapidly), SAC's replay buffer quickly accumulates outdated experiences. PPO's per-episode updates directly targeting the current policy converge faster in episode count, even though SAC's replay efficiency means SAC gets MORE GRADIENT STEPS per episode. Fewer higher-quality episodes (PPO) vs more lower-quality steps (SAC) — PPO wins on episodes, SAC wins on wall-clock time for compute-limited settings."}
+];
+
+let currentQ=0,score=0,timer=null,answered=false;
+const TOTAL_TIME=40,DASH=2*Math.PI*20;
+const $=id=>document.getElementById(id);
+function startQuiz(){$('intro').style.display='none';$('quiz').style.display='flex';loadQuestion();}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered=false;const q=Qs[currentQ];
+  $('qnum').textContent=`Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('progressFill').style.width=`${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent=`Score: ${score.toFixed(2)}`;
+  const optDiv=$('options');optDiv.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const d=document.createElement('div');d.className='opt';d.id=`opt${i}`;
+    d.innerHTML=`<div class="opt-key">${k}</div><div class="opt-text">${q.opts[i]}</div>`;
+    d.onclick=()=>revealAnswer(i);
+    optDiv.appendChild(d);
+  });
+  renderMath(optDiv);
+  startTimer();
+}
+function startTimer(){
+  let remaining=TOTAL_TIME;
+  const circle=$('timerCircle'),numEl=$('timerNum');
+  circle.style.stroke='#2AA87E';circle.style.strokeDashoffset=0;numEl.textContent=TOTAL_TIME;
+  timer=setInterval(()=>{
+    remaining--;numEl.textContent=remaining;
+    circle.style.strokeDashoffset=DASH*(1-remaining/TOTAL_TIME);
+    if(remaining<=10)circle.style.stroke='#E05218';
+    else if(remaining<=20)circle.style.stroke='#C98A12';
+    if(remaining<=0){clearInterval(timer);revealAnswer(-1);}
+  },1000);
+}
+function revealAnswer(chosen){
+  if(answered)return;answered=true;clearInterval(timer);
+  const q=Qs[currentQ];
+  if(chosen===q.ans)score+=1;else if(chosen>=0)score-=0.25;
+  q.opts.forEach((_,i)=>{
+    const el=$(`opt${i}`);el.onclick=null;
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===chosen&&chosen!==q.ans)el.classList.add('wrong');
+  });
+  setTimeout(advance,2500);
+}
+function advance(){currentQ++;if(currentQ>=Qs.length){showEnd();return;}loadQuestion();}
+function showEnd(){
+  $('quiz').style.display='none';$('end').style.display='flex';
+  const s=parseFloat(score.toFixed(2));$('finalScore').textContent=s;
+  let g='';
+  if(s>=12)g='🏆 Outstanding (≥12/15)';
+  else if(s>=9)g='⭐ Proficient (9–11/15)';
+  else if(s>=6)g='📚 Developing (6–8/15)';
+  else g='🔄 Needs Review (<6/15)';
+  $('finalGrade').textContent=g;
+}
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

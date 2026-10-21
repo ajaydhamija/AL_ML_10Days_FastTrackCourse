@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 3 Quiz — Regression & Sensor Fusion</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--blue:#2869A0;--sky:#5B9BD5;--lblue:#BDD7EE;
+    --purp:#6B2D8B;--green:#1E7A45;--orange:#E05218;--red:#C0392B;--amber:#C98A12;
+    --white:#FFFFFF;--light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--yellow:#FFF2A0;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+  #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px 18px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#2A0E40 100%);}
+  #intro .badge{background:var(--purp);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:16px;}
+  #intro h1{font-size:clamp(20px,4.5vw,32px);font-weight:800;line-height:1.2;margin-bottom:10px;}
+  #intro .sub{font-size:clamp(12px,2.5vw,15px);color:var(--lblue);margin-bottom:26px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:11px;max-width:620px;width:100%;margin:0 auto 24px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:11px;padding:12px;text-align:center;}
+  .info-card .val{font-size:clamp(20px,4.5vw,28px);font-weight:800;color:#9B5DCC;}
+  .info-card .lbl{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:11px;padding:14px 18px;max-width:580px;width:100%;margin:0 auto 24px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:13px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:12.5px;color:#D0E8F5;margin-bottom:5px;list-style:none;padding-left:16px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:#9B5DCC;}
+  .btn-start{background:var(--purp);color:#fff;border:none;padding:13px 44px;border-radius:28px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(107,45,139,0.4);transition:transform .15s;}
+  .btn-start:hover{transform:scale(1.04);}
+  .footer-info{margin-top:20px;font-size:11px;color:var(--grey);}
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--purp);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:#9B5DCC;stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+  .qbody{flex:1;display:flex;flex-direction:column;padding:20px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+  .qtext{font-size:clamp(14px,2.6vw,18px);font-weight:700;color:var(--dark);line-height:1.45;margin-bottom:18px;padding:14px 16px;background:#fff;border-left:5px solid var(--purp);border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+  .options{display:grid;gap:10px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 5px rgba(0,0,0,0.04);}
+  .opt-key{min-width:27px;height:27px;border-radius:50%;background:var(--purp);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+  .opt-text{font-size:13px;color:var(--dark);line-height:1.4;padding-top:4px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;}.opt.correct .opt-key{background:var(--green);}
+  .opt.wrong{border-color:var(--red);background:#FDE8E8;}.opt.wrong .opt-key{background:var(--red);}
+  .qfooter{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 16px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--purp);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:26px 16px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#2A0E40 100%);}
+  #end h2{font-size:clamp(20px,5vw,30px);font-weight:800;margin-bottom:8px;}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid #9B5DCC;border-radius:16px;padding:20px 36px;margin:14px 0 20px;}
+  .score-box .score-val{font-size:50px;font-weight:800;color:#9B5DCC;}
+  .score-box .score-max{font-size:16px;color:var(--lblue);}
+  .score-box .score-grade{font-size:18px;color:var(--yellow);margin-top:6px;font-weight:700;}
+  .btn-restart{background:var(--blue);color:#fff;border:none;padding:11px 32px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;}
+  @media(max-width:600px){.options{grid-template-columns:1fr;}.info-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div id="intro">
+  <div class="badge">LECTURE 3 QUIZ</div>
+  <h1>Regression Algorithms<br>& Sensor Fusion</h1>
+  <p class="sub">Supervised Learning Part 2 — Unit 4</p>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong</div></div>
+  </div>
+  <div class="rules">
+    <h3>Instructions</h3>
+    <ul>
+      <li>Auto-advances after <strong>40 seconds</strong> — negative marking applies</li>
+      <li>Covers: OLS · Ridge · Lasso · SVR · XGBoost · R² · Kalman Filter · Sensor Fusion</li>
+      <li>Maximum: <strong>15 marks</strong></li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+
+<div id="quiz">
+  <div class="qheader">
+    <div><div class="qtag">LECTURE 3 QUIZ</div><div class="qcourse">Regression & Sensor Fusion</div></div>
+    <div class="timer-circle">
+      <svg width="48" height="48" viewBox="0 0 48 48">
+        <circle class="bg" cx="24" cy="24" r="20"/>
+        <circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/>
+      </svg>
+      <div class="timer-text" id="timerNum">40</div>
+    </div>
+  </div>
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+
+<div id="end">
+  <h2>Quiz Complete!</h2>
+  <p style="color:var(--lblue);font-size:14px;margin-bottom:4px;">Lecture 3 — Regression & Sensor Fusion</p>
+  <div class="score-box">
+    <div class="score-val" id="finalScore">0</div>
+    <div class="score-max">out of 15 marks</div>
+    <div class="score-grade" id="finalGrade"></div>
+  </div>
+  <p style="color:var(--lblue);font-size:14px;">Full answers in <strong>Lecture 3 — Part 3</strong></p>
+  <button class="btn-restart" onclick="location.reload()">↺ Restart</button>
+  <p style="margin-top:14px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+
+<script>
+const Qs=[
+  {q:"The OLS closed-form solution $w^*=(X^\top X)^{-1}X^\top y$ requires inverting the d×d matrix $X^\top X$. What is the key condition for this matrix to be invertible, and what happens to OLS when this condition is violated?",
+   opts:["$X^\top X$ must be symmetric positive definite. If two columns of X are perfectly correlated (multicollinear), $X^\top X$ becomes singular and the unique solution ceases to exist — OLS produces infinite or undefined coefficients","$X^\top X$ must have N rows where N >> d. When N < d the matrix is too small to store the solution and the algorithm crashes with a memory overflow error","$X^\top X$ must have all positive diagonal entries. Negative diagonal values from standardised features prevent matrix inversion","$X^\top X$ must be orthogonal. Any correlation between features breaks orthogonality and forces the use of iterative gradient descent instead of the closed form"],
+   ans:0,exp:"$X^\top X$ is always symmetric and positive semi-definite. It is invertible (positive definite) iff X has full column rank — i.e., no perfect multicollinearity. If two features are perfectly correlated, rank($X^\top X$) < d → singular → no unique OLS solution. Ridge regularisation ($X^\top X$ + λI) adds λ to every eigenvalue, guaranteeing invertibility for any λ > 0."},
+  {q:"Ridge Regression minimises $L(w)=\|y-Xw\|^2+\lambda\|w\|^2$. In the Mission Duration Case Study A, λ=0.8 reduced the Variance Inflation Factor (VIF) for Force Size & Armour Count from 8.4 to 2.1. What is the MATHEMATICAL reason Ridge reduces VIF (i.e., resolves multicollinearity)?",
+   opts:["Ridge randomly drops correlated features from the model, ensuring the remaining features are orthogonal by construction","Adding λI to $X^\top X$ before inversion shrinks all eigenvalues away from zero, making the matrix well-conditioned. Small eigenvalues (caused by near-collinear features) are inflated by λ, stabilising coefficient estimates","Ridge applies L1 penalisation to the correlation matrix, zeroing out off-diagonal terms corresponding to correlated feature pairs","Ridge standardises the feature matrix X to have unit variance columns, which by mathematical identity makes $X^\top X$ equal to the correlation matrix with VIF=1"],
+   ans:1,exp:"Multicollinearity causes some eigenvalues of $X^\top X$ to be near-zero, producing enormous, unstable coefficient estimates (Var(w_j) ∝ 1/λ_min). Adding λI shifts ALL eigenvalues by +λ: eigenvalues of (X^TX+λI) = {λ₁+λ, ..., λ_d+λ}. The previously near-zero eigenvalues become λ+λ_small ≈ λ >> 0, dramatically reducing coefficient variance and VIF."},
+  {q:"Lasso Regression adds L1 penalty $\lambda\|w\|_1$ to OLS loss, while Ridge adds L2 penalty $\lambda\|w\|^2$. Lasso produced sparse solutions (6 of 18 features zeroed) while Ridge kept all 18. The GEOMETRIC reason for Lasso's sparsity is:",
+   opts:["Lasso uses a circular constraint region ||w||₂ ≤ t while Ridge uses a diamond constraint ||w||₁ ≤ t. Diamond corners sit on axes, making axis-intersection solutions (w_j=0) statistically optimal","Lasso uses a diamond constraint ||w||₁ ≤ t while Ridge uses a circular (sphere) constraint ||w||₂² ≤ t. The corners of the diamond lie exactly on coordinate axes, and the optimal solution of the OLS objective tends to intersect the constraint boundary at these corners — producing exact zeros","Lasso applies a threshold function that sets all coefficients below the mean of ||w|| exactly to zero as a post-processing step after solving the standard OLS problem","Lasso uses coordinate descent which randomly sets low-importance features to zero during each sweep, gradually producing a sparse solution over many iterations"],
+   ans:1,exp:"Geometrically, we minimise OLS subject to ||w||₁ ≤ t (L1 ball = diamond in 2D). The OLS contours (ellipses) expand until they touch the L1 diamond. Corners of the diamond lie ON coordinate axes (w_j=0 for some j), and it is highly probable that the first contact point is a corner → exact zero. The L2 ball (sphere) has no corners → no exact zeros, just shrinkage."},
+  {q:"Elastic Net uses penalty $\lambda_1\|w\|_1+\lambda_2\|w\|^2$. In Case A, Elastic Net (λ₁=0.2, λ₂=0.5) zeroed 8 features and achieved Test R²=0.741, RMSE=3.88hrs. Compared to pure Lasso (zeroed 6, R²=0.728) and Ridge (zeroed 0, R²=0.738), Elastic Net is described as 'best of both worlds'. The SPECIFIC advantage of Elastic Net over pure Lasso when features are correlated is:",
+   opts:["Elastic Net always zeroes more features than Lasso because the additional L2 penalty pushes small coefficients even faster toward zero","Lasso arbitrarily selects one of a set of correlated features and zeros the others. Elastic Net's L2 component encourages grouped selection — correlated features tend to be retained or dropped together rather than arbitrarily","Elastic Net replaces the non-differentiable |w_j| term at zero with a smooth quadratic approximation, enabling faster convergence via gradient descent","Elastic Net automatically tunes both λ₁ and λ₂ by maximising the log-likelihood of the training data without cross-validation"],
+   ans:1,exp:"When two features are highly correlated (say Force Size and Armour Count), Lasso's L1 penalty often arbitrarily selects just one, discarding equally predictive information. Elastic Net's L2 component adds a grouping effect: correlated features receive similar penalties and similar coefficient values, leading to more stable, meaningful feature selection."},
+  {q:"SVR (Support Vector Regression) with ε=0.5 was applied to Case A. The ε parameter defines a 'tube' around predictions where errors are not penalised. What is the PRIMARY operational advantage of the ε-insensitive loss over MSE in a defence regression application?",
+   opts:["The ε-tube automatically normalises the regression target to the range [0,1], making the model output interpretable as a probability","MSE penalises ALL prediction errors equally regardless of magnitude. In operational planning, a 20-minute error in a 24-hour mission is negligible. SVR's ε-tube sets a 'good-enough' threshold below which errors are ignored, focusing model capacity on reducing large operationally-significant errors","The ε-tube converts SVR into a classification problem by labelling predictions within the tube as 'accurate' and outside as 'inaccurate', enabling a hybrid classification-regression model","The ε-insensitive loss eliminates the need for cross-validation by providing an internal regularisation mechanism that prevents overfitting without tuning"],
+   ans:1,exp:"MSE penalises even tiny errors, wasting model capacity on irrelevant precision. With ε=0.5 hrs (~30 min), the SVR ignores all prediction errors smaller than 30 minutes — these are operationally meaningless for mission planning. The model concentrates on reducing large errors (>30 min), the ones that actually affect logistical decisions. This is exactly the right trade-off for defence scheduling applications."},
+  {q:"XGBRegressor achieved R²=0.912 (Test RMSE=2.06hrs) on Case A, far outperforming OLS (R²=0.710). The learning curve showed Val RMSE degrading after M=400 trees (M=800: 2.19hrs, M=1200: 2.34hrs). This degradation AFTER the optimal number of trees represents:",
+   opts:["Hardware limitation — adding more trees exceeds available GPU memory, causing numerical precision errors that worsen predictions","Overfitting: additional trees learn noise in the training residuals rather than true signal. Each subsequent tree reduces training error (gradient continues) but increases test error — classic variance growth with model complexity","The ensemble reaching its theoretical maximum performance ceiling determined by the Bayes error rate of the prediction task","Random Forest overfitting rather than XGBoost, since the two share the same stopping criterion but different tree architectures"],
+   ans:1,exp:"Each additional boosting tree fits the residuals of the current ensemble. Early trees (M=1 to ~400) learn genuine signal in the residuals. After M=400, the residuals are dominated by noise — trees start memorising noise patterns. This increases training set fit (lower training RMSE) but test RMSE rises as the model generalises less well. The solution: early stopping (stop when Val RMSE increases) or subsampling (η and subsample parameters)."},
+  {q:"In Case A, OLS reports R²=0.710 on the test set. $R^2=1-\frac{SS_{\text{res}}}{SS_{\text{tot}}}$. If SS_tot = 18,420 hr² and SS_res = 5,342 hr², what is R²? And if a new, worse model has SS_res = 22,000 hr², what does its R² value mean?",
+   opts:["R²=0.710; a model with SS_res=22,000 has R²=−0.19, meaning it performs worse than predicting the mean — actively harmful predictions","R²=0.710; SS_res=22,000 is impossible since residuals cannot exceed total variance, so R² would be undefined for that model","R²=0.290; SS_res=22,000 gives R²=0.80 because a larger residual sum means the model explains more variance","R²=0.710 only applies if all residuals are normally distributed; otherwise R² loses its meaning and cannot be computed"],
+   ans:0,exp:"R² = 1−5342/18420 = 1−0.290 = 0.710 ✓. For SS_res=22,000: R² = 1−22000/18420 = 1−1.194 = −0.194. Negative R² means the model's predictions are WORSE than simply predicting ȳ for every input. The model has negative predictive value — it would be better to ignore it and use the training mean as prediction."},
+  {q:"Prediction uncertainty is described in two types: aleatoric and epistemic. A Bayesian Ridge model in Case A reports 95% CI width of ±6.1 hrs on average, but ±12+ hrs for unusual mountain-jungle mission combinations (rare in training data). The WIDENING of uncertainty in sparse regions reflects which type?",
+   opts:["Aleatoric uncertainty, which increases in rare situations because the random noise component of the target variable behaves differently in uncommon terrain combinations","Epistemic uncertainty, which reflects the model's lack of knowledge in regions where training data is sparse. With few training examples from mountain-jungle terrain, the Bayesian posterior over weights remains wide — the model is genuinely uncertain about its predictions there","Aleatoric uncertainty, measured by the irreducible noise σ² in the likelihood which is constant across all input regions regardless of data density","Neither type — the widening CI simply reflects numerical instability in the matrix inversion (X^TX)⁻¹ for rare feature combinations"],
+   ans:1,exp:"Epistemic uncertainty reflects ignorance reducible by data. In Bayesian regression, the posterior P(w|D) ∝ P(D|w)P(w): where training data is sparse (unusual terrain combos), the posterior over weights remains diffuse (high variance), propagating to wide predictive intervals. More data from mountain-jungle exercises would narrow these CIs. Aleatoric uncertainty (irreducible noise σ²) is the same everywhere for homoscedastic models."},
+  {q:"The Kalman Filter Predict step computes P_k⁻ = F·P_{k-1}⁺·F^T + Q. What is the role of Q (process noise covariance) in the predict step, and what happens to tracking accuracy if Q is set too SMALL for aircraft performing evasive manoeuvres?",
+   opts:["Q represents sensor measurement noise. Setting Q too small causes the filter to over-trust sensor readings, making the track overly responsive to measurement noise","Q represents model uncertainty — how much the true state can deviate from the linear dynamics model F. Q too small means the filter is overconfident that aircraft follow the linear motion model. Evasive manoeuvres cause large deviations from F's prediction, but the filter assigns them tiny probability — K_k becomes very small, measurements are down-weighted, and the filter FAILS to track the manoeuvre","Q scales the measurement update step. Small Q makes K_k large, causing the filter to over-react to every measurement and produce jittery, unstable tracks","Q is the initial covariance P_0 carried forward unchanged through every predict step. Its magnitude only affects filter initialisation, not steady-state tracking performance"],
+   ans:1,exp:"Q models process noise w_k ~ N(0,Q) — how much the actual state can deviate from Fx_{k-1} in one step. For aircraft: a straight-line model F gives perfect prediction during cruise, but during manoeuvre, the actual state jumps far from Fx. Small Q tells the filter this jump is very unlikely → P_k⁻ stays small → Kalman gain $K_k=P_k^-H^\top(HP_k^-H^\top+R)^{-1}$ stays small → measurement barely updates the track → filter fails to follow the manoeuvre. Correct: tune Q to reflect realistic manoeuvre envelope."},
+  {q:"The Kalman Gain K_k = P_k⁻·H^T·(H·P_k⁻·H^T + R)⁻¹ approaches H⁻¹ when R is very small. What does K_k → H⁻¹ mean for the state update x̂_k⁺ = x̂_k⁻ + K_k(z_k − H·x̂_k⁻)?",
+   opts:["The update completely ignores the measurement z_k, relying exclusively on the prediction x̂_k⁻ with no correction from the sensor","The update fully replaces the predicted state with information derived from the measurement: x̂_k⁺ ≈ H⁻¹ z_k. The new state is essentially back-projected from the measurement alone, completely discarding the prediction","K_k → H⁻¹ causes numerical instability in matrix inversion, producing undefined state estimates that must be regularised","The update averages the measurement and prediction with equal weights of 0.5 each, treating them as equally reliable information sources"],
+   ans:1,exp:"x̂_k⁺ = x̂_k⁻ + H⁻¹(z_k − Hx̂_k⁻) = x̂_k⁻ + H⁻¹z_k − x̂_k⁻ = H⁻¹z_k. The predicted state cancels out and the new state estimate equals the measurement back-projected through H. Interpretation: R≈0 means the sensor is perfect — there is no reason to trust the prediction when you have a perfect measurement, so the update is entirely driven by the data."},
+  {q:"Case B compared Early Fusion (DNN, 91.4%) vs Late Fusion (vote, 89.7%) vs Hybrid KF+RF (96.2%). When IR sensor availability drops from 100% to 80% (20% gaps), Early Fusion degraded to 74.8% while Hybrid KF+RF only dropped to 94.8%. Why is Hybrid MUCH more robust to sensor dropout?",
+   opts:["The Hybrid model uses a larger neural network that was specifically trained on datasets with intentionally corrupted IR data, while Early Fusion only trained on complete data","Early Fusion concatenates all sensor features before learning any representation. A missing IR row creates a zero-block in the input, which the DNN wasn't trained to handle — the learned joint representation collapses. Hybrid KF+RF gracefully handles missing sensors: KF continues with available sensors (radar + ELINT only), and the RF corrector uses sensor_availability as a feature, having been trained to recognise and correct for missing-IR scenarios","Late Fusion is actually more robust than Hybrid but was measured incorrectly in this experiment. The correct comparison shows Late Fusion maintaining 94.1% under 20% IR dropout","The Hybrid model automatically fills in missing IR measurements by interpolating from the last available IR reading, giving it a perfect IR signal even during cloud cover"],
+   ans:1,exp:"Early Fusion's learned representation relies on the specific pattern of [radar|IR|ELINT] features being jointly present. An IR blackout creates a partial input the DNN was never designed to handle — it lacks graceful degradation. Hybrid KF+RF was designed for sensor imperfection: KF naturally runs with any subset of available sensors (just update its R matrix), and the RF corrector uses sensor_availability as an explicit feature, having been trained on scenarios with intentional sensor gaps."},
+  {q:"The innovation term ν_k = z_k − H·x̂_k⁻ in the Kalman Filter is used as a feature input to the RF bias corrector in the Hybrid KF+RF system. Why is the INNOVATION specifically valuable as a machine learning feature for bias correction?",
+   opts:["Innovation directly equals the position error of the track in Cartesian coordinates, giving the RF exact ground truth for supervised training","Innovation encodes 'how much reality deviated from the Kalman prediction'. Systematic non-zero innovations (consistent patterns in ν over time) reveal persistent model errors — manoeuvre signatures, sensor biases, non-Gaussian noise — that the linear Gaussian KF cannot handle but an RF can learn to recognise and correct","Innovation is a normalised residual that the RF uses as the target variable (label) rather than as a feature, turning the regression problem into a self-supervised anomaly detection task","Innovation is only useful because it shares the same units as the measurement vector, making it directly comparable to the tolerance thresholds used to assess track quality"],
+   ans:1,exp:"The KF prediction x̂_k⁻ represents what a perfect linear-Gaussian model would expect. The innovation ν_k is the signed deviation of reality from this expectation. If the KF model is perfect (linear dynamics, Gaussian noise), ν_k should be white noise with covariance S_k = HP_k⁻H^T+R. Systematic patterns in ν (large ν during manoeuvres, correlated ν over time) reveal KF failure modes. The RF learns to map these patterns → systematic corrections, effectively performing non-linear, non-Gaussian state estimation via the KF's residuals."},
+  {q:"RMSE=2.06 hrs and MAE=1.54 hrs are reported for XGBRegressor on Case A. The fact that RMSE > MAE always (by Cauchy-Schwarz inequality) is expected, but the ratio RMSE/MAE = 1.34 tells us something about the error distribution. What does this ratio indicate?",
+   opts:["RMSE/MAE = 1.34 confirms the errors follow a perfect Gaussian distribution with no outliers, since theoretical ratio for Gaussian is exactly 1.34","RMSE/MAE > 1 indicates the presence of large outlier errors. If all errors were equal (no variance in error magnitude), RMSE = MAE (ratio=1). A ratio of 1.34 suggests some missions have much larger errors than the average — the RMSE is inflated relative to MAE by these few large mistakes","RMSE/MAE = 1.34 means the model makes exactly 34% more errors than it should, indicating systematic underfitting with 34% of predictions being statistically unreliable","RMSE/MAE ratio below 1.5 certifies that the regression model passes the goodness-of-fit threshold for operational deployment in defence logistics planning"],
+   ans:1,exp:"For a Gaussian distribution, E[RMSE]/E[MAE] = √(π/2) ≈ 1.25. For a uniform distribution, ratio = √(4/3) ≈ 1.15. A ratio of 1.34 (above Gaussian theoretical) indicates heavier tails than Gaussian — some mission records have much larger prediction errors than typical. These outlier battles (unusually extreme OPFOR contact, unexpected resupply failure) contribute disproportionately to RMSE (squared) but less to MAE (linear), revealing the ratio."},
+  {q:"A Kalman Filter tracking a fast jet receives three sequential measurements. Measurement z₁ (radar) arrives on time. Measurement z₂ (IR) arrives 0.8 sec late due to comms delay. Measurement z₃ (ELINT) arrives 1.2 sec late. If the filter processes measurements in arrival order, what problem arises and what is the standard solution?",
+   opts:["Late measurements cause memory overflow in the covariance matrix P, which is solved by resetting P to the identity matrix whenever an out-of-sequence measurement arrives","Processing measurements in arrival order (z₁, z₂, z₃) means z₂ and z₃ are applied to states AFTER the filter has already been updated with later predictions, creating a logical time-reversal error. The standard solution is Out-of-Sequence Measurement (OOSM) processing: retro-correct by rolling back to the measurement timestamp, applying the measurement, and re-propagating forward","Late arrival of IR and ELINT measurements means these sensors should be permanently removed from the fusion architecture, since their latency makes them unreliable for real-time tracking","The solution is to synchronise all sensors to a common clock using GPS time-stamps, which eliminates all measurement delays at the hardware level and makes out-of-sequence processing unnecessary"],
+   ans:1,exp:"A KF processes measurements in time-order to maintain a consistent state estimate. If z₂ (generated at t=k) arrives after the filter has already processed z₃ (from t=k+1), inserting z₂ retroactively violates the Markov assumption. OOSM solution: store a history of state and covariance, roll back to t=k, apply z₂ there, and re-propagate the KF forward through all subsequent measurements. Computationally costly but necessary for coherent multi-sensor fusion."},
+  {q:"In the 3-sensor fusion Case B, the Extended Kalman Filter (EKF) was mentioned for non-linear dynamics. What is the FUNDAMENTAL difference between EKF and the standard (linear) Kalman Filter, and why does the EKF introduce approximation error?",
+   opts:["EKF uses matrix multiplication instead of scalar multiplication for the Kalman gain computation, making it applicable to higher-dimensional state spaces than the standard KF","EKF replaces the non-linear state transition f(x) and measurement h(x) functions with their first-order Taylor series linearisations (Jacobians F_k, H_k) evaluated at the current state estimate. This approximation is only accurate when the functions are nearly linear near the estimate — for highly non-linear dynamics (sharp turns, evasive manoeuvres), truncation error accumulates, causing track divergence","EKF applies the unscented transform to propagate a set of sigma points through the non-linear function exactly, eliminating all linearisation error at the cost of higher computational complexity","EKF is identical to the standard KF but operates in frequency-domain representation of the state, enabling faster recursive updates via Fast Fourier Transforms"],
+   ans:1,exp:"Standard KF assumes f(x_{k-1}) = Fx_{k-1} (linear). For non-linear dynamics: EKF linearises f at x̂_{k-1}: f(x) ≈ f(x̂_{k-1}) + F_k(x−x̂_{k-1}) where F_k = ∂f/∂x|_{x̂_{k-1}}. This first-order Taylor approximation introduces truncation error proportional to (true_curvature × state_error)². For gently curving aircraft paths, EKF is excellent. For sharp turns (aircraft evasion), linearisation error grows → filter underestimates covariance → overconfident, divergent track."}
+];
+
+let currentQ=0,score=0,timer=null,answered=false;
+const TOTAL_TIME=40,DASH=2*Math.PI*20;
+const $=id=>document.getElementById(id);
+
+function startQuiz(){$('intro').style.display='none';$('quiz').style.display='flex';loadQuestion();}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered=false;const q=Qs[currentQ];
+  $('qnum').textContent=`Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('progressFill').style.width=`${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent=`Score: ${score.toFixed(2)}`;
+  const optDiv=$('options');optDiv.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const d=document.createElement('div');d.className='opt';d.id=`opt${i}`;
+    d.innerHTML=`<div class="opt-key">${k}</div><div class="opt-text">${q.opts[i]}</div>`;
+    optDiv.appendChild(d);
+  });
+  renderMath(optDiv);
+  startTimer();
+}
+function startTimer(){
+  let remaining=TOTAL_TIME;
+  const circle=$('timerCircle'),numEl=$('timerNum');
+  circle.style.stroke='#9B5DCC';circle.style.strokeDashoffset=0;numEl.textContent=TOTAL_TIME;
+  timer=setInterval(()=>{
+    remaining--;numEl.textContent=remaining;
+    circle.style.strokeDashoffset=DASH*(1-remaining/TOTAL_TIME);
+    if(remaining<=10)circle.style.stroke='#E05218';
+    else if(remaining<=20)circle.style.stroke='#C98A12';
+    if(remaining<=0){clearInterval(timer);revealAnswer(-1);}
+  },1000);
+}
+function revealAnswer(chosen){
+  if(answered)return;answered=true;clearInterval(timer);
+  const q=Qs[currentQ];
+  if(chosen===q.ans)score+=1;else if(chosen>=0)score-=0.25;
+  q.opts.forEach((_,i)=>{
+    const el=$(`opt${i}`);
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===chosen&&chosen!==q.ans)el.classList.add('wrong');
+  });
+  setTimeout(advance,2500);
+}
+function advance(){currentQ++;if(currentQ>=Qs.length){showEnd();return;}loadQuestion();}
+function showEnd(){
+  $('quiz').style.display='none';$('end').style.display='flex';
+  const s=parseFloat(score.toFixed(2));$('finalScore').textContent=s;
+  let g='';
+  if(s>=12)g='🏆 Outstanding (≥12/15)';
+  else if(s>=9)g='⭐ Proficient (9–11/15)';
+  else if(s>=6)g='📚 Developing (6–8/15)';
+  else g='🔄 Needs Review (<6/15)';
+  $('finalGrade').textContent=g;
+}
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

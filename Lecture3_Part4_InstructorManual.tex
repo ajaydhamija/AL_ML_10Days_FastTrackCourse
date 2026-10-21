@@ -1,0 +1,362 @@
+\documentclass[11pt]{article}
+\usepackage{notes} % place notes.sty in the same folder
+\definecolor{AccN}{HTML}{6B2D8B}
+\fancyhead[L]{\small\color{NavyN}\nouppercase{\leftmark}}\fancyhead[R]{\small\color{GreyN}Instructor Manual --- Lecture 3}
+\usepackage{longtable,multicol,needspace}
+\setlength{\emergencystretch}{2em}
+\newtcolorbox{instr}[1]{nb,colback=AccN!6,colframe=AccN,title={#1}}
+\newtcolorbox{prob}{nb,colback=BluN!5,colframe=BluN,title={Problem statement}}
+\newtcolorbox{soln}{nb,colback=GrnN!5,colframe=GrnN,title={Model solution and marking points}}
+\newtcolorbox{sayit}{nb,colback=white,colframe=NavyN,title={Read aloud to students}}
+\newtcolorbox{live}[1]{nb,colback=AccN!4,colframe=AccN,title={#1}}
+\begin{document}
+\begin{titlepage}\centering\vspace*{2.2cm}
+{\color{AccN}\large\bfseries LECTURE 3\par}\vspace{0.6cm}
+{\color{NavyN}\Huge\bfseries Supervised Learning Part 2:\\Regression Algorithms \& Sensor Fusion\par}\vspace{0.6cm}
+{\color{AccN}\rule{0.7\textwidth}{1.5pt}}\par\vspace{0.6cm}
+{\LARGE Instructor Manual\par}\vspace{0.4cm}
+{\large\begin{minipage}{0.85\textwidth}\centering OLS \textbullet\ Ridge \textbullet\ Lasso \textbullet\ SVR \textbullet\ XGBoost Regression \textbullet\ Kalman Filter \textbullet\ ML-enhanced Sensor Fusion\\Case A: mission-duration forecast (N = 6,200, 18 features) \textbullet\ Case B: 3-sensor radar + IR + ELINT fusion (5 targets)\end{minipage}\par}\vspace{2cm}
+{\large AK DHAMIJA, Researcher \& Instructor, AI \& Machine Learning\par}\vspace{0.2cm}
+{\normalsize \href{mailto:dhamija.ak@gmail.com}{dhamija.ak@gmail.com} \quad\textbullet\quad 9811453163\par}\vspace{0.3cm}
+{Unit 4: Simulation Strategies in Warfare --- AI \& Machine Learning in Warfare\par}\vfill
+\begin{tcolorbox}[colback=NavyN!4,colframe=NavyN,boxrule=0.6pt,arc=2pt,width=0.9\textwidth]\small
+\textbf{This manual contains:} the 45-minute session plan with timings; a slide-by-slide teaching guide for all 25 slides; key messages, facilitation tips, anticipated questions with model answers, misconceptions and in-class activities; live demonstrations with the interactive studio; consistency notes on the source material; the complete quiz answer key with rationale and scoring rules; and the assignment with marking scheme and full model solutions.
+\end{tcolorbox}
+\end{titlepage}
+\tableofcontents\newpage
+
+
+\needspace{12\baselineskip}\section{Lecture at a Glance}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.3cm}>{\raggedright\arraybackslash}X@{}}\toprule
+
+\textcolor{NavyN}{Lecture}&3 --- Supervised Learning Part 2: Regression Algorithms \& Sensor Fusion\\
+\textcolor{NavyN}{Duration}&45 minutes: 5 min opening Q\&A, 30 min teaching, 10 min auto-quiz\\
+\textcolor{NavyN}{Slides}&25 (Beamer PDF, 16:9), 11 sections\\
+\textcolor{NavyN}{Prerequisite}&Lecture~2; students should have attempted its quiz and assignment.\\
+\textcolor{NavyN}{Student materials}&\texttt{Lecture3\_Slides\_Beamer.pdf}; \texttt{Lecture3\_Reference\_Text.pdf}; \texttt{Lecture3\_Quiz.html}; \texttt{Lecture3\_Answers\_Assignment.html} (release after the quiz)\\
+\textcolor{NavyN}{Interactive studio}&\texttt{Lecture3\_Regression\_Fusion\_Lab.html} (live demonstrations in Section~\ref{sec:live})\\
+\textcolor{NavyN}{Assessment}&Auto-quiz: 15 MCQs, 40~s each, $+1/-0.25$. Assignment: 5 problems, 100 marks, plus a 20-mark bonus problem.\\\bottomrule\end{tabularx}\end{center}
+
+\subsection*{Overview}Lecture~3 completes supervised learning with \emph{regression} and \emph{sensor fusion}. Case~A predicts mission duration and resource needs from 18 planning features, carrying students from ordinary least squares through ridge, lasso and elastic net to support-vector regression and gradient boosting, with an honest treatment of metrics and prediction uncertainty. Case~B fuses radar, IR and ESM tracks: the Kalman filter is derived as optimal recursive weighting, extended to the EKF and UKF, and combined with a random forest that corrects residual bias. The lecture shows that physics-based estimation and machine learning are complements, not rivals.
+
+\subsection*{Learning outcomes}By the end of the lecture students should be able to:\begin{enumerate}\item Derive and interpret the OLS solution and diagnose collinearity with VIF.\item Explain ridge versus lasso geometrically and algebraically; choose penalties by cross-validation.\item Interpret MAE, RMSE, $R^2$ and signed bias; quantify prediction uncertainty.\item Carry out scalar Kalman predict/update steps and explain the gain.\item Compare early, late and hybrid fusion and handle missing or imputed measurements.\end{enumerate}
+
+\subsection*{Syllabus mapping}\begin{itemize}\item Supervised learning --- \textbf{regression of force effectiveness, resource requirements and casualty estimates} (mission duration and resource-requirement regression; \textbf{casualty estimates} with Poisson regression; \textbf{force effectiveness} via Lanchester-coefficient regression)\item Example: \textbf{sensor fusion} (radar + IR + ESM)\end{itemize}
+
+\needspace{12\baselineskip}\section{Session Plan (45 Minutes)}
+
+\begin{center}\begin{tikzpicture}[x=0.3444cm,y=1cm]
+\fill[AmbN!40](0,0)rectangle(5,1);\node[font=\scriptsize\bfseries,align=center]at(2.5,0.5){Q\&A\\recap};
+\fill[AccN!25](5.00,0)rectangle(6.00,1);\draw[white,thick](5.00,0)--(5.00,1);
+\fill[NavyN!18](6.00,0)rectangle(8.50,1);\draw[white,thick](6.00,0)--(6.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(7.25,0.5){\parbox{0.9cm}{\centering \S2}};
+\fill[AccN!25](8.50,0)rectangle(12.50,1);\draw[white,thick](8.50,0)--(8.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(10.50,0.5){\parbox{0.9cm}{\centering \S3}};
+\fill[NavyN!18](12.50,0)rectangle(16.50,1);\draw[white,thick](12.50,0)--(12.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(14.50,0.5){\parbox{0.9cm}{\centering \S4}};
+\fill[AccN!25](16.50,0)rectangle(19.00,1);\draw[white,thick](16.50,0)--(16.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(17.75,0.5){\parbox{0.9cm}{\centering \S5}};
+\fill[NavyN!18](19.00,0)rectangle(21.50,1);\draw[white,thick](19.00,0)--(19.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(20.25,0.5){\parbox{0.9cm}{\centering \S5b}};
+\fill[AccN!25](21.50,0)rectangle(24.00,1);\draw[white,thick](21.50,0)--(21.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(22.75,0.5){\parbox{0.9cm}{\centering \S6}};
+\fill[NavyN!18](24.00,0)rectangle(30.50,1);\draw[white,thick](24.00,0)--(24.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(27.25,0.5){\parbox{0.9cm}{\centering \S7}};
+\fill[AccN!25](30.50,0)rectangle(31.50,1);\draw[white,thick](30.50,0)--(30.50,1);
+\fill[NavyN!18](31.50,0)rectangle(32.50,1);\draw[white,thick](31.50,0)--(31.50,1);
+\fill[AccN!25](32.50,0)rectangle(35.00,1);\draw[white,thick](32.50,0)--(32.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(33.75,0.5){\parbox{0.9cm}{\centering \S9}};
+\fill[RedN!30](35,0)rectangle(45,1);\node[font=\scriptsize\bfseries,align=center]at(40,0.5){Auto-quiz\\15 Q $\times$ 40 s};
+\draw[NavyN](0,0)rectangle(45,1);
+\foreach \tt in {0,5,10,15,20,25,30,35,40,45}{\draw[NavyN](\tt,0)--(\tt,-0.12);\node[font=\tiny,below]at(\tt,-0.12){\tt};}
+\node[font=\scriptsize,below]at(22.5,-0.45){minutes};
+\end{tikzpicture}\end{center}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.2}\begin{tabularx}{\textwidth}{@{}l l X r@{}}\toprule\textbf{Clock} & \textbf{Slides} & \textbf{Segment} & \textbf{Min}\\\midrule
+
+0:00--5:00 & --- & \textbf{Opening Q\&A and recap} (see prompts below) & 5\\
+
+5:00--6:00 & 2 & 1. Objectives \& Cases (1 slide) & 1\\
+
+6:00--8:30 & 3--4 & 2. Linear Regression (2 slides) & 2.5\\
+
+8:30--12:30 & 5--7 & 3. Ridge \& Lasso (3 slides) & 4\\
+
+12:30--16:30 & 8--10 & 4. SVR \& Boosting (3 slides) & 4\\
+
+16:30--19:00 & 11--12 & 5. Metrics \& Uncertainty (2 slides) & 2.5\\
+
+19:00--21:30 & 13--14 & 5b. Casualty \& Force Regression (2 slides) & 2.5\\
+
+21:30--24:00 & 15--16 & 6. Kalman Filter (2 slides) & 2.5\\
+
+24:00--30:30 & 17--21 & 7. Sensor Fusion (5 slides) & 6.5\\
+
+30:30--31:30 & 22 & 8. Unified Results (1 slide) & 1\\
+
+31:30--32:30 & 23 & 8b. Across Disciplines (1 slide) & 1\\
+
+32:30--35:00 & 24--25 & 9. Summary (2 slides) & 2.5\\
+
+35:00--45:00 & --- & \textbf{Auto-quiz} (instructions 1 min, 15 questions $\times$ 40 s = 10 min of answering; collect scores) & 10\\\bottomrule\end{tabularx}\end{center}
+
+Slide 1 is the title slide and is shown while students settle. The teaching segment covers 24 content slides in 30 minutes, an average pace of 0.8 slides per minute. 
+
+Minute allocations are proportional to slide counts; shift time towards the sections students find hardest.
+
+\begin{instr}{Opening Q\&A prompts (first 5 minutes)}\begin{enumerate}\item From Lecture~2: why is accuracy a poor metric for the bomber class?\item What is the difference between bagging and boosting?\item What does an SVM margin represent?\end{enumerate}Take two or three answers per prompt; correct misconceptions briefly and note any topic that needs revisiting.\end{instr}
+
+\needspace{12\baselineskip}\section{Slide-by-Slide Teaching Guide}
+
+Each subsection gives the slide range, the suggested time, what to emphasise, and the slide titles in order. Numbers refer to pages of the Beamer PDF.
+
+\needspace{8\baselineskip}\subsection{1. Objectives \& Cases \normalfont\small\color{GreyN}(slide 2, about 1 min)}
+
+\textbf{Teaching note.} The two case studies and what ``regression'' means operationally: predict a number with an uncertainty.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}2 & Lecture 3 --- Objectives \& Two Case Studies\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{2. Linear Regression \normalfont\small\color{GreyN}(slides 3--4, about 2.5 min)}
+
+\textbf{Teaching note.} OLS as projection; normal equations; Case~A coefficients; VIF 8.4 for force size signals collinearity.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}3 & Linear Regression --- Ordinary Least Squares: the Closed-Form Solution\\
+4 & OLS on Case A --- Coefficients and the Collinearity Check\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{3. Ridge \& Lasso \normalfont\small\color{GreyN}(slides 5--7, about 4 min)}
+
+\textbf{Teaching note.} Ridge shrinks (VIF falls to 2.1); lasso zeroes 6 of 18 features at $\lambda=0.3$; elastic net balances the two. Use the constraint-region picture.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}5 & Ridge Regression (L2) --- Shrinking Coefficients to Generalise Better\\
+6 & Lasso (L1) \& Elastic Net --- Sparsity and Feature Selection\\
+7 & Ridge vs Lasso vs Elastic Net --- When to Use Which, and the Full Case A Table\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{4. SVR \& Boosting \normalfont\small\color{GreyN}(slides 8--10, about 4 min)}
+
+\textbf{Teaching note.} SVR's $\varepsilon$-tube and robustness; gradient boosting fits residuals; validation RMSE 2.11~h at 400 trees versus 2.34~h at 1,200 shows overfitting.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}8 & Support Vector Regression --- Fitting Within a Tube: No Penalty for Small Errors\\
+9 & Why SVR in Defence Regression --- Benefits and Trade-off\\
+10 & Gradient Boosting for Regression --- XGBRegressor: Sequential Residual Learning\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{5. Metrics \& Uncertainty \normalfont\small\color{GreyN}(slides 11--12, about 2.5 min)}
+
+\textbf{Teaching note.} MAE versus RMSE (2.06 vs 1.54~h means heavy tails), $R^2$ can be negative, report signed bias; prediction intervals and quantile models.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}11 & Regression Metrics --- What They Measure and When They Mislead\\
+12 & Prediction Uncertainty --- Knowing When Your Model Doesn't Know\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{5b. Casualty \& Force Regression \normalfont\small\color{GreyN}(slides 13--14, about 2.5 min)}
+
+\textbf{Teaching note.} Casualty-estimate and force-effectiveness regression (syllabus example). Casualties are counts: Poisson regression with a log link, rate ratio $e^{0.25}=1.28$ per artillery battalion, and planning against the tail (95th percentile 8 versus a mean of 4.48). Then Lanchester's square law: estimate Red's kill rate by regression through the origin ($\hat r=0.0508$) and derive the force ratio $\sqrt{r/b}$ (4$\times$ kill rate needs only 2$\times$ numbers). Stress over-dispersion and that casualty estimates are planning inputs.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}13 & Casualty Estimates Are Counts --- Poisson Regression for Planning\\
+14 & Force Effectiveness --- Estimating Lanchester Coefficients by Regression\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{6. Kalman Filter \normalfont\small\color{GreyN}(slides 15--16, about 2.5 min)}
+
+\textbf{Teaching note.} Predict--update cycle; scalar gain $K=P/(P+R)$; posterior variance below both inputs.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}15 & Kalman Filter --- Predict, Measure, Fuse: Recursively \& Optimally\\
+16 & Kalman Gain Intuition --- How Much to Trust the Measurement\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{7. Sensor Fusion \normalfont\small\color{GreyN}(slides 17--21, about 6.5 min)}
+
+\textbf{Teaching note.} Early, late and hybrid fusion; Case~B results; the hybrid KF+RF keeps 94.8\% with 20\% IR loss while early-fusion DNN falls to 74.8\%; missing and out-of-sequence data; EKF and UKF.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}17 & Multi-Sensor Fusion --- Architecture Choices: Early, Late \& Hybrid\\
+18 & Case Study B --- 3-Sensor Fusion Results (5 Targets, 10 Runs)\\
+19 & How the Hybrid Model Works --- ML Corrects the Kalman Residuals\\
+20 & Handling Missing Data in Sensor Fusion --- Dropouts and Out-of-Sequence Measurements\\
+21 & Extended and Unscented Kalman Filters --- Non-linear Tracking\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{8. Unified Results \normalfont\small\color{GreyN}(slide 22, about 1 min)}
+
+\textbf{Teaching note.} Unified results table across both cases.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}22 & Lecture 3 --- Unified Results: Regression \& Sensor Fusion Side by Side\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{8b. Across Disciplines \normalfont\small\color{GreyN}(slide 23, about 1 min)}
+
+\textbf{Teaching note.} Estimation in surveying, biology (growth curves), psychology (measurement error) and aeronautics (inertial navigation).
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}23 & Regression \& Estimation Across the Disciplines\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{9. Summary \normalfont\small\color{GreyN}(slides 24--25, about 2.5 min)}
+
+\textbf{Teaching note.} Summary and look-ahead to unsupervised learning.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}24 & Lecture 3 Summary --- Regression Algorithms \& Sensor Fusion\\
+25 & Looking Ahead --- Lecture 4: Unsupervised Learning Part 1 --- Clustering\\\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{Key Messages}Students should leave the room able to state these in their own words:\begin{keypoint}\begin{enumerate}\item Regression outputs must carry an uncertainty; a point estimate alone is not a planning input.\item Regularisation trades a little bias for a large reduction in variance; lasso also selects features.\item RMSE much larger than MAE flags heavy-tailed errors; a negative mean error flags systematic under-prediction.\item The Kalman filter is optimal weighting by inverse variance, applied recursively.\item Hybrid fusion (physics filter plus ML correction) is more robust to sensor loss than end-to-end learning.\end{enumerate}\end{keypoint}
+
+\needspace{12\baselineskip}\section{Facilitation Tips}\begin{itemize}\item Do the scalar Kalman update with numbers on the board ($P=4$, $R=1$, $K=0.8$) before showing any matrix form.\item Use the 1-D ridge and lasso formulas $z/(1+\lambda)$ and $\mathrm{sign}(z)\max(|z|-\lambda/2,0)$; students remember them.\item Connect to casualty-estimate regression explicitly: the same pipeline (features, regularised model, intervals) applies, with extra ethical care about how such estimates are used.\end{itemize}
+
+\needspace{12\baselineskip}\section{Anticipated Questions and Model Answers}
+
+\begin{question}{anticipated question}\textbf{Q:} Why not just use XGBoost for everything?\par\smallskip\textbf{A:} It is often the most accurate, but OLS/ridge give interpretable coefficients and analytic intervals, and boosting extrapolates poorly beyond the training range.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} Is the Kalman filter machine learning?\par\smallskip\textbf{A:} It is Bayesian estimation with a known model. Its noise parameters can be learned, and ML can correct its residuals, as in the hybrid.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} How should imputed values enter the filter?\par\smallskip\textbf{A:} Flagged, with an inflated measurement variance, so they move the estimate little and do not shrink the uncertainty falsely.\end{question}
+
+\needspace{12\baselineskip}\section{Common Misconceptions}\begin{center}\small\renewcommand{\arraystretch}{1.35}\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}\toprule\textbf{Misconception} & \textbf{Correction}\\\midrule``High $R^2$ means good predictions.'' & It can coexist with large bias on the cases that matter and poor extrapolation.\\
+``Lasso finds the true causes.'' & With correlated features its choice among them is unstable.\\
+``Fusing a noisy sensor always helps.'' & Only if its noise is modelled correctly; a mis-specified $R$ adds false confidence.\\\bottomrule\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{In-Class Activities and Discussion Prompts}\label{sec:act}\begin{itemize}\item \textbf{Two-sensor fusion by hand:} prior 50~km (variance 9), radar 53~km (variance 4). Compute $K$, the estimate and the variance (0.692, 52.08~km, 2.77).\item \textbf{Bias matters:} give actual vs predicted mission durations and ask which error (over or under) is worse for fuel planning.\end{itemize}
+
+\needspace{12\baselineskip}\section{Run It Live: Studio Demonstrations}\label{sec:live}
+
+Project \texttt{Lecture3\_Regression\_Fusion\_Lab.html} (it is a single HTML file and runs offline in any browser; every result updates as an input changes). Each demonstration below follows the same rhythm: \textbf{set} the inputs, \textbf{ask} the class to commit to a prediction (a show of hands or a one-word answer), then \textbf{reveal} the result and \textbf{land} the point. The numbers are exactly what the page shows for the settings given; simulations use fixed random seeds, so they repeat every time. The 45-minute plan has little slack: choose the one demonstration marked \emph{first choice} for class, and use the others in a tutorial, a second session, or as homework with the drill cards at the bottom of the page.
+
+\begin{live}{Demo 1: How far can a fitted line be trusted? (about 3 min, with \S5 Metrics \& Uncertainty)}\textbf{Set.} Demo~1 defaults: five missions, fitted $y=4.60+1.80x$; predict at $x=8$.\par\smallskip\textbf{Ask.} ``The model predicts 19 hours at EW level 8. How many hours should the plan allow?''\par\smallskip\textbf{Reveal.} 19.00 h with $\pm$5.73 for the average mission and \textbf{$\pm$6.70} for a single mission, plus an extrapolation warning (data cover levels 1--5). At $x=3$, inside the data: 10.00 h, $\pm$1.56 and $\pm$3.82.\par\smallskip\textbf{Land the point.} Plan a single mission against the prediction interval, not the line, and treat extrapolation as an assumption to state.\end{live}
+
+\begin{live}{Demo 2: Tune the Kalman tracker (about 3 min, with \S6 Kalman Filter)}\textbf{Set.} Demo~3: radar noise 40~m, target speeds up at step~25, assumed $Q$ at $\log_{10}Q=0.5$. RMSE: raw radar 43.8~m, filter 26.8~m, gain 0.26.\par\smallskip\textbf{Ask.} ``If we tell the filter that targets never change speed (very small $Q$), will it track better?''\par\smallskip\textbf{Reveal.} At $\log_{10}Q=-2$ the filter error is \textbf{97.4~m}, worse than raw radar (gain 0.08): it ignores the manoeuvre. At $\log_{10}Q=3$ it chases noise: 32.6~m, gain 0.72.\par\smallskip\textbf{Land the point.} $Q$ and $R$ encode beliefs about the target and the sensor. Overconfidence in the motion model is as damaging as no filter at all.\end{live}
+
+\begin{live}{Demo 3: Plan for the tail of casualties (about 3 min, with \S5b Casualty \& Force Regression) --- \emph{first choice}}\textbf{Set.} Demo~4 defaults: $\beta_0=0.5$, $\beta_1=0.25$, 4 battalions in range, Poisson. Expected casualties 4.48; 95th percentile 8.\par\smallskip\textbf{Ask.} ``Real casualty data are over-dispersed. With the same mean, does the medical plan change?''\par\smallskip\textbf{Reveal.} Switch to negative binomial ($k=1.5$): P(none) rises from 1.1\% to 12.6\%, P($\geq$8) from 8.5\% to \textbf{19.1\%}, and the 95th percentile from 8 to \textbf{13}.\par\smallskip\textbf{Land the point.} The mean hides the planning risk. Size evacuation and medical capacity for the tail, and state the dispersion assumption.\end{live}
+
+\begin{live}{Demo 4: A near-tie in a Lanchester battle (about 2 min, with \S5b Casualty \& Force Regression)}\textbf{Set.} Demo~5 defaults: Blue 60, Red 50, kill rates 0.029 and 0.041. Ratio needed 1.189, actual 1.200: Blue wins with 8.1 left.\par\smallskip\textbf{Ask.} ``Blue loses five units before contact. Who wins?''\par\smallskip\textbf{Reveal.} Blue 55 (ratio 1.100): \textbf{Red wins with 19.0 left}.\par\smallskip\textbf{Land the point.} Under the square law small changes in numbers swing the outcome, and the required ratio rests on two noisy estimates. Report the uncertainty, not a verdict.\end{live}
+
+\needspace{12\baselineskip}\section{Quiz Administration and Answer Key}
+
+\begin{sayit}``You will now take a 15-question quiz. Each question has four options and exactly one correct answer. You have 40 seconds per question; the quiz advances automatically when time runs out. A correct answer scores $+1$, a wrong answer $-0.25$, and an unanswered question 0. The maximum is 15 and the minimum is $-3.75$. Because of the negative marking, guessing blindly among four options gains nothing on average --- answer when you can eliminate options. Your score and a full review appear at the end.''\end{sayit}
+
+\textbf{Delivery.} Open \texttt{Lecture3\_Quiz.html} on each student device (or project it and collect answers on paper). The page enforces the timer and computes the score with negative marking. Release \texttt{Lecture3\_Answers\_Assignment.html} only after all students have finished.
+
+\subsection*{Answer key}\begin{center}\small\renewcommand{\arraystretch}{1.3}\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}\hline \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{11} & \textbf{12} & \textbf{13} & \textbf{14} & \textbf{15}\\\hline C & A & B & B & C & B & A & A & B & C & C & C & C & D & D\\\hline\end{tabular}\end{center}
+
+\textbf{Interpreting scores.} 12 or more: secure command of the lecture. 9--11.75: good, review missed items. Below 9: revisit the reference text before the assignment. If more than half the class misses a question, revisit that point in the next lecture's opening Q\&A.
+
+\subsection*{Questions, options and rationale}
+
+{\small
+
+\noindent\textbf{Q1.} The OLS solution is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] $w^*=X^\top y$\item[B.] $w^*=(XX^\top)^{-1}y$\item[\textbf{C.}] \textbf{$w^*=(X^\top X)^{-1}X^\top y$}~{\color{GrnN}$\checkmark$}\item[D.] $w^*=X^{-1}y$\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Setting $\nabla\|y-Xw\|^2=0$ gives the normal equations $X^\top Xw=X^\top y$.\par\medskip
+
+\noindent\textbf{Q2.} A Poisson casualty model has $\ln\mu=0.5+0.25x$, where $x$ is the number of enemy artillery battalions in range. Each additional battalion multiplies the expected casualties by about:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{1.28}~{\color{GrnN}$\checkmark$}\item[B.] 1.65\item[C.] 2.72\item[D.] 4.48\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} The rate ratio is $e^{0.25}=1.28$: a 28\% increase per battalion. (1.65, 2.72 and 4.48 are the expected counts at 0, 2 and 4 battalions.)\par\medskip
+
+\noindent\textbf{Q3.} A VIF of 8.4 for force size indicates:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] No problem\item[\textbf{B.}] \textbf{Strong collinearity inflating that coefficient's variance}~{\color{GrnN}$\checkmark$}\item[C.] A non-linear effect\item[D.] An outlier\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $\text{VIF}=1/(1-R_j^2)$; values above about 5--10 are a warning; ridge reduced it to 2.1.\par\medskip
+
+\noindent\textbf{Q4.} Ridge regression differs from lasso because ridge:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Sets some coefficients exactly to zero\item[\textbf{B.}] \textbf{Shrinks all coefficients smoothly but none to exactly zero}~{\color{GrnN}$\checkmark$}\item[C.] Has no closed form\item[D.] Uses an absolute-value penalty\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} In 1-D ridge gives $z/(1+\lambda)$; lasso soft-thresholds to exact zeros.\par\medskip
+
+\noindent\textbf{Q5.} Why does the L1 penalty produce exact zeros?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] It is quadratic\item[B.] It is differentiable everywhere\item[\textbf{C.}] \textbf{Its constraint region has corners on the axes where the loss contours tend to touch}~{\color{GrnN}$\checkmark$}\item[D.] It increases variance\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} The diamond-shaped region meets the ellipses at corners, where some $w_j=0$.\par\medskip
+
+\noindent\textbf{Q6.} In Case A, lasso (lambda = 0.3) zeroed how many of 18 features?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] 0\item[\textbf{B.}] \textbf{6}~{\color{GrnN}$\checkmark$}\item[C.] 12\item[D.] 18\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Six weak features (comms quality, temperature, etc.) were removed; 12 retained.\par\medskip
+
+\noindent\textbf{Q7.} SVR's epsilon-insensitive loss means:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Errors smaller than epsilon cost nothing}~{\color{GrnN}$\checkmark$}\item[B.] All errors are squared\item[C.] Only outliers are fitted\item[D.] Epsilon is the learning rate\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $L_\varepsilon=\max(0,|y-\hat y|-\varepsilon)$: points inside the tube are ignored, giving robustness.\par\medskip
+
+\noindent\textbf{Q8.} Gradient boosting for regression fits each new tree to:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{The residuals of the current ensemble}~{\color{GrnN}$\checkmark$}\item[B.] The original targets\item[C.] Random noise\item[D.] The test set\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $r_i=y_i-F_{m-1}(x_i)$, the negative gradient of squared loss.\par\medskip
+
+\noindent\textbf{Q9.} XGBoost validation RMSE was 2.11 h at 400 trees and 2.34 h at 1,200. This shows:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] More trees always help\item[\textbf{B.}] \textbf{Overfitting beyond the optimum: the number of trees is a hyper-parameter (early stopping)}~{\color{GrnN}$\checkmark$}\item[C.] A bug\item[D.] Underfitting\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Choose M by validation/early stopping.\par\medskip
+
+\noindent\textbf{Q10.} RMSE 2.06 h vs MAE 1.54 h suggests:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] No errors\item[B.] Negative R-squared\item[\textbf{C.}] \textbf{A few large errors (outlier missions)}~{\color{GrnN}$\checkmark$}\item[D.] Perfect calibration\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} RMSE weights large errors more; RMSE well above MAE signals heavy-tailed errors.\par\medskip
+
+\noindent\textbf{Q11.} R-squared is negative when:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] N is large\item[B.] Errors are small\item[\textbf{C.}] \textbf{The model is worse than predicting the mean}~{\color{GrnN}$\checkmark$}\item[D.] Features are scaled\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $R^2=1-SS_{res}/SS_{tot}<0$ when $SS_{res}>SS_{tot}$.\par\medskip
+
+\noindent\textbf{Q12.} Scalar Kalman update: prior variance P = 4, measurement variance R = 1. The gain is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] 0.2\item[B.] 0.25\item[\textbf{C.}] \textbf{0.8}~{\color{GrnN}$\checkmark$}\item[D.] 4\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $K=P/(P+R)=4/5=0.8$: trust the precise measurement.\par\medskip
+
+\noindent\textbf{Q13.} Under Lanchester's square law, Red's per-unit kill rate is four times Blue's. To prevail, Blue needs a force ratio $B_0/R_0$ greater than:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] 0.5\item[B.] 1\item[\textbf{C.}] \textbf{2}~{\color{GrnN}$\checkmark$}\item[D.] 4\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Blue wins if $bB_0^2>rR_0^2$, i.e. $B_0/R_0>\sqrt{r/b}=\sqrt4=2$: numbers count squared.\par\medskip
+
+\noindent\textbf{Q14.} Hybrid KF+RF fusion kept 94.8\% accuracy with 20\% IR loss while early-fusion DNN fell to 74.8\% because:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] The DNN had fewer features\item[B.] IR data are irrelevant\item[C.] RF is always better\item[\textbf{D.}] \textbf{The KF handles timing and missing sensors physically; the RF only corrects residual bias}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Physics backbone plus learned correction is robust to dropout.\par\medskip
+
+\noindent\textbf{Q15.} When an IR bearing is imputed, the filter should:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Treat it exactly as a real measurement\item[B.] Set K = 1\item[C.] Delete the track\item[\textbf{D.}] \textbf{Flag it and inflate its measurement noise R}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Otherwise the filter gains false confidence from made-up data.\par\medskip
+
+}
+
+\needspace{12\baselineskip}\section{Assignment: Marking Scheme and Model Solutions}
+
+\textbf{Instructions.} Five problems, 100 marks, plus a 20-mark bonus problem (Problem 6). Show all working. Reference: Lecture 3 reference text.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{0.85\textwidth}{@{}l X r@{}}\toprule\textbf{\#} & \textbf{Problem} & \textbf{Marks}\\\midrule1 & Least squares by hand & 20\\
+2 & Ridge versus lasso & 20\\
+3 & Two-sensor Kalman fusion & 20\\
+4 & Metrics and directional bias & 20\\
+5 & Fusion with imputed data & 20\\
+6 & Problem 6 (bonus): Casualty estimates and force ratios & 20\\\midrule & \textbf{Total} & \textbf{100} + 20 bonus\\\bottomrule\end{tabularx}\end{center}
+
+\begin{instr}{General marking guidance}\begin{itemize}
+\item Marks for each part are shown in square brackets in the problem statement.
+\item Award method marks for correct working even when an arithmetic slip carries through; deduct once for the slip, not again for its consequences.
+\item For interpretive parts, full marks need (i) the correct conclusion, (ii) the reason, and (iii) an operational implication or caveat.
+\item Answers that state a number without uncertainty, baseline or caveat where one is required lose a mark per part.
+\item Suggested deadline: one week after the lecture; return marked work before the next quiz on the same topic.
+\end{itemize}\end{instr}
+
+\needspace{8\baselineskip}\subsection{Problem 1: Least squares by hand \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}EW intensity level $x$ and mission duration $y$ (h) for five missions: (1, 6), (2, 9), (3, 9), (4, 13), (5, 13).
+
+(a) Compute the OLS slope and intercept. [8]\newline (b) Compute fitted values, residuals, $SS_{res}$, $SS_{tot}$, $R^2$ and RMSE. [8]\newline (c) Predict duration at EW level 8 and comment on its reliability. [4]\end{prob}
+
+\begin{soln}\textbf{(a)} $\bar x=3$, $\bar y=10$. Deviations: $x$: $-2,-1,0,1,2$; $y$: $-4,-1,-1,3,3$. $S_{xy}=8+1+0+3+6=18$, $S_{xx}=10$. Slope $b_1=1.8$ h per level; intercept $b_0=10-1.8(3)=\mathbf{4.6}$ h.
+
+\textbf{(b)} Fitted: 6.4, 8.2, 10.0, 11.8, 13.6. Residuals: $-0.4, 0.8, -1.0, 1.2, -0.6$. $SS_{res}=3.6$; $SS_{tot}=16+1+1+9+9=36$; $R^2=1-3.6/36=\mathbf{0.90}$; RMSE $=\sqrt{3.6/5}=\mathbf{0.85}$ h.
+
+\textbf{(c)} $\hat y=4.6+1.8(8)=19.0$ h, but level 8 is far outside the observed range 1--5: extrapolation assumes linearity continues, and the prediction interval widens sharply ($x^\top(X^\top X)^{-1}x$ grows). Treat it as highly uncertain (a Challenger-style extrapolation risk).\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 2: Ridge versus lasso \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}For a single standardised feature, minimise $(z-w)^2+\lambda w^2$ (ridge) or $(z-w)^2+\lambda|w|$ (lasso).
+
+(a) Derive both solutions. [8]\newline (b) Evaluate both for $\lambda=1$ with $z=2.0$ and $z=0.4$. [6]\newline (c) Explain which you would use for a 45-feature model in which you suspect only 8 features matter, and why elastic net may be safer. [6]\end{prob}
+
+\begin{soln}\textbf{(a)} Ridge: $-2(z-w)+2\lambda w=0\Rightarrow w=z/(1+\lambda)$. Lasso: for $w>0$, $-2(z-w)+\lambda=0\Rightarrow w=z-\lambda/2$ if $z>\lambda/2$; symmetric for $w<0$; otherwise $w=0$. So $w=\text{sign}(z)\max(|z|-\lambda/2,0)$.
+
+\textbf{(b)} $z=2.0$: ridge 1.0, lasso 1.5. $z=0.4$: ridge 0.2, lasso \textbf{0} (since $0.4<0.5$). Ridge scales everything by the same factor; lasso subtracts a fixed amount and kills small effects.
+
+\textbf{(c)} Lasso (or elastic net) gives an interpretable sparse model when most features are irrelevant. With correlated groups lasso may keep one feature arbitrarily and drop its partners, and selections can change between samples; elastic net's L2 term spreads weight across correlated features and stabilises selection. Choose penalties by cross-validation.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 3: Two-sensor Kalman fusion \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Prior range estimate 50 km with variance 9 km$^2$. A radar reports 53 km (variance 4); then an IR-derived range reports 49 km (variance 16). Take $H=1$.
+
+(a) Apply the radar update: gain, estimate, variance. [6]\newline (b) Apply the IR update. [6]\newline (c) Verify the result with the information form $1/P=\sum1/P_i$, $\hat x=P\sum\hat x_i/P_i$. [4]\newline (d) Predict to the next step with $F=1$, $Q=1$. [4]\end{prob}
+
+\begin{soln}\textbf{(a)} $K=9/13=0.692$; $\hat x=50+0.692(3)=52.08$; $P=(1-0.692)9=2.77$.
+
+\textbf{(b)} $K=2.77/(2.77+16)=0.148$; $\hat x=52.08+0.148(49-52.08)=\mathbf{51.62}$ km; $P=(1-0.148)2.77=\mathbf{2.36}$ km$^2$. The noisy IR moves the estimate only slightly.
+
+\textbf{(c)} $1/P=1/9+1/4+1/16=0.4236\Rightarrow P=2.361$. $\hat x=2.361(50/9+53/4+49/16)=2.361(21.87)=51.63$ km. Order of sequential updates does not matter for linear Gaussian fusion.
+
+\textbf{(d)} $\hat x^-=51.62$; $P^-=2.36+1=\mathbf{3.36}$: uncertainty grows between measurements.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 4: Metrics and directional bias \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Actual mission durations: 10, 12, 20, 8, 30 h. Predictions: 11, 11, 17, 9, 24 h.
+
+(a) Compute MAE, RMSE, signed mean error ($y-\hat y$) and $R^2$. [12]\newline (b) Interpret for a logistics planner. [8]\end{prob}
+
+\begin{soln}\textbf{(a)} Errors $y-\hat y$: $-1, 1, 3, -1, 6$. MAE $=12/5=\mathbf{2.4}$; MSE $=48/5=9.6$, RMSE $=\mathbf{3.10}$; mean error $=8/5=\mathbf{+1.6}$ h; $\bar y=16$, $SS_{tot}=36+16+16+64+196=328$, $R^2=1-48/328=\mathbf{0.854}$.
+
+\textbf{(b)} The model explains most variance but systematically \textbf{under}-predicts by 1.6 h, worst on the longest mission (6 h short). For logistics, under-prediction means running out of fuel or ammunition; add a bias correction or plan on an upper prediction bound rather than the point estimate.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 5: Fusion with imputed data \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Continue Problem 3 after the radar update ($\hat x=52.08$, $P=2.77$). The IR sensor is blocked by cloud, and an imputation model supplies 49 km.
+
+(a) Compute the update if the imputed value is given the normal IR variance 16. [5]\newline (b) Recompute with an inflated variance of 64 and compare. [5]\newline (c) Design a robust three-sensor fusion architecture for Case B, covering timing, missing data, non-linear manoeuvres and validation. [10]\end{prob}
+
+\begin{soln}\textbf{(a)} As in Problem 3(b): $\hat x=51.62$, $P=2.36$ --- the filter treats invented data as real and claims extra certainty.
+
+\textbf{(b)} $K=2.77/66.77=0.0415$; $\hat x=52.08-0.0415(3.08)=51.95$; $P=2.65$. The imputed value has little influence and the reported uncertainty stays honest.
+
+\textbf{(c)} A model answer: a hybrid ML-enhanced Kalman (or UKF for manoeuvring targets) per target; asynchronous updates at each sensor's own rate with out-of-sequence handling (roll back and re-propagate); missing sensors skipped rather than imputed, or imputed with inflated $R$ and a flag; an RF residual corrector trained on innovation features; data association gating with the innovation covariance $S$; validation on held-out runs with simulated dropout (e.g. 20\% IR), reporting accuracy, latency and calibration of $P$; monitoring for distribution shift in innovations once deployed.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 6 (bonus): Casualty estimates and force ratios \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}A planning cell fits a Poisson model for casualties per company-day, $\ln\mu=0.2+0.3x$, where $x$ is the number of enemy artillery battalions in range. Separately, simulated engagements give Blue losses per hour $\Delta B$ = 4.9, 4.1, 3.3, 2.4 when Red strength $R$ = 120, 100, 80, 60, and Red losses per hour $\Delta R$ = 2.6, 2.3, 2.0, 1.8 when Blue strength $B$ = 90, 80, 70, 60.
+
+(a) For $x=3$, compute $\mu$, the rate ratio per battalion, $P(0)$ and $P(\ge6)$. [6]\newline (b) Over 40 company-days at $x=3$ the observed variance of casualties is 9.1. Is the Poisson model adequate? Estimate the negative-binomial dispersion $k$ from $\text{Var}=\mu+\mu^2/k$, and say how the planning tail changes ($P(\ge6)$ under the negative binomial is 0.169). [4]\newline (c) Estimate Red's kill rate $r$ and Blue's kill rate $b$ by regression through the origin. [6]\newline (d) Blue has 60 units against Red's 50. Under the square law, who prevails, and with how many survivors? Comment on how much you would trust the answer. [4]\end{prob}
+
+\begin{soln}\textbf{(a)} $\mu=e^{0.2+0.9}=e^{1.1}=\mathbf{3.00}$. Rate ratio $e^{0.3}=\mathbf{1.35}$ (+35\% per battalion). $P(0)=e^{-3.00}=\mathbf{0.050}$. $P(\ge6)=1-P(\le5)=\mathbf{0.084}$.
+
+\textbf{(b)} Dispersion ratio $9.1/3.0=3.0$, far above 1: strongly over-dispersed, so Poisson intervals are too narrow. $k=\mu^2/(\text{Var}-\mu)=9.02/6.10=\mathbf{1.48}$. The probability of six or more casualties doubles, from 0.084 to 0.169: medical and evacuation planning based on the Poisson tail would be badly under-provisioned.
+
+\textbf{(c)} $\hat r=\sum R\,\Delta B/\sum R^2=1{,}406/34{,}400=\mathbf{0.0409}$ Blue units per Red unit per hour. $\hat b=\sum B\,\Delta R/\sum B^2=666/23{,}000=\mathbf{0.0290}$ Red units per Blue unit per hour. Red is about 1.41 times as lethal per unit.
+
+\textbf{(d)} Required ratio $\sqrt{r/b}=\sqrt{1.412}=1.19$; actual $60/50=1.20$. Blue's fighting strength $bB_0^2=104.2$ just exceeds Red's $rR_0^2=102.2$, so Blue prevails --- with $\sqrt{60^2-1.412\times50^2}\approx\mathbf{8}$ survivors out of 60. This is a near-tie and a pyrrhic outcome. The coefficients come from four points each, so modest estimation error can reverse the result. Bootstrap or otherwise propagate the uncertainty, check whether the square law fits better than the linear law, and do not present ``Blue wins'' as a finding.\end{soln}
+
+\end{document}

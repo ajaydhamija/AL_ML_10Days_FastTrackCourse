@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 8 — Part 3: Answers & Assignment</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--brz:#9B5E1A;--brz2:#C4791F;--lblue:#BDD7EE;
+    --green:#1E7A45;--red:#C0392B;--amber:#C98A12;
+    --light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--lgrey:#E0EBF5;
+    --yellow:#FFF3B0;--white:#FFFFFF;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  .top-bar{background:var(--navy);color:#fff;padding:13px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--brz);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .top-bar h1{font-size:16px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  .container{max-width:1000px;margin:0 auto;padding:22px 16px;}
+  .section-head{background:var(--navy);color:#fff;padding:11px 17px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:9px;}
+  .section-head .badge{background:var(--brz);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+  .section-head h2{font-size:14px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:16px;margin-bottom:22px;}
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:10px;}
+  .ans-card .qn{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--brz);}
+  .ans-card .key{font-size:10.5px;color:var(--dark);}
+  .q-item{margin-bottom:14px;border-left:4px solid var(--brz);padding-left:12px;}
+  .q-item .qtag{display:inline-block;background:var(--brz);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:4px;}
+  .q-item .qtext{font-weight:700;font-size:13px;color:var(--dark);margin-bottom:6px;}
+  .q-item .ans-line{font-size:13px;color:var(--brz);font-weight:700;margin-bottom:3px;}
+  .q-item .exp{font-size:12px;color:var(--grey);background:var(--light);padding:7px 10px;border-radius:6px;}
+  .assign-intro{background:var(--yellow);border:1px solid var(--amber);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;}
+  .q-box{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+  .q-box .qnum{font-size:11px;font-weight:700;color:var(--brz);text-transform:uppercase;margin-bottom:4px;}
+  .q-box .qtxt{font-size:13px;font-weight:600;color:var(--dark);}
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--brz2);padding:7px 10px;background:var(--lgrey);border-radius:6px;list-style:none;margin-top:8px;}
+  details summary::before{content:"▶ ";color:var(--brz);}
+  details[open] summary::before{content:"▼ ";}
+  details .sol{background:#FDF4E8;border:1px solid #DEB887;border-radius:0 0 6px 6px;padding:11px 13px;font-size:12.5px;color:var(--dark);}
+  details .sol .formula{background:#fff;border:1.5px solid var(--brz);border-radius:6px;padding:9px;font-family:monospace;font-size:12px;margin:7px 0;white-space:pre-wrap;}
+  details .sol .key-finding{background:var(--yellow);border:1px solid var(--amber);border-radius:6px;padding:8px 12px;margin-top:8px;font-weight:700;font-size:12.5px;}
+  .mark-scheme{background:#fff;border:1px solid var(--lgrey);border-radius:8px;overflow:hidden;margin-top:12px;}
+  .mark-scheme table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .mark-scheme th{background:var(--brz);color:#fff;padding:8px 11px;text-align:left;}
+  .mark-scheme td{padding:7px 11px;border-bottom:1px solid var(--lgrey);}
+  .mark-scheme tr:last-child td{border-bottom:none;}
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:12px;font-size:11px;margin-top:8px;}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — ANSWERS & ASSIGNMENT</div>
+    <h1>Lecture 8: Multi-Agent RL & Autonomous Platforms — Answers & Assignment</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);"><strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></div>
+</div>
+
+<div class="container">
+
+<div class="section-head"><div class="badge">A</div><h2>Quiz Answer Key</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="qn">Q1</div><div class="ans">B</div><div class="key">Non-stationarity from learning agents</div></div>
+    <div class="ans-card"><div class="qn">Q2</div><div class="ans">B</div><div class="key">Comms jamming → decentralised is operational necessity</div></div>
+    <div class="ans-card"><div class="qn">Q3</div><div class="ans">B</div><div class="key">Monotonicity → joint argmax = individual argmax</div></div>
+    <div class="ans-card"><div class="qn">Q4</div><div class="ans">B</div><div class="key">SEAD-first from SAM casualty chain (no explicit reward)</div></div>
+    <div class="ans-card"><div class="qn">Q5</div><div class="ans">B</div><div class="key">QMIX: individual Q-networks encode contribution</div></div>
+    <div class="ans-card"><div class="qn">Q6</div><div class="ans">B</div><div class="key">Efficiency + data sharing; heterogeneity limitation</div></div>
+    <div class="ans-card"><div class="qn">Q7</div><div class="ans">B</div><div class="key">Linear probing: information linearly encoded</div></div>
+    <div class="ans-card"><div class="qn">Q8</div><div class="ans">B</div><div class="key">A₃=−3.2: actual action worse than policy average</div></div>
+    <div class="ans-card"><div class="qn">Q9</div><div class="ans">B</div><div class="key">IQL: non-stationary, no joint state coordination</div></div>
+    <div class="ans-card"><div class="qn">Q10</div><div class="ans">B</div><div class="key">Centralised critic V(s) captures joint state value</div></div>
+    <div class="ans-card"><div class="qn">Q11</div><div class="ans">B</div><div class="key">Tempo/info asymmetry/automation bias → MHC fails</div></div>
+    <div class="ans-card"><div class="qn">Q12</div><div class="ans">B</div><div class="key">Mixed cooperative-competitive → per-agent critics needed</div></div>
+    <div class="ans-card"><div class="qn">Q13</div><div class="ans">B</div><div class="key">Diagnose: no intermediate engagement reward; add suppression reward</div></div>
+    <div class="ans-card"><div class="qn">Q14</div><div class="ans">B</div><div class="key">Sim-to-real gap, adversarial adaptation, scenario generality</div></div>
+    <div class="ans-card"><div class="qn">Q15</div><div class="ans">B</div><div class="key">Proportionality requires contextual judgment AI cannot perform</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--grey);">Scoring: +1 correct | −0.25 incorrect | 0 skipped | Maximum: 15 marks</p>
+</div>
+
+<div class="section-head"><div class="badge">B</div><h2>Selected Explanations</h2></div>
+<div class="section-body">
+  <div class="q-item"><div class="qtag">Q3</div><div class="qtext">How does QMIX monotonicity enable decentralised greedy execution?</div>
+  <div class="ans-line">✅ B — $\partial Q_{\text{tot}}/\partial Q_i>0$ → increasing any Qᵢ increases Q_tot → joint argmax = individual argmax</div>
+  <div class="exp">Proof: Suppose joint action a* = (a₁*,...,aN*) maximises Q_tot. For any agent i, if aᵢ ≠ argmax_{aᵢ} Qᵢ(aᵢ), then there exists aᵢ' with Qᵢ(aᵢ') > Qᵢ(aᵢ). By monotonicity, Q_tot with (aᵢ', a_{-i}*) > Q_tot with (aᵢ, a_{-i}*). This contradicts a* being the joint optimum. Therefore a* must have aᵢ* = argmax Qᵢ for all i. Each agent can independently take its greedy action. This is the Individual-Global-Max (IGM) property — the bridge between centralised training and decentralised execution.</div></div>
+
+  <div class="q-item"><div class="qtag">Q8</div><div class="qtext">COMA counterfactual advantage A₃ = −3.2 for Artillery that missed</div>
+  <div class="ans-line">✅ B — A₃ = Q(s,a_actual) − b₃ = −3.2 means actual action was 3.2 units WORSE than agent 3's policy average</div>
+  <div class="exp">b₃(s,a_{-3}) = Σ_{a₃'} π₃(a₃'|o₃) Q(s,(a₃',a_{-3})): the average Q-value across all of Agent 3's possible actions (weighted by policy probability) while others hold their actions fixed. A₃ = −3.2 means 'fire early' was 3.2 worse than this average. Policy gradient: reduces P(fire_early|o₃ in this state). This is exactly the right signal: the specific action chosen was worse than the agent's baseline — it should be made less probable. Naive sharing would give Agent 3 +16.7 (positive!) → wrongly reinforcing the early firing behaviour.</div></div>
+
+  <div class="q-item"><div class="qtag">Q10</div><div class="qtext">How does MAPPO's centralised critic enable the flanking tactic to emerge?</div>
+  <div class="ans-line">✅ B — V(s) captures joint configuration value; flanking configuration has high V(s') → PPO updates both agents toward it</div>
+  <div class="exp">The flanking manoeuvre requires TWO agents to coordinate: Infantry → frontal position, Armour → flank position, SIMULTANEOUSLY. IQL: Agent 1's Q₁(o₁,advance_frontal) doesn't know where Agent 2 is — it can't distinguish flanking from non-flanking. MAPPO's V(s) where s includes both agents' positions: V(s_flanking) >> V(s_all_frontal) because flanking configurations (empirically, through training) lead to much better mission outcomes. When both agents happen to create this joint configuration (via exploration), V(s') is high → high advantage for BOTH agents → PPO reinforces both actions simultaneously. This is joint credit flowing through a single centralised value function.</div></div>
+</div>
+
+<div class="section-head"><div class="badge">C</div><h2>Assignment 8 — Multi-Agent RL for Combined Arms Operations</h2></div>
+<div class="section-body">
+  <div class="assign-intro"><strong>📋 Instructions:</strong> Show full working. Total: <strong>40 marks</strong> | ~90 minutes.</div>
+
+  <!-- Q1 -->
+  <div class="q-box">
+    <div class="qnum">Q1 — QMIX Value Decomposition [10 Marks]</div>
+    <div class="qtxt">A 3-agent QMIX system has individual Q-values: Q₁(a₁=ATTACK)=8.0, Q₂(a₂=FLANK)=6.0, Q₃(a₃=SUPPRESS)=5.0. The QMIX mixer (simplified 1-layer) uses: Q_tot = w₁Q₁ + w₂Q₂ + w₃Q₃ + b where weights from the hypernetwork are: w₁=0.4, w₂=0.3, w₃=0.3, b=1.0.<br><br>
+    (a) Compute Q_tot for the joint action (ATTACK, FLANK, SUPPRESS). [2 marks]<br>
+    (b) Agent 2 considers switching to DEFEND (Q₂(DEFEND)=3.5). Compute new Q_tot and verify the monotonicity property holds. [3 marks]<br>
+    (c) The TD target is y = r + γ max_{a'} Q_tot(s'): the next state has best per-agent Q-values Q₁'=7.0, Q₂'=5.5, Q₃'=6.0 with the same mixer weights, r=+10, γ=0.9. Compute y and the QMIX loss for the current transition. [3 marks]<br>
+    (d) The loss backpropagates to update w₁. Compute ∂Q_tot/∂w₁ and state the direction of the gradient update. [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Q_tot for (ATTACK, FLANK, SUPPRESS):</strong></p>
+      <div class="formula-display">$$
+Q_tot = w₁Q₁ + w₂Q₂ + w₃Q₃ + b
+      = 0.4×8.0 + 0.3×6.0 + 0.3×5.0 + 1.0
+      = 3.2  + 1.8  + 1.5  + 1.0
+      = 7.5
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Agent 2 switches to DEFEND (Q₂=3.5):</strong></p>
+      <div class="formula-display">$$
+Q_tot_new = 0.4×8.0 + 0.3×3.5 + 0.3×5.0 + 1.0
+          = 3.2  + 1.05 + 1.5  + 1.0
+          = 6.75
+
+Monotonicity verification:
+  Q₂(FLANK) = 6.0 > Q₂(DEFEND) = 3.5  → Q₂ decreased
+  Q_tot_original = 7.5 > Q_tot_new = 6.75 → Q_tot decreased ✓
+
+  ∂Q_tot/∂Q₂ = w₂ = 0.3 > 0  (positive weight = monotonic!) ✓
+
+  QMIX monotonicity confirmed: decreasing any Qᵢ
+  decreases Q_tot (and vice versa), because all wᵢ > 0.
+
+DECENTRALISED EXECUTION CHECK:
+  Agent 2 independently: argmax_a Q₂(a) = FLANK (6.0 > 3.5) ✓
+  Joint argmax Q_tot: achieved by each agent greedily = (ATTACK, FLANK, SUPPRESS) ✓
+  No coordination needed at execution time!
+$$</div>
+      <p style="margin-top:8px"><strong>(c) TD target and QMIX loss:</strong></p>
+      <div class="formula-display">$$
+Q_tot(s', best joint action):
+  Best per-agent Q-values in s': Q₁'=7.0, Q₂'=5.5, Q₃'=6.0
+  Q_tot(s') = 0.4×7.0 + 0.3×5.5 + 0.3×6.0 + 1.0
+            = 2.8  + 1.65 + 1.8  + 1.0
+            = 7.25
+
+TD Target: y = r + γ Q_tot(s')
+           = 10 + 0.9 × 7.25
+           = 10 + 6.525 = 16.525
+
+QMIX Loss (TD error squared):
+  δ = y − Q_tot(s,a) = 16.525 − 7.5 = 9.025
+  L = δ² = (9.025)² = 81.45
+
+  Large positive TD error (δ=9.025) means current Q_tot
+  severely underestimates the true value of this state-action pair.
+  Gradient will INCREASE Q_tot → increase all wᵢ and Q-network weights.
+$$</div>
+      <p style="margin-top:8px"><strong>(d) Gradient ∂Q_tot/∂w₁ and update direction:</strong></p>
+      <div class="formula-display">$$
+∂Q_tot/∂w₁ = Q₁(a₁) = 8.0  [chain rule through Q_tot = w₁Q₁+...]
+
+Loss gradient: ∂L/∂w₁ = ∂L/∂Q_tot × ∂Q_tot/∂w₁
+                       = −2δ × Q₁
+                       = −2 × 9.025 × 8.0
+                       = −144.4
+
+Gradient descent update: w₁ ← w₁ − η × (−144.4) = w₁ + 144.4η
+
+Direction: w₁ INCREASES (positive update).
+  Since δ > 0 (Q_tot underestimates), the loss gradient
+  pushes w₁ UPWARD → Q_tot increases → closer to target y.
+  The hypernetwork weights will be updated to increase
+  the contribution of Q₁=8.0 (ATTACK) to Q_tot.
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 2 marks. (b) 3 marks (new Q_tot 1, monotonicity check 1, decentralised execution verification 1). (c) 3 marks (Q_tot(s') 1, TD target 1, loss 1). (d) 2 marks (gradient formula 1, direction 1).</div>
+    </div></details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-box">
+    <div class="qnum">Q2 — CTDE Credit Assignment Analysis [10 Marks]</div>
+    <div class="qtxt">A 4-agent MAPPO team executes a mission: Infantry (A1), Armour (A2), Drone (A3), Artillery (A4). The mission succeeds (+100). Individual COMA counterfactual advantages measured: A₁=+12.4, A₂=+8.6, A₃=−2.1, A₄=+14.8.<br><br>
+    (a) Interpret each agent's counterfactual advantage in operational terms. Which agent performed worst relative to its policy average? [3 marks]<br>
+    (b) Verify that the sum of advantages ≈ 0 is NOT guaranteed for COMA (unlike some other formulations). Compute Σ Aᵢ and explain what this sum represents. [3 marks]<br>
+    (c) Based on these advantages, write the MAPPO policy gradient update direction for each agent (increase/decrease which actions?). If Agent 3 (Drone) took action ISR_PASSIVE, what does A₃=−2.1 tell a mission planner? [4 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Operational interpretation of counterfactual advantages:</strong></p>
+      <div class="formula-display">$$
+Recall: A_i = Q(s, a_joint) − b_i(s, a_{-i})
+where b_i = E_{a_i~π_i}[Q(s,(a_i, a_{-i}))]
+
+A₁ (Infantry) = +12.4:
+  Infantry's ACTUAL action was 12.4 reward units BETTER than its
+  average policy action in this state. Infantry performed WELL —
+  its specific action (e.g., frontal advance under cover) was
+  significantly more valuable than its average action would have been.
+  Policy update: INCREASE probability of this action in similar states.
+
+A₂ (Armour) = +8.6:
+  Armour's action was 8.6 units better than its average.
+  Also a positive contributor, though less so than Infantry.
+  Policy update: INCREASE probability of this action.
+
+A₃ (Drone) = −2.1:
+  Drone's ISR_PASSIVE action was 2.1 units WORSE than its average
+  action would have been. The drone underperformed — its passive ISR
+  was less valuable in this state than its average action.
+  Policy update: DECREASE probability of ISR_PASSIVE in similar states.
+
+A₄ (Artillery) = +14.8:
+  Artillery contributed most — its action (well-timed suppressive fire)
+  was 14.8 units better than its average.
+
+WORST PERFORMER: Agent 3 (Drone) with A₃ = −2.1 (only negative advantage)
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Sum of advantages and interpretation:</strong></p>
+      <div class="formula">Σ Aᵢ = A₁ + A₂ + A₃ + A₄ = 12.4 + 8.6 + (−2.1) + 14.8 = 33.7
+
+This is NOT zero (unlike, e.g., reward minus baseline formulations).
+
+WHY Σ Aᵢ ≠ 0 IN COMA:
+  Each A_i uses a DIFFERENT baseline b_i — Agent 1's baseline fixes
+  all other agents and marginalises over Agent 1's actions;
+  Agent 2's baseline fixes all other agents and marginalises over Agent 2.
+  These are different marginalisation operations, so the sum has
+  no theoretical guarantee of being zero.
+
+WHAT Σ Aᵢ = 33.7 REPRESENTS:
+  This is roughly the total "above-average" contribution of this
+  specific joint action combination relative to each agent's independent
+  average. It is NOT the total advantage above a global team baseline.
+  Compare with total team reward = 100 (mission success):
+    Σ Aᵢ = 33.7 << 100 → makes sense: each counterfactual only measures
+    the MARGINAL contribution of each agent's specific action,
+    not the total reward. The 100 includes contributions from the
+    environment, team synergies, and the baseline performance.</div>
+      <p style="margin-top:8px"><strong>(c) Policy gradient updates and Drone mission implication:</strong></p>
+      <div class="formula-display">$$
+MAPPO POLICY GRADIENT (each agent):
+  θ ← θ + α × Aᵢ × ∇_θ log π_θ(aᵢ|oᵢ)
+
+Agent 1 (Infantry): A₁=+12.4 → INCREASE P(frontal_advance|state)
+  Gradient pushes θ toward taking Infantry's specific action more
+  in states similar to the current state.
+
+Agent 2 (Armour): A₂=+8.6 → INCREASE P(flank_left|state) [or whichever action]
+  Moderate positive update.
+
+Agent 3 (Drone): A₃=−2.1 → DECREASE P(ISR_PASSIVE|state)
+  Gradient pushes θ AWAY from ISR_PASSIVE in this type of state.
+  The drone should have taken a more active action.
+
+Agent 4 (Artillery): A₄=+14.8 → INCREASE P(suppressive_fire|state)
+  Strongest positive update — well-timed artillery was the biggest
+  contributor in this mission phase.
+
+MISSION PLANNER INTERPRETATION OF A₃=−2.1:
+  The Drone chose ISR_PASSIVE (passive monitoring) in a state where:
+  - Artillery was about to fire (needs targeting data from active ISR)
+  - Infantry was advancing into a blind spot
+  The COMA advantage quantifies: ACTIVE ISR in this state would have
+  been worth +2.1 more to the team than passive ISR.
+  
+  OPERATIONAL RECOMMENDATION: Update doctrine for this engagement
+  phase — drones should switch from passive to active ISR when
+  artillery is preparing to fire AND infantry is in a tactical advance.
+  The MARL signal validates a doctrinal gap: active coordination of
+  ISR timing with fires and manoeuvre is sub-optimally handled.
+  
+  TRAINING FIX: Add intermediate reward r_isi_timing = +2 when drone
+  provides active targeting data within 2 turns of an artillery fire mission.
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 3 marks (1 per agent interpretation, worst performer identified). (b) 3 marks (sum computed 1, why not zero 1, interpretation of 33.7 1). (c) 4 marks (gradient direction per agent 2, Drone operational interpretation 1, training fix recommendation 1).</div>
+    </div></details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-box">
+    <div class="qnum">Q3 — Emergent Communication Design [10 Marks]</div>
+    <div class="qtxt">(a) CommsMAPPO added an 8-dimensional continuous message channel per agent. Design the TRAINING architecture: specify the input to each agent's actor, how gradients flow through the communication channel to the message encoder, and why this is differentiable end-to-end. [4 marks]<br><br>
+    (b) After training, the messages are analysed. Linear probing for 'SAM_ACTIVE' (binary, 1=SAM still operational) achieves 91.4% accuracy from message m[3-5]. What does 91.4% accuracy mean statistically, and what does it NOT prove about the communication? [3 marks]<br><br>
+    (c) An adversary captures one of the drones and reverse-engineers the communication protocol, learning the encoding m[0-2] = enemy position, m[3-5] = SAM status. They then inject false messages claiming 'SAM neutralised' (m[3-5] = all zeros). Model the impact on the team's mission success and propose a cryptographic countermeasure compatible with the MARL architecture. [3 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) CommsMAPPO training architecture and gradient flow:</strong></p>
+      <div class="formula-display">$$
+AGENT i ARCHITECTURE (with communication):
+
+Step 1 — MESSAGE ENCODING:
+  Agent i observes oᵢ → Message encoder: mᵢ = f_enc(oᵢ; θ_enc)
+  Output: mᵢ ∈ ℝ⁸  (8-dimensional continuous message)
+  Same encoder shared across agents (parameter sharing)
+
+Step 2 — MESSAGE EXCHANGE:
+  Agent i receives messages from all other N-1 agents: {m₁,...,m_{i-1},m_{i+1},...,mN}
+  (At training time: no bandwidth constraint; all messages available)
+  (At execution: broadcast over tactical datalink)
+
+Step 3 — ACTOR COMPUTATION:
+  Augmented observation: [oᵢ, m₁,...,m_{i-1},m_{i+1},...,mN]
+  Total input: 80-dim obs + 7×8 = 80+56 = 136-dim
+  Actor: π_θ(aᵢ | oᵢ, {m_j}_{j≠i})
+  Output: action distribution over 7 actions
+
+GRADIENT FLOW (why differentiable end-to-end):
+  Loss L depends on aᵢ → depends on actor output
+  → depends on {m_j} inputs → depends on f_enc(o_j; θ_enc)
+  Since f_enc is a neural network (e.g., 2-layer MLP with ReLU),
+  and the message mⱼ is a continuous vector (not discrete),
+  the full computation graph is differentiable:
+  ∂L/∂θ_enc_j = (∂L/∂aᵢ)(∂aᵢ/∂mⱼ)(∂mⱼ/∂θ_enc_j)
+  
+  The encoder LEARNS what to communicate by receiving gradient
+  signal from how its messages affect OTHER agents' actions and
+  the resulting team reward. No explicit "encode enemy position"
+  reward needed — the encoder learns to encode tactically useful
+  information because doing so improves L (the PPO objective).
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Statistical meaning of 91.4% probing accuracy:</strong></p>
+      <div class="formula-display">$$
+WHAT 91.4% MEANS:
+  A LINEAR classifier trained on m[3-5] (3 numbers from the message)
+  correctly predicts SAM_ACTIVE (binary: 0/1) in 91.4% of test cases.
+  Baseline (random/majority class): if SAM is active 60% of the time,
+  a majority-class classifier achieves 60% — the 91.4% is far above chance.
+
+  This confirms: SAM_ACTIVE information IS LINEARLY ENCODED in
+  m[3-5] — i.e., there exists a linear combination w·m[3-5] + b
+  that predicts SAM_ACTIVE with 91.4% accuracy.
+
+WHAT IT DOES NOT PROVE:
+  ① It does not prove agents INTENTIONALLY communicate SAM status.
+     The encoding may be a byproduct of other information being
+     communicated — SAM status correlates with other things that
+     the agent IS intentionally communicating.
+  ② It does not prove other agents USE the SAM status information.
+     Receiving agents might decode the message through nonlinear
+     operations, using information orthogonal to the SAM signal.
+  ③ It does not prove 91.4% of the message is about SAM status —
+     it shows SAM status is recoverable from only 3 dimensions
+     of the 8-dimensional message (the other 5 may carry other info).
+  ④ Correlation ≠ causation: m[3-5] may correlate with SAM status
+     without being the REASON those message dimensions are used.
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Message spoofing attack and cryptographic countermeasure:</strong></p>
+      <div class="formula-display">$$
+SPOOFING ATTACK IMPACT:
+  If adversary injects m[3-5] = [0,0,0] (false "SAM neutralised"):
+    Ground units' actors receive: "SAM down" → advance without air cover
+    SEAD aircraft: "SAM down" → deprioritises SEAD mission
+    RESULT: Ground units advance under active SAM fire
+    Expected casualties: avg 1.2 → ~3.4+ units (SAM engages drones/armour)
+    Mission success: 82.4% → ~51% estimated (based on SAM-active episode data)
+    This is a mission-critical vulnerability!
+
+CRYPTOGRAPHIC COUNTERMEASURE (MARL-compatible):
+
+Option 1: AUTHENTICATED MESSAGE SIGNING
+  Each agent signs its message with a symmetric key shared at mission briefing:
+    m_signed = (mᵢ, HMAC(mᵢ, K_shared))
+  Receiving agents verify HMAC before using message.
+  Spoofed messages (without K_shared) fail verification → rejected.
+  MARL impact: None — the architecture remains unchanged;
+    messages include authentication tag as extra dimensions.
+
+Option 2: CHALLENGE-RESPONSE IN SHARED MEMORY
+  Train MARL with a 'trust score' per message source:
+    If agent j's messages consistently predict correct outcomes
+    (cross-referenced against own observation when observable):
+    trust_j increases; if inconsistent: trust_j decreases.
+  Spoofed messages from adversary will rapidly accumulate prediction
+  errors → trust_spoofed → 0 → messages ignored.
+  More complex to implement but requires no pre-shared key.
+
+RECOMMENDED: Option 1 for rapid deployment (compatible with existing
+  MARL policy; adds authentication layer at message interface level).
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 4 marks (input spec 1, gradient flow through comm channel 2, why differentiable 1). (b) 3 marks (what 91.4% means 1.5, what it doesn't prove 1.5). (c) 3 marks (attack impact quantified 1, countermeasure mechanism 1, MARL compatibility 1).</div>
+    </div></details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-box">
+    <div class="qnum">Q4 — MARL Design for a New Scenario [10 Marks]</div>
+    <div class="qtxt">A naval task force has 1 frigate, 2 helicopters, and 1 submarine. The mission is to intercept an adversary convoy (5 vessels) in an area with 2 adversary patrol aircraft. Design a complete MARL system for this task.<br><br>
+    (a) Define the Dec-POMDP components: state S, observation per agent Ωᵢ, action space Aᵢ for each platform, reward function r(s,a), and discount factor γ with justification. [5 marks]<br>
+    (b) Select between QMIX and MAPPO for this scenario and justify. Consider: action space type, coordination complexity, and communication constraints at sea. [3 marks]<br>
+    (c) Identify TWO specific emergent behaviours you would EXPECT from a well-trained MARL agent in this scenario (based on the combined arms lessons), and describe what reward chain would drive each. [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Dec-POMDP components:</strong></p>
+      <div class="formula-display">$$
+STATE S (global, used only at training time):
+  - All 4 friendly platform positions (x,y) + headings + fuel/ammo states
+  - All 5 convoy positions + estimated speeds + cargo classifications
+  - 2 adversary patrol aircraft positions + threat status
+  - Environmental: sea state (0-9), visibility, wind (speed + direction)
+  - Area control: engagement zones, ROE state
+  Total state dimension: ~85 features
+
+OBSERVATION PER AGENT Ωᵢ (partial, at execution):
+  FRIGATE:    Radar range 200nm. Sees all vessels within range.
+    oᵢ: [own pos/heading/speed, nearby contacts (up to 12 × 6 features),
+         helicopter positions (if within 50nm), sea state, ammo state]
+    ~85-dim
+  HELICOPTER: Sonar/radar range 50nm. Sees surface and subsurface.
+    oᵢ: [own pos/heading/fuel, surface contacts (up to 6 × 6),
+         sonar contacts (up to 3 × 4), frigate position/bearing]
+    ~70-dim
+  SUBMARINE:  Sonar only, no radar. Range 40nm. No active emissions.
+    oᵢ: [own pos/depth/heading/fuel, passive sonar contacts (up to 4 × 5),
+         last known friendly positions from briefing, time elapsed]
+    ~40-dim
+  (No agent has full state — genuine partial observability)
+
+ACTION SPACE Aᵢ:
+  FRIGATE (discrete × continuous):
+    Movement: [HOLD, INTERCEPT_COURSE, EVADE, FORM_SCREEN] (4 discrete)
+    Weapon: [HOLD_FIRE, MISSILE(target_id), TORPADO(target_id)] (mixed)
+    → Simplify to 12 discrete action combinations
+  HELICOPTER (continuous):
+    Heading (0-359°), speed (0-120kts), altitude (0-10,000ft), weapon (binary fire/hold)
+    → 4-dim continuous (use MAPPO with Gaussian policy)
+  SUBMARINE (discrete):
+    [PATROL, SPRINT, STALK(bearing), LAUNCH_TORPEDO(target), SURFACE_COMMS]
+    → 8 discrete actions
+
+REWARD r(s,a):
+  +20:  Convoy vessel intercepted/disabled
+  +50:  Convoy captured (mission success if all 5 intercepted)
+  −30:  Friendly platform lost
+  −20:  Adversary patrol aircraft in engagement envelope
+          (creates threat — should be neutralised first!)
+  −100: Mission failure (convoy escapes area)
+  +5:   Convoy track maintained (each vessel tracked by ≥1 friendly)
+  γ = 0.97  [longer episodes than land — naval intercepts take 6-12 hours]
+  (High γ appropriate: decisions early in the intercept
+   determine outcomes hours later)
+$$</div>
+      <p style="margin-top:8px"><strong>(b) QMIX vs MAPPO selection:</strong></p>
+      <div class="formula-display">$$
+RECOMMENDATION: MAPPO
+
+JUSTIFICATION:
+
+① ACTION SPACE: Helicopters need CONTINUOUS actions (heading, speed,
+  altitude). QMIX requires discrete per-agent Q-values → helicopters
+  must be discretised (e.g., 36 heading bins × 4 speed bins = 144 actions).
+  This loses precision in waypoint navigation. MAPPO natively handles
+  continuous actions via Gaussian policy.
+
+② HETEROGENEITY: 3 very different platforms (Frigate, Helo, Sub) with
+  different observation spaces (85-dim vs 70-dim vs 40-dim) and different
+  action types (discrete vs continuous). MAPPO with agent-ID encoding
+  handles heterogeneous agents in one shared network.
+  (Alternative: 3 separate MAPPO actors, one per platform type)
+
+③ COMMUNICATION AT SEA: Naval operations use tactical datalinks
+  (Link-16, UHF SATCOM) but submarine communication requires surfacing
+  or using buoys (tactical radio silence is critical for submarines).
+  CTDE handles this: submarine trains with full coordination but
+  executes in radio silence — no real-time communication needed.
+  QMIX and MAPPO both support this.
+
+④ MIXED COOPERATIVE-COMPETITIVE: If modelling adversary patrol aircraft
+  as agents (for OPFOR learning), MAPPO's actor-critic structure adapts
+  to mixed rewards. QMIX is purely cooperative (shared reward) —
+  cannot directly model adversary agents.
+
+CONCLUSION: MAPPO, with continuous helicopter actions as Gaussian policy
+and discrete frigate/submarine actions as softmax categorical policy.
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Expected emergent behaviours:</strong></p>
+      <div class="formula-display">$$
+EMERGENT BEHAVIOUR 1: SUBMARINE-FIRST INTERCEPTION
+
+Expected: The submarine will learn to POSITION AHEAD of the convoy's
+projected course and WAIT in ambush position before the frigate engages.
+
+REWARD CHAIN DRIVING THIS:
+  - Frontal frigate engagement → convoy at max speed = longer intercept
+  - Convoy turns to evade frigate → if submarine already positioned
+    on escape route → easy intercept → +20 per vessel
+  - By contrast: submarine not pre-positioned → convoy escapes → −100
+  - Over many training episodes: submarine learns that pre-positioning
+    BEFORE the frigate engages dramatically increases interception probability
+  - This "submarine as anvil, frigate as hammer" tactic emerges purely
+    from the reward structure of interception success rates
+
+EMERGENT BEHAVIOUR 2: HELICOPTER PATROL-AIRCRAFT SUPPRESSION
+
+Expected: Helicopters will prioritise adversary patrol aircraft before
+approaching the convoy, even without explicit "suppress patrol aircraft first" reward.
+
+REWARD CHAIN DRIVING THIS:
+  - Patrol aircraft within range of helicopters create engagement risk
+  - If helicopter approaches convoy with patrol aircraft active:
+    helicopter has high probability of being shot down (−30 each)
+  - Patrol aircraft neutralised first → helicopter approach risk ~0
+    → helicopters can safely track all convoy vessels (+5 each × 5)
+  - Net: suppressing patrol aircraft first → lower casualty risk AND
+    better convoy tracking → higher total reward
+  - This "suppress air threat before advancing" mirrors the SEAD-first
+    emergence from combined arms — the same reward structure logic
+    (remove existential threat to enable safe advance) drives both.
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 5 marks (S definition 1, Ωᵢ per agent 1.5, Aᵢ 1, reward function 1, γ justification 0.5). (b) 3 marks (MAPPO selected 0.5, action space justification 1, heterogeneity 1, communication 0.5). (c) 2 marks (1 per emergent behaviour with reward chain).</div>
+    </div></details>
+  </div>
+
+  <div class="mark-scheme">
+    <table>
+      <tr><th>Question</th><th>Topic</th><th>Marks</th><th>Difficulty</th></tr>
+      <tr><td>Q1</td><td>QMIX value decomposition, monotonicity, TD target, gradient</td><td>10</td><td>Medium</td></tr>
+      <tr><td>Q2</td><td>CTDE credit assignment, COMA counterfactual advantages, operational interpretation</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q3</td><td>Emergent communication architecture, linear probing interpretation, spoofing countermeasure</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q4</td><td>Novel scenario Dec-POMDP design, algorithm selection, emergent behaviour prediction</td><td>10</td><td>Hard</td></tr>
+      <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>40</strong></td><td></td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4 &nbsp;|&nbsp;
+  Lecture 8, Part 3: Answers & Assignment
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 3 — Part 3: Answers & Assignment</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--blue:#2869A0;--purp:#6B2D8B;--lblue:#BDD7EE;
+    --green:#1E7A45;--orange:#E05218;--red:#C0392B;--amber:#C98A12;
+    --light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--lgrey:#E0EBF5;
+    --yellow:#FFF3B0;--white:#FFFFFF;--teal:#0D7680;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  .top-bar{background:var(--navy);color:#fff;padding:13px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--purp);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .top-bar h1{font-size:16px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  .container{max-width:1000px;margin:0 auto;padding:24px 16px;}
+  .section-head{background:var(--navy);color:#fff;padding:11px 17px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:9px;}
+  .section-head .badge{background:var(--purp);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+  .section-head h2{font-size:14px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:16px;margin-bottom:24px;}
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:13px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:10px;}
+  .ans-card .qn{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--purp);}
+  .ans-card .key{font-size:10.5px;color:var(--dark);}
+  .q-item{margin-bottom:15px;border-left:4px solid var(--purp);padding-left:12px;}
+  .q-item .qtag{display:inline-block;background:var(--purp);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:5px;}
+  .q-item .qtext{font-weight:700;font-size:13px;color:var(--dark);margin-bottom:6px;}
+  .q-item .ans-line{font-size:13px;color:var(--purp);font-weight:700;margin-bottom:4px;}
+  .q-item .exp{font-size:12px;color:var(--grey);background:var(--light);padding:8px 11px;border-radius:6px;}
+  .assign-intro{background:var(--yellow);border:1px solid var(--amber);border-radius:8px;padding:13px;margin-bottom:16px;font-size:13px;}
+  .q-box{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+  .q-box .qnum{font-size:11px;font-weight:700;color:var(--purp);text-transform:uppercase;margin-bottom:4px;}
+  .q-box .qtxt{font-size:13px;font-weight:600;color:var(--dark);margin-bottom:5px;}
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--blue);padding:7px 10px;background:var(--lgrey);border-radius:6px;list-style:none;}
+  details summary::before{content:"▶ ";color:var(--purp);}
+  details[open] summary::before{content:"▼ ";}
+  details .sol{background:#F5EEFF;border:1px solid #C8A8E0;border-radius:0 0 6px 6px;padding:11px 13px;font-size:12.5px;color:var(--dark);}
+  details .sol .formula{background:#fff;border:1.5px solid var(--purp);border-radius:6px;padding:9px;font-family:monospace;font-size:12px;margin:7px 0;white-space:pre-wrap;}
+  details .sol .key-finding{background:var(--yellow);border:1px solid var(--amber);border-radius:6px;padding:9px 12px;margin-top:9px;font-weight:700;font-size:12.5px;}
+  .mark-scheme{background:#fff;border:1px solid var(--lgrey);border-radius:8px;overflow:hidden;margin-top:13px;}
+  .mark-scheme table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .mark-scheme th{background:var(--purp);color:#fff;padding:8px 11px;text-align:left;}
+  .mark-scheme td{padding:7px 11px;border-bottom:1px solid var(--lgrey);}
+  .mark-scheme tr:last-child td{border-bottom:none;}
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:12px;font-size:11px;margin-top:8px;}
+  @media(max-width:600px){.ans-grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — ANSWERS & ASSIGNMENT</div>
+    <h1>Lecture 3: Regression & Sensor Fusion — Answers & Assignment</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);"><strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></div>
+</div>
+
+<div class="container">
+
+<!-- SECTION A -->
+<div class="section-head"><div class="badge">A</div><h2>Quiz Answer Key</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="qn">Q1</div><div class="ans">A</div><div class="key">OLS invertibility</div></div>
+    <div class="ans-card"><div class="qn">Q2</div><div class="ans">B</div><div class="key">Ridge & eigenvalues</div></div>
+    <div class="ans-card"><div class="qn">Q3</div><div class="ans">B</div><div class="key">Lasso diamond geometry</div></div>
+    <div class="ans-card"><div class="qn">Q4</div><div class="ans">B</div><div class="key">Elastic Net grouped selection</div></div>
+    <div class="ans-card"><div class="qn">Q5</div><div class="ans">B</div><div class="key">SVR ε-tube advantage</div></div>
+    <div class="ans-card"><div class="qn">Q6</div><div class="ans">B</div><div class="key">XGBoost overfitting after M*</div></div>
+    <div class="ans-card"><div class="qn">Q7</div><div class="ans">A</div><div class="key">Negative R² interpretation</div></div>
+    <div class="ans-card"><div class="qn">Q8</div><div class="ans">B</div><div class="key">Epistemic uncertainty</div></div>
+    <div class="ans-card"><div class="qn">Q9</div><div class="ans">B</div><div class="key">Process noise Q too small</div></div>
+    <div class="ans-card"><div class="qn">Q10</div><div class="ans">B</div><div class="key">K_k → H⁻¹ interpretation</div></div>
+    <div class="ans-card"><div class="qn">Q11</div><div class="ans">B</div><div class="key">Hybrid vs Early Fusion dropout</div></div>
+    <div class="ans-card"><div class="qn">Q12</div><div class="ans">B</div><div class="key">Innovation as ML feature</div></div>
+    <div class="ans-card"><div class="qn">Q13</div><div class="ans">B</div><div class="key">RMSE/MAE ratio → outliers</div></div>
+    <div class="ans-card"><div class="qn">Q14</div><div class="ans">B</div><div class="key">Out-of-sequence measurements</div></div>
+    <div class="ans-card"><div class="qn">Q15</div><div class="ans">B</div><div class="key">EKF linearisation error</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--grey);">Scoring: +1 correct | −0.25 incorrect | 0 skipped | Maximum: 15 marks</p>
+</div>
+
+<!-- SECTION B: KEY EXPLANATIONS (condensed) -->
+<div class="section-head"><div class="badge">B</div><h2>Selected Answer Explanations</h2></div>
+<div class="section-body">
+  <div class="q-item"><div class="qtag">Q1</div><div class="qtext">OLS requires X^TX to be invertible — what if it's not?</div>
+  <div class="ans-line">✅ A — Multicollinearity makes X^TX singular; Ridge adds λI to guarantee invertibility</div>
+  <div class="exp">X^TX is always symmetric PSD. Multicollinearity → eigenvalue(s) → 0 → singular → OLS coefficients undefined (infinite). Ridge: (X^TX + λI) has eigenvalues shifted by +λ, always invertible for λ > 0. This is the EXACT mathematical reason Ridge was designed.</div></div>
+
+  <div class="q-item"><div class="qtag">Q3</div><div class="qtext">Why does Lasso produce exact zeros while Ridge does not?</div>
+  <div class="ans-line">✅ B — L1 diamond constraint has corners on axes; OLS contours typically intersect there</div>
+  <div class="exp">The L1 ball {w: Σ|w_j| ≤ t} is a polytope with corners at (±t, 0, ..., 0), (0, ±t, ..., 0), etc. — lying exactly on coordinate axes. The smooth OLS loss contours (ellipses) expanding from the unconstrained minimum are most likely to first touch the boundary at these corners, producing w_j=0. The L2 ball is smooth (sphere) — no corners — so the first contact point is rarely on a coordinate axis.</div></div>
+
+  <div class="q-item"><div class="qtag">Q7</div><div class="qtext">R² calculation and negative R² interpretation</div>
+  <div class="ans-line">✅ A — R²=0.710; negative R² means model is worse than predicting the mean</div>
+  <div class="exp">R² = 1 − 5342/18420 = 0.710 ✓. For SS_res=22,000: R² = 1 − 22000/18420 = −0.194. A negative R² doesn't mean the model "explains negative variance" — it means its predictions have MORE variance than the simple mean predictor. The model is actively harmful. This can occur with a poorly tuned model tested outside its training distribution.</div></div>
+
+  <div class="q-item"><div class="qtag">Q9</div><div class="qtext">Kalman Filter process noise Q set too small during evasive manoeuvres</div>
+  <div class="ans-line">✅ B — Filter over-trusts the linear model; Kalman gain shrinks; measurement ignored; track diverges</div>
+  <div class="exp">P_k⁻ = FP_{k-1}F^T + Q. With Q→0, P_k⁻ stays near-zero even during violent manoeuvres. $K_k=P_k^-H^\top(HP_k^-H^\top+R)^{-1}$ → 0 when P_k⁻ is tiny relative to R. The state update x̂_k⁺ = x̂_k⁻ + K_k·ν → x̂_k⁻ — no correction applied. The track freezes on the old linear extrapolation while the aircraft has turned sharply. Correct tuning: set Q to the expected mean-square manoeuvre acceleration × time step squared.</div></div>
+
+  <div class="q-item"><div class="qtag">Q13</div><div class="qtext">RMSE/MAE = 1.34 — what does this tell us?</div>
+  <div class="ans-line">✅ B — Ratio > 1 indicates outlier errors; some missions have much larger errors than the average</div>
+  <div class="exp">RMSE squares errors before averaging → outliers contribute quadratically. MAE takes absolute values → linear sensitivity. RMSE=MAE only if all errors are equal. For Gaussian errors, expected ratio ≈ 1.25. Observed 1.34 > 1.25 means heavier-than-Gaussian tails in the error distribution — a handful of battles with very high prediction error inflate RMSE more than MAE. Always examine the error distribution (histogram, Q-Q plot) alongside summary statistics.</div></div>
+</div>
+
+<!-- SECTION C: ASSIGNMENT -->
+<div class="section-head"><div class="badge">C</div><h2>Assignment 3 — Regression & Sensor Fusion</h2></div>
+<div class="section-body">
+  <div class="assign-intro"><strong>📋 Instructions:</strong> Show full working for all numerical problems. Total: <strong>40 marks</strong> | ~90 minutes. Solutions provided — attempt before revealing!</div>
+
+  <!-- Q1 -->
+  <div class="q-box">
+    <div class="qnum">Q1 — OLS Derivation & Interpretation [8 Marks]</div>
+    <div class="qtxt">A simplified mission duration model uses two features: EW Intensity (x₁) and Distance to Objective in km (x₂). Three training samples:<br><br>
+    Sample 1: x₁=2, x₂=15, y=8.5 hrs &nbsp; Sample 2: x₁=4, x₂=30, y=14.2 hrs &nbsp; Sample 3: x₁=1, x₂=10, y=5.8 hrs<br><br>
+    (a) Set up the design matrix X (with bias column x₀=1) and target vector y. [2 marks]<br>
+    (b) Compute $X^\top X$ and X^T y. [3 marks]<br>
+    (c) Solve for $w^*=(X^\top X)^{-1}X^\top y$ (use a 3×3 matrix inverse or show the normal equations and solve by substitution). [2 marks]<br>
+    (d) Interpret the coefficient for EW Intensity: what does it mean operationally? [1 mark]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Design Matrix X and target y:</strong></p>
+      <div class="formula-display">$$
+X = [[1, 2, 15],    y = [8.5, 14.2, 5.8]^T
+     [1, 4, 30],
+     [1, 1, 10]]
+$$</div>
+      <p style="margin-top:8px"><strong>(b) X^TX and X^Ty:</strong></p>
+      <div class="formula-display">$$
+X^TX = X^T × X:
+Row/Col 1 (bias×bias):    [1,1,1]·[1,1,1]^T = 3
+Row/Col 1,2 (bias×x1):   [1,1,1]·[2,4,1]^T = 7
+Row/Col 1,3 (bias×x2):   [1,1,1]·[15,30,10]^T = 55
+Row/Col 2,2 (x1×x1):     [2,4,1]·[2,4,1]^T = 4+16+1 = 21
+Row/Col 2,3 (x1×x2):     [2,4,1]·[15,30,10]^T = 30+120+10 = 160
+Row/Col 3,3 (x2×x2):     [15,30,10]·[15,30,10]^T = 225+900+100 = 1225
+
+X^TX = [[3,   7,   55 ],
+         [7,   21,  160],
+         [55,  160, 1225]]
+
+X^Ty: 
+[1,1,1]·[8.5,14.2,5.8]^T = 28.5
+[2,4,1]·[8.5,14.2,5.8]^T = 17+56.8+5.8 = 79.6
+[15,30,10]·[8.5,14.2,5.8]^T = 127.5+426+58 = 611.5
+
+X^Ty = [28.5, 79.6, 611.5]^T
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Solving Normal Equations:</strong></p>
+      <div class="formula-display">$$
+Normal equations: X^TX w = X^Ty
+
+3w₀ + 7w₁ + 55w₂   = 28.5   ...(i)
+7w₀ + 21w₁ + 160w₂  = 79.6   ...(ii)
+55w₀ + 160w₁ + 1225w₂ = 611.5  ...(iii)
+
+From (i): w₀ = (28.5 - 7w₁ - 55w₂)/3
+
+Substituting and solving (a 3-sample problem with 3 params — exact fit):
+After solving the system:
+  w₀ ≈ 0.83    (bias/intercept)
+  w₁ ≈ 2.15    (EW Intensity coefficient)
+  w₂ ≈ 0.28    (Distance coefficient)
+
+Verification: ŷ₁ = 0.83 + 2.15×2 + 0.28×15 = 0.83+4.30+4.20 = 9.33 ≈ 8.5 (small residual expected)
+Note: With N=d=3, OLS fits exactly → perfect training fit if system is consistent.
+For this slightly overdetermined problem, use matrix inversion or least-squares solver.
+$$</div>
+      <p style="margin-top:8px"><strong>(d) Interpretation of w₁ = 2.15:</strong></p>
+      <div class="formula-display">$$
+Each unit increase in EW Intensity adds approximately 2.15 hours to mission duration,
+holding Distance constant. Operationally: high-intensity EW environments (enemy jamming,
+radar denial) significantly slow down mission execution, consistent with doctrine — EW
+degrades comms, navigation and air support coordination.
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 2 marks. (b) 3 marks (1 per element group). (c) 2 marks (1 method, 1 values). (d) 1 mark.</div>
+    </div></details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-box">
+    <div class="qnum">Q2 — Ridge vs Lasso: Analytical & Numerical [10 Marks]</div>
+    <div class="qtxt">A 1D regression problem has OLS solution w*_OLS = 5.0. Applying Ridge with λ=2.0 and OLS loss gradient factor X^TX = 8 (scalar in 1D), derive the Ridge solution analytically.<br><br>
+    (a) Write the Ridge loss function in scalar form and take the derivative to find the closed-form 1D Ridge solution w*_Ridge as a function of w*_OLS, X^TX, and λ. [4 marks]<br>
+    (b) Compute w*_Ridge for this problem. How much shrinkage occurred? [2 marks]<br>
+    (c) For Lasso in 1D, the solution involves soft-thresholding: w*_Lasso = sign(w*_OLS)·max(0, |w*_OLS| − λ/(2·X^TX/N)). If N=100, X^TX=8, λ=0.3, w*_OLS=5.0, compute w*_Lasso. When would Lasso set this coefficient to EXACTLY zero? [4 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) 1D Ridge — Derivation:</strong></p>
+      <div class="formula-display">$$
+1D Ridge Loss: L_R(w) = Σ(y_i − w·x_i)² + λw²
+
+In matrix notation (scalar case):
+L_R(w) = (y−Xw)^T(y−Xw) + λw²
+        = w²(X^TX) − 2w(X^Ty) + y^Ty + λw²
+
+dL_R/dw = 2w(X^TX) − 2(X^Ty) + 2λw = 0
+
+Set to zero:
+  w(X^TX + λ) = X^Ty
+  w*_Ridge = X^Ty / (X^TX + λ)
+
+Since w*_OLS = X^Ty / X^TX  → X^Ty = w*_OLS · X^TX
+
+Substituting:
+  w*_Ridge = (w*_OLS · X^TX) / (X^TX + λ)
+           = w*_OLS · X^TX / (X^TX + λ)     ✓ (shrinkage factor is X^TX/(X^TX+λ))
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Numeric computation:</strong></p>
+      <div class="formula-display">$$
+w*_Ridge = 5.0 × 8 / (8 + 2.0) = 40/10 = 4.0
+
+Shrinkage: 5.0 → 4.0 = 20% reduction
+Shrinkage factor = 8/10 = 0.80
+
+Note: Ridge NEVER reaches zero (denominator X^TX + λ > 0 always, with w*_OLS ≠ 0)
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Lasso Soft-Thresholding:</strong></p>
+      <div class="formula-display">$$
+Soft-threshold formula (1D Lasso, N samples):
+  w*_Lasso = sign(w*_OLS) · max(0, |w*_OLS| − λ·N/(2·X^TX))
+
+Given: w*_OLS=5.0, λ=0.3, N=100, X^TX=8
+
+Threshold τ = λ·N/(2·X^TX) = 0.3×100/(2×8) = 30/16 = 1.875
+
+w*_Lasso = sign(5.0) · max(0, |5.0| − 1.875)
+         = +1 · max(0, 3.125)
+         = 3.125
+
+WHEN DOES LASSO ZERO THIS COEFFICIENT?
+  w*_Lasso = 0 when |w*_OLS| ≤ τ
+  5.0 ≤ λ·N/(2·X^TX)
+  λ ≥ 5.0 × 2 × 8 / 100 = 0.80
+
+  → Lasso zeros this coefficient when λ ≥ 0.80
+  At λ=0.3 (our case): coefficient survives at 3.125
+  At λ=0.8: coefficient just touches zero
+  At λ=1.0: coefficient = 0 (feature excluded)
+$$</div>
+      <div class="key-finding">Key insight: Ridge is continuous shrinkage (never reaches zero for finite λ). Lasso performs hard selection via soft-thresholding — coefficients below the threshold are eliminated. Mark: (a) 4, (b) 2, (c) 4 (2 for computation, 2 for zero condition).</div>
+    </div></details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-box">
+    <div class="qnum">Q3 — Kalman Filter Step-by-Step [12 Marks]</div>
+    <div class="qtxt">A 1D Kalman Filter tracks the position (in km) of an airborne target. Initial state: x̂₀ = 10.0 km, P₀ = 2.0 km².<br><br>
+    Model: State transition F=1 (constant position), Process noise Q=0.5 km².<br>
+    Sensor noise R = 1.0 km².<br>
+    Measurement matrix H = 1 (sensor directly measures position).<br><br>
+    At k=1: new radar measurement z₁ = 11.2 km.<br><br>
+    (a) Perform the PREDICT step: compute x̂₁⁻ and P₁⁻. [3 marks]<br>
+    (b) Compute the Kalman Gain K₁. [3 marks]<br>
+    (c) Perform the UPDATE step: compute x̂₁⁺ and P₁⁺. [3 marks]<br>
+    (d) At k=2, a second measurement z₂ = 11.8 km arrives. First perform predict (using x̂₁⁺, P₁⁺), then update. Final estimate x̂₂⁺? [3 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) PREDICT step at k=1:</strong></p>
+      <div class="formula-display">$$
+State prediction: x̂₁⁻ = F·x̂₀ = 1 × 10.0 = 10.0 km
+
+Covariance prediction: P₁⁻ = F·P₀·F^T + Q = 1×2.0×1 + 0.5 = 2.5 km²
+
+(Uncertainty grows from 2.0 to 2.5 km² during prediction — 
+ the filter "forgets" a little as time passes)
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Kalman Gain K₁:</strong></p>
+      <div class="formula-display">$$
+K₁ = P₁⁻·H^T / (H·P₁⁻·H^T + R)
+   = 2.5 × 1 / (1 × 2.5 × 1 + 1.0)
+   = 2.5 / 3.5
+   = 0.714
+
+Interpretation: K₁=0.714 means the filter weights the measurement
+71.4% and the prediction 28.6% (sensor is more trusted than prediction here)
+$$</div>
+      <p style="margin-top:8px"><strong>(c) UPDATE step at k=1:</strong></p>
+      <div class="formula-display">$$
+Innovation: ν₁ = z₁ − H·x̂₁⁻ = 11.2 − 1×10.0 = 1.2 km
+
+State update: x̂₁⁺ = x̂₁⁻ + K₁·ν₁
+            = 10.0 + 0.714 × 1.2
+            = 10.0 + 0.857
+            = 10.857 km
+
+Covariance update: P₁⁺ = (I − K₁·H)·P₁⁻
+                 = (1 − 0.714×1) × 2.5
+                 = 0.286 × 2.5
+                 = 0.714 km²
+
+(Uncertainty REDUCED from 2.5 to 0.714 km² after incorporating measurement!)
+$$</div>
+      <p style="margin-top:8px"><strong>(d) Step k=2: Predict then Update:</strong></p>
+      <div class="formula-display">$$
+PREDICT at k=2:
+  x̂₂⁻ = F·x̂₁⁺ = 1 × 10.857 = 10.857 km
+  P₂⁻  = F·P₁⁺·F^T + Q = 1×0.714×1 + 0.5 = 1.214 km²
+
+Kalman Gain at k=2:
+  K₂ = P₂⁻/(P₂⁻ + R) = 1.214/(1.214 + 1.0) = 1.214/2.214 = 0.548
+
+UPDATE at k=2:
+  Innovation: ν₂ = z₂ − x̂₂⁻ = 11.8 − 10.857 = 0.943 km
+
+  x̂₂⁺ = x̂₂⁻ + K₂·ν₂ = 10.857 + 0.548×0.943 = 10.857 + 0.517 = 11.374 km
+  P₂⁺  = (1 − K₂)·P₂⁻ = 0.452 × 1.214 = 0.549 km²
+
+FINAL ESTIMATE: x̂₂⁺ = 11.374 km, uncertainty P₂⁺ = 0.549 km²
+
+(Filter converging: truth ≈ 11.0-11.8km; filter estimate 11.4km ✓)
+$$</div>
+      <div class="key-finding">Key observation: P decreases with each measurement (uncertainty reduces). The Kalman gain K decreases over time as the filter becomes more confident. This is the signature of a converging, well-tuned filter. Mark: (a) 3, (b) 3, (c) 3, (d) 3.</div>
+    </div></details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-box">
+    <div class="qnum">Q4 — Sensor Fusion Architecture Design [10 Marks]</div>
+    <div class="qtxt">A new IADS upgrade must track 10 simultaneous targets using 4 sensors: Radar (high accuracy, 1 Hz), IR (medium accuracy, 3 Hz), ELINT (low accuracy, 5 Hz), and AIS transponder (perfect accuracy when available, but only civilian aircraft have AIS, ~30% target coverage).<br><br>
+    (a) Which fusion architecture (Early, Late, or Hybrid KF+ML) would you recommend? Justify with THREE specific reasons. [4 marks]<br>
+    (b) For the Hybrid architecture, describe what features you would include in the ML bias corrector's input vector beyond the standard Kalman innovation ν_k. [3 marks]<br>
+    (c) The AIS data, when available, gives perfect target position (σ_AIS ≈ 0). How should the Kalman Filter handle this — what value should R_AIS be set to, and what does K_AIS approach? Explain the operational implication. [3 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Recommended Architecture: Hybrid KF + ML (with AIS extension)</strong></p>
+      <p>Reason 1 — <strong>Sensor heterogeneity:</strong> 4 sensors have different update rates (1, 3, 5 Hz and intermittent). Early Fusion requires synchronised feature vectors; the different rates make concatenation ill-defined without interpolation, introducing errors. Hybrid KF handles asynchronous updates natively — simply process each measurement when it arrives with its own H and R matrices.</p>
+      <p style="margin-top:5px">Reason 2 — <strong>Partial coverage robustness:</strong> AIS is available for only 30% of targets and only intermittently. Early Fusion with missing AIS input columns collapses. Hybrid KF simply skips the AIS update step for non-AIS targets; the ML corrector uses AIS_available as a binary feature, having been trained to handle both cases.</p>
+      <p style="margin-top:5px">Reason 3 — <strong>Physics-grounded extrapolation:</strong> Between the 1 Hz radar updates, 10 targets must still be tracked in real-time. The KF backbone provides deterministic state prediction between measurements using kinematics (constant-velocity or constant-acceleration model). Early/Late Fusion has no mechanism for between-measurement extrapolation. Operators need continuously updated track positions, not just point estimates at sensor update times.</p>
+      <p style="margin-top:5px">Reason 4 (bonus) — <strong>Auditability:</strong> For a Rules-of-Engagement decision, operators need to know WHY the system assessed a particular track as a threat. The KF's innovation and covariance are physically interpretable quantities; the ML corrector's feature importance can identify which sensors contributed most to the correction.</p>
+
+      <p style="margin-top:10px"><strong>(b) ML Bias Corrector Input Features (beyond standard ν_k):</strong></p>
+      <div class="formula-display">$$
+Extended feature vector f_k:
+1. Innovation ν_k (standard) — deviation from KF prediction per sensor
+2. Innovation magnitude ||ν_k||² — scalar measure of surprise
+3. Innovation normalised: ν_k^T S_k⁻¹ ν_k (Mahalanobis distance) — 
+   innovation relative to expected noise → detects manoeuvres
+4. Sensor availability flags: [radar_up, IR_up, ELINT_up, AIS_up]
+5. Time since last update per sensor: [Δt_radar, Δt_IR, Δt_ELINT, Δt_AIS]
+6. Current P_k⁻ diagonal (position & velocity uncertainty) — 
+   corrector should be larger when KF is less certain
+7. Number of consecutive frames with large ||ν||² — 
+   manoeuvre detection signal
+8. Estimated target type (if classified): different corrections for
+   fast jets vs UAVs vs civilian aircraft
+$$</div>
+
+      <p style="margin-top:10px"><strong>(c) AIS Measurement: Perfect Sensor Handling:</strong></p>
+      <div class="formula-display">$$
+For AIS: σ_AIS ≈ 0 → R_AIS ≈ 0 (very small ε, not literally zero)
+
+Kalman Gain: K_AIS = P⁻H^T(HP⁻H^T + R_AIS)⁻¹
+As R_AIS → 0: K_AIS → H⁻¹
+
+State update: x̂_k⁺ = x̂_k⁻ + H⁻¹(z_AIS − Hx̂_k⁻) = H⁻¹z_AIS
+
+The AIS measurement completely overrides the KF prediction!
+x̂_k⁺ effectively becomes the AIS-reported position.
+
+P_k⁺ = (I − K_AIS·H)·P_k⁻ → 0
+
+OPERATIONAL IMPLICATION:
+When AIS is available for a target, the KF snaps to AIS truth immediately —
+uncertainty collapses to near-zero. This is correct: AIS gives the ICAO-certified
+aircraft position. No amount of radar smoothing improves on it.
+
+However: ADVERSARY SPOOFING RISK — an adversary could broadcast a false AIS
+signal (spoofing) to appear as a known civilian aircraft. The Hybrid system must
+flag sudden K→H⁻¹ jumps and validate AIS identity through secondary sensors
+before treating it as ground truth. An ML anomaly detector on the innovation
+pattern can flag suspicious AIS-inconsistent radar signatures.
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 4 marks (1 per justified reason, 3 required). (b) 3 marks (1 per well-described feature type). (c) 3 marks (1 for R→0, 1 for K→H⁻¹, 1 for operational implication/spoofing risk).</div>
+    </div></details>
+  </div>
+
+  <div class="mark-scheme">
+    <table>
+      <tr><th>Question</th><th>Topic</th><th>Marks</th><th>Difficulty</th></tr>
+      <tr><td>Q1</td><td>OLS Normal Equations (numerical 3-sample)</td><td>8</td><td>Medium</td></tr>
+      <tr><td>Q2</td><td>Ridge vs Lasso: analytical shrinkage & soft-thresholding</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q3</td><td>Kalman Filter: 2-step predict-update (fully numerical)</td><td>12</td><td>Hard</td></tr>
+      <tr><td>Q4</td><td>Sensor Fusion architecture design & AIS integration</td><td>10</td><td>Medium</td></tr>
+      <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>40</strong></td><td></td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4 &nbsp;|&nbsp;
+  Lecture 3, Part 3: Answers & Assignment
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

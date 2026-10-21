@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 4 — Part 3: Answers & Assignment</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--teal:#0D5C6F;--teal2:#128A9E;--lblue:#BDD7EE;
+    --green:#1E7A45;--orange:#E05218;--red:#C0392B;--amber:#C98A12;
+    --light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--lgrey:#E0EBF5;
+    --yellow:#FFF3B0;--white:#FFFFFF;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  .top-bar{background:var(--navy);color:#fff;padding:13px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--teal);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .top-bar h1{font-size:16px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  .container{max-width:1000px;margin:0 auto;padding:22px 16px;}
+  .section-head{background:var(--navy);color:#fff;padding:11px 17px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:9px;}
+  .section-head .badge{background:var(--teal);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+  .section-head h2{font-size:14px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:16px;margin-bottom:22px;}
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-bottom:12px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:10px;}
+  .ans-card .qn{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--teal);}
+  .ans-card .key{font-size:10.5px;color:var(--dark);}
+  .q-item{margin-bottom:14px;border-left:4px solid var(--teal);padding-left:12px;}
+  .q-item .qtag{display:inline-block;background:var(--teal);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:4px;}
+  .q-item .qtext{font-weight:700;font-size:13px;color:var(--dark);margin-bottom:6px;}
+  .q-item .ans-line{font-size:13px;color:var(--teal);font-weight:700;margin-bottom:3px;}
+  .q-item .exp{font-size:12px;color:var(--grey);background:var(--light);padding:7px 10px;border-radius:6px;}
+  .assign-intro{background:var(--yellow);border:1px solid var(--amber);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;}
+  .q-box{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+  .q-box .qnum{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin-bottom:4px;}
+  .q-box .qtxt{font-size:13px;font-weight:600;color:var(--dark);}
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--teal2);padding:7px 10px;background:var(--lgrey);border-radius:6px;list-style:none;margin-top:8px;}
+  details summary::before{content:"▶ ";color:var(--teal);}
+  details[open] summary::before{content:"▼ ";}
+  details .sol{background:#E6F8FB;border:1px solid #9CD8E0;border-radius:0 0 6px 6px;padding:11px 13px;font-size:12.5px;color:var(--dark);}
+  details .sol .formula{background:#fff;border:1.5px solid var(--teal);border-radius:6px;padding:9px;font-family:monospace;font-size:12px;margin:7px 0;white-space:pre-wrap;}
+  details .sol .key-finding{background:var(--yellow);border:1px solid var(--amber);border-radius:6px;padding:8px 12px;margin-top:8px;font-weight:700;font-size:12.5px;}
+  .mark-scheme{background:#fff;border:1px solid var(--lgrey);border-radius:8px;overflow:hidden;margin-top:12px;}
+  .mark-scheme table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .mark-scheme th{background:var(--teal);color:#fff;padding:8px 11px;text-align:left;}
+  .mark-scheme td{padding:7px 11px;border-bottom:1px solid var(--lgrey);}
+  .mark-scheme tr:last-child td{border-bottom:none;}
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:12px;font-size:11px;margin-top:8px;}
+  @media(max-width:600px){.ans-grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — ANSWERS & ASSIGNMENT</div>
+    <h1>Lecture 4: Clustering & Dimensionality Reduction — Answers & Assignment</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);"><strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></div>
+</div>
+
+<div class="container">
+
+<div class="section-head"><div class="badge">A</div><h2>Quiz Answer Key</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="qn">Q1</div><div class="ans">A</div><div class="key">WCSS mean minimisation</div></div>
+    <div class="ans-card"><div class="qn">Q2</div><div class="ans">B</div><div class="key">Elbow + Silhouette complementary</div></div>
+    <div class="ans-card"><div class="qn">Q3</div><div class="ans">B</div><div class="key">DBSCAN noise vs k-Means</div></div>
+    <div class="ans-card"><div class="qn">Q4</div><div class="ans">B</div><div class="key">GMM soft membership value</div></div>
+    <div class="ans-card"><div class="qn">Q5</div><div class="ans">B</div><div class="key">GMM covariance singularity</div></div>
+    <div class="ans-card"><div class="qn">Q6</div><div class="ans">B</div><div class="key">Ward vs Single/Complete linkage</div></div>
+    <div class="ans-card"><div class="qn">Q7</div><div class="ans">B</div><div class="key">PCA variance via correlations</div></div>
+    <div class="ans-card"><div class="qn">Q8</div><div class="ans">B</div><div class="key">k-distance knee meaning</div></div>
+    <div class="ans-card"><div class="qn">Q9</div><div class="ans">B</div><div class="key">Silhouette score s=0.37</div></div>
+    <div class="ans-card"><div class="qn">Q10</div><div class="ans">A</div><div class="key">t-SNE crowding problem / t-dist</div></div>
+    <div class="ans-card"><div class="qn">Q11</div><div class="ans">B</div><div class="key">UMAP parametric function</div></div>
+    <div class="ans-card"><div class="qn">Q12</div><div class="ans">B</div><div class="key">PC1 loadings interpretation</div></div>
+    <div class="ans-card"><div class="qn">Q13</div><div class="ans">A</div><div class="key">ARI convergent validity</div></div>
+    <div class="ans-card"><div class="qn">Q14</div><div class="ans">B</div><div class="key">Gap statistic reference data</div></div>
+    <div class="ans-card"><div class="qn">Q15</div><div class="ans">B</div><div class="key">k-Means init for GMM EM</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--grey);">Scoring: +1 correct | −0.25 incorrect | 0 skipped | Maximum: 15 marks</p>
+</div>
+
+<div class="section-head"><div class="badge">B</div><h2>Selected Explanations</h2></div>
+<div class="section-body">
+  <div class="q-item"><div class="qtag">Q1</div><div class="qtext">Why does centroid update μⱼ = mean(Cⱼ) minimise WCSS contribution from cluster j?</div>
+  <div class="ans-line">✅ A — ∂/∂μⱼ Σ||x−μⱼ||² = 0 yields exactly the mean</div>
+  <div class="exp">Taking the derivative: ∂/∂μⱼ Σ_{x∈Cⱼ}||x−μⱼ||² = −2Σ(x−μⱼ) = 0 → Σx = |Cⱼ|μⱼ → μⱼ = mean. This guarantees J decreases (or stays equal) at each M-step — k-Means is a coordinate descent algorithm on WCSS, alternating between assignment (E-step equivalent) and mean update (M-step).</div></div>
+
+  <div class="q-item"><div class="qtag">Q5</div><div class="qtext">GMM covariance singularity — when and how to fix it</div>
+  <div class="ans-line">✅ B — Single-point cluster collapse → Σ_k → 0 → N(x|μ,0) → ∞; fix with regularisation Σ_k += εI</div>
+  <div class="exp">If a cluster's EM trajectory lands its mean exactly on one data point, N_k→1, and Σ_k = r_ik(x_i−μ_k)(x_i−μ_k)^T with x_i=μ_k → zero matrix. The likelihood then diverges because a Gaussian with zero variance has infinite probability density at its mean. Regularisation Σ_k += 0.01·I constrains all eigenvalues to be ≥ 0.01, bounding the probability density and preventing numerical collapse.</div></div>
+
+  <div class="q-item"><div class="qtag">Q9</div><div class="qtext">s(i) calculation for trajectory with a=0.42, b=0.67</div>
+  <div class="ans-line">✅ B — s(i) = (0.67−0.42)/0.67 = 0.373; correctly placed but near cluster boundary</div>
+  <div class="exp">s(i) = (b−a)/max(a,b) = (0.67−0.42)/max(0.42,0.67) = 0.25/0.67 = 0.373. Positive means correctly assigned (b > a). However 0.37 < 0.50 threshold for "reasonable" — this trajectory is near the INFILTRATION/ASSAULT boundary. Intelligence implication: flag for secondary analyst review — this trajectory could be a fast assault force adopting infiltration-style evasion, a genuinely elevated threat signature.</div></div>
+
+  <div class="q-item"><div class="qtag">Q13</div><div class="qtext">ARI=0.847 between k-Means and Ward Hierarchical — what does it prove?</div>
+  <div class="ans-line">✅ A — Two algorithmically independent methods agree 84.7% → strong evidence clusters are real, not artefacts</div>
+  <div class="exp">Convergent validity: if two completely different mathematical approaches (k-Means minimising WCSS vs agglomerative Ward minimising merge cost) converge on the same 5-group structure, the groups are unlikely to be algorithmic artefacts. ARI corrects for chance agreement (ARI=0 for random, ARI=1 for perfect). ARI=0.847 is extremely high for unsupervised comparisons — this is the clustering equivalent of two independent lab experiments replicating the same result.</div></div>
+</div>
+
+<div class="section-head"><div class="badge">C</div><h2>Assignment 4 — Clustering & Dimensionality Reduction</h2></div>
+<div class="section-body">
+  <div class="assign-intro"><strong>📋 Instructions:</strong> Show full working. Total: <strong>40 marks</strong> | ~90 minutes. Attempt before revealing solutions!</div>
+
+  <!-- Q1 -->
+  <div class="q-box">
+    <div class="qnum">Q1 — k-Means Iteration [10 Marks]</div>
+    <div class="qtxt">A 2D dataset has 6 points: A=(1,1), B=(2,1), C=(4,4), D=(5,4), E=(1,2), F=(5,5). Run k-Means with k=2, initialising centroids at μ₁=(1,1) and μ₂=(5,5).<br><br>
+    (a) Assign all 6 points to their nearest centroid in Iteration 1. [3 marks]<br>
+    (b) Update centroids μ₁ and μ₂ after Iteration 1. [2 marks]<br>
+    (c) Reassign all points to the new centroids. Does any assignment change? [3 marks]<br>
+    (d) Compute the final WCSS after convergence. [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Iteration 1 Assignments (μ₁=(1,1), μ₂=(5,5)):</strong></p>
+      <div class="formula-display">$$
+d(A=(1,1), μ₁=(1,1)) = 0.00      d(A, μ₂=(5,5)) = √(16+16) = 5.66  → C₁
+d(B=(2,1), μ₁)     = √(1+0) = 1.00  d(B, μ₂)         = √(9+16)  = 5.00  → C₁
+d(C=(4,4), μ₁)     = √(9+9) = 4.24  d(C, μ₂)         = √(1+1)   = 1.41  → C₂
+d(D=(5,4), μ₁)     = √(16+9)= 5.00  d(D, μ₂)         = √(0+1)   = 1.00  → C₂
+d(E=(1,2), μ₁)     = √(0+1) = 1.00  d(E, μ₂)         = √(16+9)  = 5.00  → C₁
+d(F=(5,5), μ₁)     = √(16+16)=5.66  d(F, μ₂)         = 0.00     → C₂
+
+C₁ = {A, B, E}    C₂ = {C, D, F}
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Update Centroids:</strong></p>
+      <div class="formula-display">$$
+μ₁_new = mean(A,B,E) = mean((1,1),(2,1),(1,2)) = ((1+2+1)/3, (1+1+2)/3) = (4/3, 4/3) ≈ (1.33, 1.33)
+
+μ₂_new = mean(C,D,F) = mean((4,4),(5,4),(5,5)) = ((4+5+5)/3, (4+4+5)/3) = (14/3, 13/3) ≈ (4.67, 4.33)
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Reassignment with μ₁=(1.33,1.33), μ₂=(4.67,4.33):</strong></p>
+      <div class="formula-display">$$
+d(A=(1,1), μ₁=(1.33,1.33)) = √(0.11+0.11) = 0.47
+d(A=(1,1), μ₂=(4.67,4.33)) = √(13.4+10.9) = 4.93  → C₁ ✓ (no change)
+
+d(B=(2,1), μ₁=(1.33,1.33)) = √(0.44+0.11) = 0.74
+d(B=(2,1), μ₂=(4.67,4.33)) = √(7.13+10.9) = 4.25  → C₁ ✓
+
+d(C=(4,4), μ₁) = √(7.11+7.11) = 3.77
+d(C=(4,4), μ₂) = √(0.45+0.11) = 0.75  → C₂ ✓
+
+d(D=(5,4), μ₁) = √(13.4+7.11) = 4.53
+d(D=(5,4), μ₂) = √(0.11+0.11) = 0.47  → C₂ ✓
+
+d(E=(1,2), μ₁) = √(0.11+0.44) = 0.74
+d(E=(1,2), μ₂) = √(13.4+5.43) = 4.34  → C₁ ✓
+
+d(F=(5,5), μ₁) = √(13.4+13.4) = 5.19
+d(F=(5,5), μ₂) = √(0.11+0.44) = 0.74  → C₂ ✓
+
+No assignment changes → CONVERGED after 1 update!
+$$</div>
+      <p style="margin-top:8px"><strong>(d) Final WCSS:</strong></p>
+      <div class="formula-display">$$
+C₁ = {A=(1,1), B=(2,1), E=(1,2)},  μ₁=(1.33, 1.33)
+
+WCSS₁ = ||A−μ₁||² + ||B−μ₁||² + ||E−μ₁||²
+       = (0.11+0.11) + (0.44+0.11) + (0.11+0.44)
+       = 0.22 + 0.55 + 0.55 = 1.32
+
+C₂ = {C=(4,4), D=(5,4), F=(5,5)},  μ₂=(4.67, 4.33)
+
+WCSS₂ = ||C−μ₂||² + ||D−μ₂||² + ||F−μ₂||²
+       = (0.45+0.11) + (0.11+0.11) + (0.11+0.44)
+       = 0.56 + 0.22 + 0.55 = 1.33
+
+Total WCSS = 1.32 + 1.33 = 2.65
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 0.5 per point = 3 marks. (b) 1 mark each centroid = 2 marks. (c) 0.5 per correct re-check + 1 for convergence statement = 3 marks. (d) 2 marks (1 per cluster WCSS).</div>
+    </div></details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-box">
+    <div class="qnum">Q2 — DBSCAN Analysis [8 Marks]</div>
+    <div class="qtxt">Apply DBSCAN (ε=1.5, MinPts=3) to the following 8 points in 1D: P1=1.0, P2=1.8, P3=2.5, P4=4.0, P5=4.6, P6=5.1, P7=8.0, P8=8.6<br><br>
+    (a) For each point, list all neighbours within ε=1.5. [3 marks]<br>
+    (b) Classify each point as Core, Border, or Noise. [3 marks]<br>
+    (c) Identify the final cluster assignments and noise points. [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) ε-Neighbourhood of each point (|Pi − Pj| ≤ 1.5):</strong></p>
+      <div class="formula-display">$$
+P1=1.0: neighbours within 1.5 → |P1−P2|=0.8✓, |P1−P3|=1.5✓  N(P1) = {P2, P3} → |N|=2
+P2=1.8: |P2−P1|=0.8✓, |P2−P3|=0.7✓                         N(P2) = {P1, P3} → |N|=2
+P3=2.5: |P3−P1|=1.5✓, |P3−P2|=0.7✓, |P3−P4|=1.5✓          N(P3) = {P1, P2, P4} → |N|=3
+P4=4.0: |P4−P3|=1.5✓, |P4−P5|=0.6✓, |P4−P6|=1.1✓          N(P4) = {P3, P5, P6} → |N|=3
+P5=4.6: |P5−P4|=0.6✓, |P5−P6|=0.5✓, |P5−P3|=2.1✗          N(P5) = {P4, P6} → |N|=2
+P6=5.1: |P6−P4|=1.1✓, |P6−P5|=0.5✓                         N(P6) = {P4, P5} → |N|=2
+P7=8.0: |P7−P8|=0.6✓                                         N(P7) = {P8} → |N|=1
+P8=8.6: |P8−P7|=0.6✓                                         N(P8) = {P7} → |N|=1
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Classification (MinPts=3, so need ≥3 neighbours INCLUDING self, or ≥2 excluding self... Note: MinPts typically includes the point itself):</strong></p>
+      <div class="formula">Standard DBSCAN: Core if |N_ε(p)| ≥ MinPts (including point itself)
+
+P1: |N|=2+1(self)=3 ≥ 3 → CORE
+P2: |N|=2+1(self)=3 ≥ 3 → CORE
+P3: |N|=3+1(self)=4 ≥ 3 → CORE
+P4: |N|=3+1(self)=4 ≥ 3 → CORE
+P5: |N|=2+1(self)=3 ≥ 3 → CORE
+P6: |N|=2+1(self)=3 ≥ 3 → CORE
+P7: |N|=1+1(self)=2 < 3 → check if within ε of a Core point
+    |P7−P8|=0.6, P8 is not core → P7 is NOISE
+P8: |N|=1+1(self)=2 < 3 → check if within ε of a Core point
+    |P8−P7|=0.6, P7 is not core → P8 is NOISE
+
+(Alternative with MinPts excluding self: P1,P2,P5,P6 need ≥2 neighbours excl. self → still CORE)
+CORE: P1, P2, P3, P4, P5, P6   NOISE: P7, P8</div>
+      <p style="margin-top:8px"><strong>(c) Cluster Assignments:</strong></p>
+      <div class="formula-display">$$
+Start from P1 (core): expand to N(P1)={P2,P3}
+  P2 is core → expand to N(P2)={P1,P3} (already visited)
+  P3 is core → expand to N(P3)={P1,P2,P4}
+  P4 is core → expand to N(P4)={P3,P5,P6}
+  P5 is core → expand to N(P5)={P4,P6} (already visited)
+  P6 is core → expand to N(P6)={P4,P5} (already visited)
+  All reachable from P1 via density-connection → CLUSTER 1
+
+CLUSTER 1 = {P1, P2, P3, P4, P5, P6}
+NOISE     = {P7, P8}
+
+→ DBSCAN finds 1 cluster and 2 noise points.
+   P7 and P8 are isolated — their neighbourhood density
+   is too low to form a cluster (only 1 mutual neighbour).
+$$</div>
+      <div class="key-finding">Operational interpretation: P7 and P8 represent isolated trajectories with no similar companions — analogous to lone-actor or deception movements that don't fit established patterns. These would be flagged for analyst review, exactly as in the OPFOR case study. Mark: (a) 3 marks, (b) 3 marks, (c) 2 marks.</div>
+    </div></details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-box">
+    <div class="qnum">Q3 — GMM EM Algorithm Step [10 Marks]</div>
+    <div class="qtxt">A 1D GMM with K=2 components has current parameters: π₁=0.6, μ₁=2.0, σ₁=1.0 and π₂=0.4, μ₂=6.0, σ₂=1.5. Three data points: x₁=1.5, x₂=3.5, x₃=5.8.<br><br>
+    N(x; μ, σ) = (1/σ√2π) exp(−(x−μ)²/2σ²). Use π≈3.14159.<br><br>
+    (a) E-step: Compute responsibilities r_i1 and r_i2 for each of the 3 data points. [6 marks]<br>
+    (b) M-step: Compute updated N₁, N₂, π₁_new, π₂_new, μ₁_new, μ₂_new. [4 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) E-Step: Compute likelihoods then normalise to get responsibilities:</strong></p>
+      <div class="formula-display">$$
+Gaussian likelihoods (1/σ√2π = 1/(1.0×2.507) = 0.3989 for σ=1.0;
+                         1/(1.5×2.507) = 0.2659 for σ=1.5):
+
+For x₁=1.5:
+  N(1.5; μ=2.0, σ=1.0) = 0.3989 × exp(−(1.5−2)²/2) = 0.3989 × exp(−0.125)
+                         = 0.3989 × 0.8825 = 0.3521
+  N(1.5; μ=6.0, σ=1.5) = 0.2659 × exp(−(1.5−6)²/4.5) = 0.2659 × exp(−4.5)
+                         = 0.2659 × 0.0111 = 0.00295
+
+  Weighted: w₁₁ = 0.6×0.3521 = 0.2113,  w₁₂ = 0.4×0.00295 = 0.001180
+  Sum = 0.2125
+  r₁₁ = 0.2113/0.2125 = 0.994   r₁₂ = 0.001180/0.2125 = 0.006
+
+For x₂=3.5:
+  N(3.5; μ=2.0, σ=1.0) = 0.3989 × exp(−(3.5−2)²/2) = 0.3989 × exp(−1.125)
+                         = 0.3989 × 0.3247 = 0.1295
+  N(3.5; μ=6.0, σ=1.5) = 0.2659 × exp(−(3.5−6)²/4.5) = 0.2659 × exp(−1.389)
+                         = 0.2659 × 0.2494 = 0.06632
+
+  Weighted: w₂₁ = 0.6×0.1295 = 0.0777,  w₂₂ = 0.4×0.06632 = 0.02653
+  Sum = 0.1042
+  r₂₁ = 0.0777/0.1042 = 0.746   r₂₂ = 0.02653/0.1042 = 0.255
+
+For x₃=5.8:
+  N(5.8; μ=2.0, σ=1.0) = 0.3989 × exp(−(5.8−2)²/2) = 0.3989 × exp(−7.22)
+                         = 0.3989 × 0.000731 = 0.000292
+  N(5.8; μ=6.0, σ=1.5) = 0.2659 × exp(−(5.8−6)²/4.5) = 0.2659 × exp(−0.00889)
+                         = 0.2659 × 0.9911 = 0.2636
+
+  Weighted: w₃₁ = 0.6×0.000292 = 0.000175,  w₃₂ = 0.4×0.2636 = 0.10544
+  Sum = 0.10562
+  r₃₁ = 0.000175/0.10562 = 0.002   r₃₂ = 0.10544/0.10562 = 0.998
+
+RESPONSIBILITY SUMMARY:
+  Point   r_i1 (Comp. 1)   r_i2 (Comp. 2)
+  x₁=1.5:    0.994             0.006
+  x₂=3.5:    0.746             0.255
+  x₃=5.8:    0.002             0.998
+$$</div>
+      <p style="margin-top:8px"><strong>(b) M-Step: Update parameters using responsibilities:</strong></p>
+      <div class="formula-display">$$
+N₁ = Σ r_i1 = 0.994 + 0.746 + 0.002 = 1.742
+N₂ = Σ r_i2 = 0.006 + 0.255 + 0.998 = 1.259
+
+π₁_new = N₁/N = 1.742/3 = 0.581    π₂_new = N₂/N = 1.259/3 = 0.420
+(Check: 0.581+0.420 = 1.001 ≈ 1.0 ✓, rounding)
+
+μ₁_new = (r₁₁×x₁ + r₂₁×x₂ + r₃₁×x₃) / N₁
+        = (0.994×1.5 + 0.746×3.5 + 0.002×5.8) / 1.742
+        = (1.491 + 2.611 + 0.012) / 1.742
+        = 4.114 / 1.742 = 2.362
+
+μ₂_new = (r₁₂×x₁ + r₂₂×x₂ + r₃₂×x₃) / N₂
+        = (0.006×1.5 + 0.255×3.5 + 0.998×5.8) / 1.259
+        = (0.009 + 0.893 + 5.788) / 1.259
+        = 6.690 / 1.259 = 5.314
+
+SUMMARY: Component 1 mean shifted 2.0→2.36 (x₂ pulling it right)
+         Component 2 mean shifted 6.0→5.31 (x₂ pulling it left)
+         Both means converging toward the data they are responsible for
+$$</div>
+      <div class="key-finding">Key observation: x₂=3.5 (the ambiguous middle point, r=0.746/0.255) is pulling both components toward it. After many iterations, Component 1 will settle around x₁ & x₂ region, Component 2 around x₂ & x₃ — but x₂ will always have split responsibility (soft clustering). Mark: (a) 2 marks per point = 6 marks. (b) 1 mark each for N₁/N₂, π updates, μ₁_new, μ₂_new = 4 marks.</div>
+    </div></details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-box">
+    <div class="qnum">Q4 — PCA & Dimensionality Reduction [12 Marks]</div>
+    <div class="qtxt">A 2D dataset (Z-score normalised) has covariance matrix C = [[2.8, 1.6], [1.6, 1.2]].<br><br>
+    (a) Find the eigenvalues λ₁ and λ₂ of C. [4 marks]<br>
+    (b) Find the eigenvector corresponding to λ₁ (the first principal component). [3 marks]<br>
+    (c) What percentage of total variance is explained by PC1? [1 mark]<br>
+    (d) A new trajectory x = [2.1, 1.4]ᵀ is projected onto PC1. Compute the PC1 score (assume the data is already centred). [2 marks]<br>
+    (e) A wargame analyst wants to visualise 8,000 OPFOR trajectories (12D) using UMAP. They ask: "Should I run PCA to reduce to 4D first, then apply UMAP?" Evaluate this pipeline choice and state when it is and isn't beneficial. [2 marks]</div>
+    <details><summary>Show Answer</summary><div class="sol">
+      <p><strong>(a) Eigenvalues of C = [[2.8, 1.6], [1.6, 1.2]]:</strong></p>
+      <div class="formula-display">$$
+Characteristic equation: det(C − λI) = 0
+
+|2.8−λ   1.6  |
+|1.6     1.2−λ| = 0
+
+(2.8−λ)(1.2−λ) − (1.6)(1.6) = 0
+3.36 − 2.8λ − 1.2λ + λ² − 2.56 = 0
+λ² − 4.0λ + 3.36 − 2.56 = 0
+λ² − 4.0λ + 0.80 = 0
+
+Quadratic formula: λ = (4.0 ± √(16 − 3.2)) / 2 = (4.0 ± √12.8) / 2
+                     = (4.0 ± 3.578) / 2
+
+λ₁ = (4.0 + 3.578)/2 = 7.578/2 = 3.789
+λ₂ = (4.0 − 3.578)/2 = 0.422/2 = 0.211
+
+Check: λ₁ + λ₂ = 3.789 + 0.211 = 4.000 = trace(C) = 2.8+1.2 ✓
+       λ₁ × λ₂ = 3.789 × 0.211 = 0.800 = det(C) = 3.36−2.56 ✓
+$$</div>
+      <p style="margin-top:8px"><strong>(b) Eigenvector for λ₁=3.789:</strong></p>
+      <div class="formula-display">$$
+(C − λ₁I)v = 0:
+[2.8−3.789   1.6    ] [v₁]   [−0.989  1.6  ] [v₁]
+[1.6         1.2−3.789] [v₂] = [1.6    −2.589] [v₂] = 0
+
+From row 1: −0.989v₁ + 1.6v₂ = 0 → v₁ = (1.6/0.989)v₂ = 1.618 v₂
+
+Let v₂ = 1: v₁ = 1.618, v = [1.618, 1]
+
+Normalise: ||v|| = √(1.618² + 1²) = √(2.618 + 1) = √3.618 = 1.902
+
+v₁_normalised = [1.618/1.902, 1/1.902] = [0.851, 0.526]
+
+PC1 direction: v₁ = [0.851, 0.526]ᵀ
+
+Interpretation: PC1 is approximately along a 32° angle from x-axis
+(mostly x₁ but also x₂ contribution) — captures the main correlation direction
+$$</div>
+      <p style="margin-top:8px"><strong>(c) Variance explained by PC1:</strong></p>
+      <div class="formula-display">$$
+EVR₁ = λ₁/(λ₁+λ₂) = 3.789/(3.789+0.211) = 3.789/4.000 = 0.947 = 94.7%
+
+PC1 alone explains 94.7% of total variance — very high!
+The 2D data is nearly 1-dimensional (strong linear correlation between the two features).
+$$</div>
+      <p style="margin-top:8px"><strong>(d) PC1 score for x=[2.1, 1.4]ᵀ:</strong></p>
+      <div class="formula-display">$$
+PC1 score = v₁ᵀ x = [0.851, 0.526] · [2.1, 1.4]
+           = 0.851 × 2.1 + 0.526 × 1.4
+           = 1.787 + 0.736
+           = 2.523
+
+Interpretation: This trajectory has PC1 score = 2.523, placing it 2.52 standard deviations
+along the 'Activity/Aggression' direction — a moderately active trajectory.
+$$</div>
+      <p style="margin-top:8px"><strong>(e) PCA → UMAP Pipeline Evaluation:</strong></p>
+      <div class="formula-display">$$
+BENEFICIAL when:
+  - d is very high (d >> 20): PCA reduces noise dimensions, speeding up
+    UMAP's neighbour graph construction (O(N×d) cost) and reducing the
+    curse of dimensionality in k-NN computation
+  - Clear structure in first k PCs: if top 4 PCs capture 84% variance,
+    discarding remaining 8 dimensions (mostly noise) improves UMAP quality
+  - For d=12 in our case: marginal benefit; UMAP handles 12D well directly
+
+NOT BENEFICIAL when:
+  - Meaningful structure exists in lower-variance PCs (rare but possible)
+  - Non-linear structure: PCA's linear projection may distort cluster shapes
+    that UMAP would discover directly in the original space
+  - Very few dimensions (d ≤ 20): UMAP handles directly without PCA
+
+RECOMMENDATION for 12D OPFOR data:
+  PCA to 4D → UMAP: saves ~20% UMAP runtime, negligible quality loss
+  (since 4 PCs explain 84.4% variance)
+  But PCA to 2D first is WRONG: that pre-empts the non-linear structure
+  that makes UMAP valuable in the first place
+$$</div>
+      <div class="key-finding">Mark Scheme: (a) 4 marks (2 correct formula, 1 per eigenvalue). (b) 3 marks (2 eigenvector derivation, 1 normalisation). (c) 1 mark. (d) 2 marks. (e) 2 marks (1 beneficial case, 1 not beneficial case with reasoning).</div>
+    </div></details>
+  </div>
+
+  <div class="mark-scheme">
+    <table>
+      <tr><th>Question</th><th>Topic</th><th>Marks</th><th>Difficulty</th></tr>
+      <tr><td>Q1</td><td>k-Means 2D iteration — assign, update, converge, WCSS</td><td>10</td><td>Easy</td></tr>
+      <tr><td>Q2</td><td>DBSCAN 1D — core/border/noise, cluster assignments</td><td>8</td><td>Medium</td></tr>
+      <tr><td>Q3</td><td>GMM EM: 1D E-step (responsibilities) + M-step (updates)</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q4</td><td>PCA: eigenvalue decomposition, eigenvector, score, pipeline design</td><td>12</td><td>Hard</td></tr>
+      <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>40</strong></td><td></td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4 &nbsp;|&nbsp;
+  Lecture 4, Part 3: Answers & Assignment
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

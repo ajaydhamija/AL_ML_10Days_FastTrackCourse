@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 2 Quiz — Classification Algorithms</title>
+<style>
+  :root{
+    --navy:#1B3A5E; --blue:#2869A0; --sky:#5B9BD5; --lblue:#BDD7EE;
+    --green:#1E7A45; --orange:#E05218; --red:#C0392B; --amber:#C98A12;
+    --white:#FFFFFF; --light:#EFF6FB; --dark:#152744; --grey:#6A7A8A;
+    --yellow:#FFF2A0;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+  #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:30px 20px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#0A2030 100%);}
+  #intro .badge{background:var(--green);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:18px;}
+  #intro h1{font-size:clamp(22px,5vw,34px);font-weight:800;line-height:1.2;margin-bottom:10px;}
+  #intro .sub{font-size:clamp(13px,3vw,16px);color:var(--lblue);margin-bottom:28px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;max-width:660px;width:100%;margin:0 auto 26px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px;text-align:center;}
+  .info-card .val{font-size:clamp(22px,5vw,30px);font-weight:800;color:var(--green);}
+  .info-card .lbl{font-size:12px;color:var(--lblue);margin-top:4px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:12px;padding:16px 20px;max-width:600px;width:100%;margin:0 auto 26px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:13px;margin-bottom:9px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:13px;color:#D0E8F5;margin-bottom:6px;list-style:none;padding-left:18px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:var(--green);}
+  .btn-start{background:var(--green);color:#fff;border:none;padding:14px 46px;border-radius:30px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(30,122,69,0.4);transition:transform .15s;}
+  .btn-start:hover{transform:scale(1.04);}
+  .footer-info{margin-top:22px;font-size:11px;color:var(--grey);}
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--green);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:var(--green);stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+  .qbody{flex:1;display:flex;flex-direction:column;padding:22px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+  .qtext{font-size:clamp(15px,2.8vw,19px);font-weight:700;color:var(--dark);line-height:1.45;margin-bottom:20px;padding:16px 18px;background:#fff;border-left:5px solid var(--green);border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+  .options{display:grid;gap:11px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:13px 16px;display:flex;align-items:flex-start;gap:11px;box-shadow:0 2px 5px rgba(0,0,0,0.04);}
+  .opt-key{min-width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+  .opt-text{font-size:13.5px;color:var(--dark);line-height:1.4;padding-top:4px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;} .opt.correct .opt-key{background:var(--green);}
+  .opt.wrong{border-color:var(--red);background:#FDE8E8;} .opt.wrong .opt-key{background:var(--red);}
+  .qfooter{background:var(--navy);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 18px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px 18px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#0A2030 100%);}
+  #end h2{font-size:clamp(20px,5vw,30px);font-weight:800;margin-bottom:8px;}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid var(--green);border-radius:16px;padding:22px 38px;margin:16px 0 22px;}
+  .score-box .score-val{font-size:52px;font-weight:800;color:var(--green);}
+  .score-box .score-max{font-size:17px;color:var(--lblue);}
+  .score-box .score-grade{font-size:19px;color:var(--yellow);margin-top:6px;font-weight:700;}
+  .btn-restart{background:var(--blue);color:#fff;border:none;padding:11px 34px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:14px;}
+  @media(max-width:600px){.options{grid-template-columns:1fr;}.info-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+
+<div id="intro">
+  <div class="badge">LECTURE 2 QUIZ</div>
+  <h1>Classification Algorithms<br>for Defence</h1>
+  <p class="sub">Supervised Learning Part 1 — Unit 4</p>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong</div></div>
+  </div>
+  <div class="rules">
+    <h3>Instructions</h3>
+    <ul>
+      <li>One correct answer per question — auto-advances at <strong>40 seconds</strong></li>
+      <li><strong>+1</strong> correct &nbsp;|&nbsp; <strong>−0.25</strong> incorrect &nbsp;|&nbsp; <strong>0</strong> skipped</li>
+      <li>Maximum: <strong>15 marks</strong> — negative marking applies</li>
+      <li>Covers: LR · kNN · DT · RF · SVM · NB · Metrics · Imbalance</li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+
+<div id="quiz">
+  <div class="qheader">
+    <div>
+      <div class="qtag">LECTURE 2 QUIZ</div>
+      <div class="qcourse">Classification Algorithms</div>
+    </div>
+    <div class="timer-circle">
+      <svg width="48" height="48" viewBox="0 0 48 48">
+        <circle class="bg" cx="24" cy="24" r="20"/>
+        <circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/>
+      </svg>
+      <div class="timer-text" id="timerNum">40</div>
+    </div>
+  </div>
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+
+<div id="end">
+  <h2>Quiz Complete!</h2>
+  <p style="color:var(--lblue);font-size:14px;margin-bottom:4px;">Lecture 2 — Classification Algorithms for Defence</p>
+  <div class="score-box">
+    <div class="score-val" id="finalScore">0</div>
+    <div class="score-max">out of 15 marks</div>
+    <div class="score-grade" id="finalGrade"></div>
+  </div>
+  <p style="color:var(--lblue);font-size:14px;">Detailed answers in <strong>Lecture 2 — Part 3</strong></p>
+  <button class="btn-restart" onclick="location.reload()">↺ Restart</button>
+  <p style="margin-top:16px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+
+<script>
+const Qs = [
+  {
+    q:"Logistic Regression produces class predictions by passing a linear score z = w·x + b through the sigmoid function σ(z) = 1/(1+e⁻ᶻ). What is the GEOMETRIC shape of its decision boundary in a d-dimensional feature space?",
+    opts:["A d-dimensional curved surface determined by the RBF kernel bandwidth γ","A hyperplane defined by w·x + b = 0, which is linear in the original feature space","A piecewise-constant rectangular region formed by axis-aligned feature threshold splits","A Voronoi region formed by the distances to the k nearest training examples"],
+    ans:1,exp:"The decision boundary of Logistic Regression is where σ(z)=0.5, i.e. z=0, i.e. w·x+b=0 — a linear hyperplane in the input feature space. This is why LR is called a 'linear classifier'."
+  },
+  {
+    q:"In the k-NN algorithm applied to the 5-class IADS dataset, k=1 achieves 100% training accuracy but only 78.3% validation accuracy, while k=21 achieves 91.8% training and 90.2% validation accuracy. This pattern BEST illustrates:",
+    opts:["Distribution shift between the training environment and validation environment","Label noise causing incorrect ground truth labels in the training set","Bias-variance tradeoff: k=1 has zero bias but high variance (overfitting); larger k introduces bias but reduces variance and generalises better","Survivorship bias in the IADS data collection methodology"],
+    ans:2,exp:"k=1 memorises the training set (zero training error) but is highly sensitive to noise — high variance, low bias. As k increases, the decision boundary smooths out (more bias) but becomes more stable (less variance). The optimal k=21 balances both."
+  },
+  {
+    q:"The CART algorithm at the root node of the IADS Decision Tree found that EW Jamming (x9) produced a Gini Reduction of 0.077, making it the best first split. If a node has 5 equal classes (200 samples each), what is its Gini Impurity BEFORE splitting?",
+    opts:["0.40","0.64","0.50","0.80"],
+    ans:3,exp:"Gini = 1 - Σ pₐ² = 1 - (5 × 0.2²) = 1 - (5 × 0.04) = 1 - 0.20 = 0.80. Maximum Gini for K classes occurs at equal distribution: 1 - 1/K = 1 - 0.2 = 0.80."
+  },
+  {
+    q:"Random Forest achieves 97.5% accuracy while a single Decision Tree achieves 91.8%. The CORE mathematical reason for this improvement relates to the ensemble variance formula Var_ensemble = ρσ² + (1-ρ)σ²/B. Which variable does Random Forest PRIMARILY reduce?",
+    opts:["σ² (the variance of each individual tree) by limiting maximum tree depth to prevent overfitting","ρ (the correlation between trees) by training each tree on a random feature subset at each split, forcing diversity","B (the number of trees) to achieve computational efficiency while maintaining accuracy","λ (the regularisation parameter) by applying L2 weight decay to each decision tree"],
+    ans:1,exp:"The key insight of RF is reducing ρ — tree correlation — via random feature subsampling at each split (only m=√d features considered). If trees were fully correlated (ρ=1), Var_ensemble=σ² (no benefit). With ρ→0, Var_ensemble→σ²/B → approaches zero as B→∞."
+  },
+  {
+    q:"XGBoost achieved the fastest inference time (0.7ms) among the classifiers tested, despite using 400 sequential trees. Gradient Boosting builds trees SEQUENTIALLY while Random Forest builds them PARALLELLY. Why does XGBoost still achieve fast inference despite sequential training?",
+    opts:["XGBoost uses shallower trees (max_depth=5) than Random Forest's unlimited depth, so each tree has fewer nodes to traverse at inference","XGBoost runs only on GPU which is inherently faster than CPU-based Random Forest inference","XGBoost applies kernel methods at inference that reduce the number of dot products required","XGBoost removes incorrect predictions from previous trees at inference time, reducing total computation"],
+    ans:0,exp:"XGBoost trees are deliberately shallow (max_depth=5, giving max 31 leaf nodes per tree). RF trees are grown to full depth (unlimited) with potentially thousands of nodes. At inference, traversing 400 shallow trees (XGBoost) is faster than 500 deep trees (RF), despite XGBoost using more trees."
+  },
+  {
+    q:"In the SVM Hard Margin formulation, we maximise the margin 2/||w||, which is equivalent to minimising ½||w||². The solution depends ONLY on the 'support vectors'. In the IADS 5-class SVM (C=100, RBF), 1,247 support vectors were found. What does this represent?",
+    opts:["The 1,247 most confident training samples, far from the decision boundary, that define the class centroids","The 1,247 training samples that lie ON or WITHIN the margin boundaries, whose Lagrange multipliers αᵢ > 0 in the dual problem","The 1,247 hyperparameters of the SVM model, one for each unique feature combination seen during training","The 1,247 pairwise comparisons between classes in the One-vs-One multi-class strategy (1,247 ≈ 5×4/2 = 10, so incorrect count)"],
+    ans:1,exp:"Support vectors are training points with αᵢ > 0 in the SVM dual — they lie on the margin boundaries or are misclassified (slack ξᵢ > 0). Only support vectors contribute to the decision function ŷ = sign(Σᵢ αᵢ yᵢ K(xᵢ,x) + b). The 21.6% ratio is typical for multi-class SVMs with noisy data."
+  },
+  {
+    q:"The RBF kernel is defined as K(x,x') = exp(-γ||x-x'||²). In the IADS grid search, γ=0.08 was optimal (95.4% val acc) while γ=2.0 achieved only 74.2%. What happens geometrically when γ is very LARGE?",
+    opts:["Each training point influences a very WIDE region of feature space, creating an overly smooth decision boundary that underfits","Each training point influences a very NARROW neighbourhood, creating a jagged boundary that overfits to individual training points","Large γ linearises the kernel, equivalent to using a linear SVM on the original feature space","Large γ forces the SVM to use fewer support vectors, making the model sparser and more efficient"],
+    ans:1,exp:"RBF K(x,x')=exp(-γ||x-x'||²): large γ makes the Gaussian very narrow (sharp peak). A training point only strongly influences points extremely close to it. The decision boundary becomes highly irregular, memorising training data — high variance, low bias: overfitting."
+  },
+  {
+    q:"Gaussian Naïve Bayes classifies a new radar signal with PRF=1,950 Hz by computing P(PRF=1950|FF) ≈ 4.7×10⁻⁷ and P(PRF=1950|AB) ≈ 0.0023. The classifier predicts AB. The CRITICAL assumption that enables this calculation is:",
+    opts:["All features are statistically independent of each other unconditionally across the entire dataset","Features are conditionally independent given the class label: P(x₁,x₂,...,xd|y=c) = Π P(xⱼ|y=c)","The class-conditional distributions are always Gaussian and perfectly symmetrical around the class mean","Each feature's importance is equally weighted in the final classification decision"],
+    ans:1,exp:"The 'Naïve' assumption: features are conditionally independent GIVEN the class. This allows P(x|y=c) = Π P(xⱼ|y=c), reducing a joint d-dimensional density to d univariate densities. This is almost never exactly true (PRF and Speed ARE correlated for AB class) but often works well enough in practice."
+  },
+  {
+    q:"The IADS training set contains 78.4% Civilian aircraft and only 0.8% Adversary Bombers (realistic operational ratio). A Random Forest trained on this imbalanced distribution achieves 92.6% overall accuracy but only 12.3% AB Recall. The class-weighted fix sets weight_AB = N/(K × N_AB) ≈ 26.9×. What is the MATHEMATICAL effect of this 26.9× weight on training?",
+    opts:["It artificially increases the number of AB samples by SMOTE synthetic oversampling to 26.9 times the original count","Each misclassification error on an AB sample contributes 26.9× more to the loss function, forcing the optimiser to prioritise correct AB classification over maximising overall accuracy","It removes 26.9% of Civilian samples from training to reduce class imbalance without creating synthetic samples","It multiplies all AB feature values by 26.9 to shift the AB cluster farther from the Civilian cluster in feature space"],
+    ans:1,exp:"Class weighting rescales the contribution of each sample to the loss: L_weighted = Σ wᵢ·L(f(xᵢ), yᵢ). With w_AB=26.9, a single AB misclassification incurs 26.9× the gradient update compared to one Civilian misclassification. The optimiser naturally shifts toward minimising AB errors at the cost of slightly more Civilian errors."
+  },
+  {
+    q:"A Decision Tree (depth=10) and a Random Forest (B=500) are both trained on the IADS dataset. The Decision Tree's training accuracy is 95.7% while RF's is 99.2%. Both test at similar accuracy (~92% and 97.5% respectively). From a bias-variance perspective, which statement is MOST accurate?",
+    opts:["The Decision Tree has higher bias than the Random Forest because its axis-aligned splits cannot model diagonal decision boundaries","Both models have identical bias but Random Forest has lower variance due to bootstrap averaging of 500 diverse trees","The Random Forest has higher bias because its majority-vote aggregation smooths out fine-grained decision boundaries","The Decision Tree overfits more (higher variance) because it was grown to depth 10 while RF trees are shallower"],
+    ans:1,exp:"Both models can grow arbitrarily complex trees, so they have similar capacity/bias. The key difference is VARIANCE: RF reduces variance via bagging (averaging B independent estimators each with variance σ²) and random feature subsampling (reducing inter-tree correlation ρ), giving Var_ensemble ≈ ρσ²+(1-ρ)σ²/B << σ² of a single tree."
+  },
+  {
+    q:"In the Soft Margin SVM, the C hyperparameter controls the trade-off between margin width and training error. In a defence system where missing an Adversary Bomber (AB) is catastrophically more expensive than a false alarm, which modification to the standard SVM training is MOST appropriate?",
+    opts:["Increase C globally to a very large value so the SVM has near-zero tolerance for any classification errors","Use class-weighted C: C_AB = 5× C_others so that misclassifying AB samples incurs 5× the penalty compared to other classes","Decrease γ in the RBF kernel to create a wider, smoother boundary that captures more AB samples","Remove all Civilian samples from training so the SVM focuses exclusively on the threat classes"],
+    ans:1,exp:"Class-weighted C directly implements asymmetric cost in the SVM objective: min ½||w||² + C_CI·Σ ξᵢ(CI) + C_AB·Σ ξᵢ(AB) + ... Setting C_AB >> C_others forces the optimiser to nearly eliminate AB misclassifications even at the cost of a narrower margin and more errors on other classes. This is the correct approach for asymmetric cost scenarios."
+  },
+  {
+    q:"The IADS algorithm comparison showed Naïve Bayes achieved 83.1% overall accuracy but only 79.3% AB Recall — the worst among all classifiers. The PRIMARY reason NB underperforms here (compared to RF at 96.1% AB Recall) is:",
+    opts:["Naïve Bayes was not trained with L2 regularisation, causing it to overfit the training data more than Random Forest","Naïve Bayes violates its conditional independence assumption — PRF, Speed, and Doppler are strongly correlated within each class, causing joint probabilities to be mis-estimated when features are multiplied independently","Naïve Bayes cannot handle the 5-class problem and should have been applied using a One-vs-Rest strategy instead","Naïve Bayes requires Z-score normalisation of features, and without it, features on larger scales dominate the probability computation"],
+    ans:1,exp:"The conditional independence assumption P(x₁,...,xd|y=c) = Πⱼ P(xⱼ|y=c) is violated here: PRF and Speed are positively correlated for AB (high-speed aircraft tend to use high PRF fire-control radars). Multiplying independent Gaussians underestimates the joint probability of the true correlated distribution, degrading classification accuracy."
+  },
+  {
+    q:"ROC-AUC for Random Forest on the AB class (binary OvR) was 0.998. At a Fixed False Positive Rate (FPR) of 5%, the RF achieved TPR = 97.8%. What does a False Positive Rate of 5% mean operationally in the IADS context?",
+    opts:["5% of actual Adversary Bombers are missed by the classifier (not classified as AB)","5% of non-AB signals (Friendly Fighters, Civilians, Missiles, UAVs combined) are incorrectly flagged as Adversary Bombers","The classifier has a 5% probability of completely failing to produce any output for a given input signal","5% of training samples had corrupted labels during the model training phase"],
+    ans:1,exp:"FPR = FP/(FP+TN) = fraction of ACTUAL NEGATIVE samples misclassified as positive (AB). Here negatives = non-AB signals. 5% FPR means 5% of Friendly Fighters, Civilians, UAVs, and Missiles are falsely flagged as AB — triggering unnecessary intercept orders. At 97.8% TPR simultaneously, this is an excellent trade-off."
+  },
+  {
+    q:"Post-pruning a Decision Tree reduced its node count from 317 to 89 (72% reduction) while improving test accuracy from 91.8% to 92.4%. This improvement occurs because:",
+    opts:["Pruning randomly removes nodes to reduce model size, occasionally improving accuracy by coincidence","The pruned tree has higher bias, which mathematically increases accuracy by shifting from an overfit to a better-fit model","Pruning removes subtrees that overfit to training-set noise, reducing model variance. The resulting simpler tree generalises better to the test set because the removed splits captured noise rather than true signal","Pruning applies L2 regularisation to the leaf node weights, preventing the model from assigning extreme probability estimates"],
+    ans:2,exp:"Overgrown trees memorise training noise via very specific splits deep in the tree (e.g., 'if PRF is between 1,847 and 1,849 Hz'). These splits have high variance — they fit training data perfectly but don't generalise. Pruning removes these noisy sub-trees, slightly increasing bias but substantially reducing variance: the net effect is improved test accuracy."
+  },
+  {
+    q:"The One-vs-Rest (OvR) strategy for the 5-class IADS problem trains 5 binary classifiers (each class vs all others). When this approach is used with Logistic Regression, which problem commonly occurs with the resulting probability scores?",
+    opts:["The 5 binary classifiers always produce identical probability outputs, making it impossible to determine the winning class","The 5 binary classifiers' output probabilities do not necessarily sum to 1 across all classes, as each is trained independently on a different binary problem — Platt scaling or softmax normalisation is required for calibrated probabilities","OvR cannot be applied to Logistic Regression — only Random Forest and SVM support multi-class extension via this strategy","The OvR strategy requires the training dataset to be balanced across all 5 classes, which is not satisfied in the real IADS distribution"],
+    ans:1,exp:"Each OvR binary LR is trained independently and calibrated for its own binary problem. There is no constraint ensuring P(FF|x)+P(AB|x)+P(CM|x)+P(UV|x)+P(CI|x)=1. Scores may sum to values >1 or <1. For proper probability interpretation, apply Platt scaling or use native Softmax Logistic Regression (multinomial LR) which enforces the sum-to-1 constraint by construction."
+  }
+];
+
+let currentQ=0,score=0,timer=null,answered=false;
+const TOTAL_TIME=40,DASH=2*Math.PI*20;
+const $=id=>document.getElementById(id);
+
+function startQuiz(){$('intro').style.display='none';$('quiz').style.display='flex';loadQuestion();}
+
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered=false;
+  const q=Qs[currentQ];
+  $('qnum').textContent=`Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('progressFill').style.width=`${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent=`Score: ${score.toFixed(2)}`;
+  const optDiv=$('options');optDiv.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const d=document.createElement('div');d.className='opt';d.id=`opt${i}`;
+    d.innerHTML=`<div class="opt-key">${k}</div><div class="opt-text">${q.opts[i]}</div>`;
+    optDiv.appendChild(d);
+  });
+  renderMath(optDiv);
+  startTimer();
+}
+
+function startTimer(){
+  let remaining=TOTAL_TIME;
+  const circle=$('timerCircle'),numEl=$('timerNum');
+  circle.style.stroke='#1E7A45';circle.style.strokeDashoffset=0;numEl.textContent=TOTAL_TIME;
+  timer=setInterval(()=>{
+    remaining--;numEl.textContent=remaining;
+    circle.style.strokeDashoffset=DASH*(1-remaining/TOTAL_TIME);
+    if(remaining<=10)circle.style.stroke='#E05218';
+    else if(remaining<=20)circle.style.stroke='#C98A12';
+    if(remaining<=0){clearInterval(timer);revealAnswer(-1);}
+  },1000);
+}
+
+function revealAnswer(chosen){
+  if(answered)return;answered=true;clearInterval(timer);
+  const q=Qs[currentQ];
+  if(chosen===q.ans)score+=1;else if(chosen>=0)score-=0.25;
+  q.opts.forEach((_,i)=>{
+    const el=$(`opt${i}`);
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===chosen&&chosen!==q.ans)el.classList.add('wrong');
+  });
+  setTimeout(advance,2500);
+}
+
+function advance(){currentQ++;if(currentQ>=Qs.length){showEnd();return;}loadQuestion();}
+
+function showEnd(){
+  $('quiz').style.display='none';$('end').style.display='flex';
+  const s=parseFloat(score.toFixed(2));
+  $('finalScore').textContent=s;
+  let g='';
+  if(s>=12)g='🏆 Outstanding (≥12/15)';
+  else if(s>=9)g='⭐ Proficient (9–11/15)';
+  else if(s>=6)g='📚 Developing (6–8/15)';
+  else g='🔄 Needs Review (<6/15)';
+  $('finalGrade').textContent=g;
+}
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

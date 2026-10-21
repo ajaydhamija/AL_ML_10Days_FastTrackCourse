@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 1 — Part 3: Quiz Answers & Assignment</title>
+<style>
+  :root{
+    --navy:#1B3A5E; --blue:#2869A0; --sky:#5B9BD5; --lblue:#BDD7EE;
+    --orange:#E05218; --green:#1E7A45; --red:#C0392B; --amber:#C98A12;
+    --light:#EFF6FB; --dark:#152744; --grey:#6A7A8A; --lgrey:#E0EBF5;
+    --yellow:#FFF3B0; --white:#FFFFFF;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  
+  .top-bar{background:var(--navy);color:#fff;padding:14px 28px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--orange);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .top-bar h1{font-size:18px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  
+  .container{max-width:1000px;margin:0 auto;padding:28px 20px;}
+  
+  /* SECTION HEADS */
+  .section-head{background:var(--navy);color:#fff;padding:12px 20px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:10px;}
+  .section-head .badge{background:var(--orange);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+  .section-head h2{font-size:15px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:20px;margin-bottom:28px;}
+
+  /* ANSWER TABLE */
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:4px;}
+  .ans-card .qn{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--green);}
+  .ans-card .key{font-size:11px;color:var(--dark);}
+
+  /* DETAILED ANSWERS */
+  .q-item{margin-bottom:18px;border-left:4px solid var(--blue);padding-left:14px;}
+  .q-item .qtag{display:inline-block;background:var(--blue);color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;margin-bottom:6px;}
+  .q-item .qtext{font-weight:700;font-size:13.5px;color:var(--dark);margin-bottom:8px;}
+  .q-item .ans-line{font-size:13px;color:var(--green);font-weight:700;margin-bottom:4px;}
+  .q-item .exp{font-size:12.5px;color:var(--grey);background:var(--light);padding:8px 12px;border-radius:6px;}
+
+  /* ASSIGNMENT */
+  .assign-intro{background:var(--yellow);border:1px solid var(--amber);border-radius:8px;padding:16px;margin-bottom:20px;font-size:13px;}
+  .dataset-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0;}
+  .dataset-table th{background:var(--navy);color:#fff;padding:9px 12px;text-align:left;font-size:12px;}
+  .dataset-table td{padding:8px 12px;border-bottom:1px solid var(--lgrey);}
+  .dataset-table tr:nth-child(even) td{background:var(--light);}
+  .q-box{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:14px 16px;margin-bottom:12px;}
+  .q-box .qnum{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;margin-bottom:5px;}
+  .q-box .qtxt{font-size:13.5px;font-weight:600;color:var(--dark);margin-bottom:6px;}
+  
+  /* SOLUTION TOGGLE */
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--blue);padding:8px 12px;background:var(--lgrey);border-radius:6px;list-style:none;}
+  details summary::before{content:"▶ ";color:var(--orange);}
+  details[open] summary::before{content:"▼ ";}
+  details .sol{background:#E8F4FF;border:1px solid var(--lblue);border-radius:0 0 6px 6px;padding:12px 16px;font-size:13px;color:var(--dark);}
+  details .sol table{width:100%;border-collapse:collapse;margin:8px 0;}
+  details .sol th{background:var(--navy);color:#fff;padding:7px 10px;font-size:12px;}
+  details .sol td{padding:7px 10px;border-bottom:1px solid #C5DCF0;font-size:12.5px;}
+  details .sol tr:nth-child(even) td{background:#F2F8FF;}
+  details .sol .formula{background:#fff;border:1.5px solid var(--blue);border-radius:6px;padding:10px;font-family:monospace;font-size:13px;margin:8px 0;}
+  details .sol .key-finding{background:var(--yellow);border:1px solid var(--amber);border-radius:6px;padding:10px 14px;margin-top:10px;font-weight:700;font-size:13px;}
+
+  .mark-scheme{background:#fff;border:1px solid var(--lgrey);border-radius:8px;overflow:hidden;margin-top:16px;}
+  .mark-scheme table{width:100%;border-collapse:collapse;font-size:13px;}
+  .mark-scheme th{background:var(--blue);color:#fff;padding:9px 12px;text-align:left;}
+  .mark-scheme td{padding:8px 12px;border-bottom:1px solid var(--lgrey);}
+  .mark-scheme tr:last-child td{border-bottom:none;}
+
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:14px 20px;font-size:11px;margin-top:10px;}
+  
+  @media(max-width:600px){.ans-grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — ANSWERS & ASSIGNMENT</div>
+    <h1>Lecture 1: AI & ML Foundations — Quiz Answers & Assignment</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);">
+    <strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION A: QUICK ANSWER KEY -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section-head"><div class="badge">A</div><h2>Quiz Answer Key — At-a-Glance</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="qn">Q1</div><div class="ans">B</div><div class="key">Supervised vs Unsupervised</div></div>
+    <div class="ans-card"><div class="qn">Q2</div><div class="ans">C</div><div class="key">Discount Factor γ</div></div>
+    <div class="ans-card"><div class="qn">Q3</div><div class="ans">C</div><div class="key">Survivorship Bias</div></div>
+    <div class="ans-card"><div class="qn">Q4</div><div class="ans">C</div><div class="key">Accuracy vs Recall</div></div>
+    <div class="ans-card"><div class="qn">Q5</div><div class="ans">C</div><div class="key">Silhouette Score</div></div>
+    <div class="ans-card"><div class="qn">Q6</div><div class="ans">B</div><div class="key">RNN/LSTM for time series</div></div>
+    <div class="ans-card"><div class="qn">Q7</div><div class="ans">C</div><div class="key">RAG mechanism</div></div>
+    <div class="ans-card"><div class="qn">Q8</div><div class="ans">C</div><div class="key">Simpson's Paradox</div></div>
+    <div class="ans-card"><div class="qn">Q9</div><div class="ans">C</div><div class="key">Covariate shift</div></div>
+    <div class="ans-card"><div class="qn">Q10</div><div class="ans">B</div><div class="key">Spurious correlation</div></div>
+    <div class="ans-card"><div class="qn">Q11</div><div class="ans">C</div><div class="key">SSL feature learning</div></div>
+    <div class="ans-card"><div class="qn">Q12</div><div class="ans">B</div><div class="key">TD error interpretation</div></div>
+    <div class="ans-card"><div class="qn">Q13</div><div class="ans">B</div><div class="key">Targeted data poisoning</div></div>
+    <div class="ans-card"><div class="qn">Q14</div><div class="ans">C</div><div class="key">Self-attention mechanism</div></div>
+    <div class="ans-card"><div class="qn">Q15</div><div class="ans">C</div><div class="key">Sim-to-Real gap</div></div>
+  </div>
+  <p style="font-size:12.5px;color:var(--grey);margin-top:8px;"><strong>Scoring:</strong> +1 mark for correct | −0.25 for incorrect | 0 for skipped | Maximum: 15 marks</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION B: DETAILED EXPLANATIONS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section-head"><div class="badge">B</div><h2>Detailed Answer Explanations</h2></div>
+<div class="section-body">
+  <div class="q-item">
+    <div class="qtag">Q1</div>
+    <div class="qtext">Fundamental distinction between Supervised and Unsupervised Learning</div>
+    <div class="ans-line">✅ Correct Answer: B — Supervised requires labelled (x,y) pairs; Unsupervised finds structure in unlabelled {x}</div>
+    <div class="exp">The defining distinction is the presence of ground-truth labels. Supervised learning minimises a loss function L(f(x;θ), y) over labelled pairs. Unsupervised learning has no labels — it discovers inherent structure (clusters, densities, manifolds) in the data distribution P(x) alone. The architecture choice (neural network vs decision tree) and hardware are implementation details, not paradigm definitions.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q2</div>
+    <div class="qtext">Role of discount factor γ in RL wargame agent</div>
+    <div class="ans-line">✅ Correct Answer: C — γ balances immediate vs future rewards in G_t = Σ γ^k R_{t+k+1}</div>
+    <div class="exp">γ is not a learning rate (α) or exploration parameter (ε). In the return G_t = R_{t+1} + γR_{t+2} + γ²R_{t+3} + …, γ≈1 means the agent values all future rewards equally (long-term strategic thinker). γ≈0 means the agent is myopic — maximises immediate reward only. In wargaming, γ≈0.95–0.99 is typical to balance short-term tactical gains with long-term campaign objectives.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q3</div>
+    <div class="qtext">Wald's aircraft armour analysis — which data pitfall?</div>
+    <div class="ans-line">✅ Correct Answer: C — Survivorship bias (only returning aircraft were observable)</div>
+    <div class="exp">The critical insight is that the analysis population was inherently biased — it consisted only of planes that survived. Planes destroyed by hits to engines or cockpits were absent from the analysis by definition. This is survivorship bias: the failure mode is invisible because failures don't return to be counted. In ML: any training dataset built from "successful outcomes" or "surviving entities" carries this same structural bias.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q4</div>
+    <div class="qtext">Why is 97.2% accuracy insufficient for radar threat classification?</div>
+    <div class="ans-line">✅ Correct Answer: C — Asymmetric costs: false negatives (missed threats) have catastrophically higher operational cost than false positives</div>
+    <div class="exp">Accuracy = (TP+TN)/(TP+TN+FP+FN) treats all errors equally. In IADS, a false negative (enemy bomber classified as 'Friendly') = catastrophic operational failure. A false positive (civilian classified as 'threat' = unnecessary alert) is costly but recoverable. The appropriate metric is Recall_threat = TP/(TP+FN), optimised within an acceptable Precision constraint. F1 partially addresses this but the real solution is asymmetric cost-weighted loss functions during training.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q5</div>
+    <div class="qtext">Silhouette Score of 0.683 for OPFOR movement clustering</div>
+    <div class="ans-line">✅ Correct Answer: C — Moderate-to-good cluster structure; some overlap, particularly ASSAULT/TRANSIT</div>
+    <div class="exp">Silhouette s = (b-a)/max(a,b) where a = avg intra-cluster distance, b = avg distance to nearest other cluster. Range: [-1, +1]. Score 0.683 &gt; 0.5 (reasonable) but &lt; 0.7 (strong). It does NOT represent classification accuracy (68.3%) — that interpretation conflates the metric with its meaning. It tells analysts that cluster boundaries exist but with some overlap, requiring additional validation before operational deployment.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q6</div>
+    <div class="qtext">Best architecture for time-series sensor track classification</div>
+    <div class="ans-line">✅ Correct Answer: B — RNN/LSTM: designed for sequential temporal dependencies</div>
+    <div class="exp">LSTM explicitly models temporal state through gated memory cells (input, forget, output gates), allowing it to capture dependencies across time steps — critical for trajectory analysis where movement at t=5 depends on t=1 through t=4. While 1D-CNN (Option A) can also work on time series by treating time as a spatial dimension, LSTM is the better-motivated choice for movement trajectories where long-range temporal dependencies matter. GAN (C) is generative, not discriminative. PCA+GMM (D) is unsupervised.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q7</div>
+    <div class="qtext">Primary mechanism behind RAG's accuracy improvement</div>
+    <div class="ans-line">✅ Correct Answer: C — Retrieved context injected into prompt grounds generation in verified source material</div>
+    <div class="exp">RAG architecture: Query → Embed → Vector search → Retrieve top-k chunks → Augment prompt with [Query + Context] → LLM generates conditioned on both. The LLM isn't changed — it's the same model. The improvement comes from replacing hallucination-prone parametric memory with verified retrieved content. RAG doesn't eliminate hallucination (3.2% still occurs), and it adds latency (+1.3s). Option D is incorrect: RAG still uses an LLM for generation.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q8</div>
+    <div class="qtext">Which scenario represents Simpson's Paradox in wargame data?</div>
+    <div class="ans-line">✅ Correct Answer: C — AI units better in BOTH terrain types, but appear equal in aggregate due to non-AI unit bias toward easier terrain</div>
+    <div class="exp">Simpson's Paradox: A effect appears in each sub-group but disappears or reverses when groups are combined. The confounder (terrain difficulty) is unevenly distributed between groups — non-AI units are over-represented in easier terrain, inflating their apparent aggregate performance. This is a classic confounding problem in observational data and a common trap in wargame exercise analysis. Option A is simulation-to-reality gap; Option D is overfitting.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q9</div>
+    <div class="qtext">Mine detection model fails from Afghan to Iraqi terrain — primary cause?</div>
+    <div class="ans-line">✅ Correct Answer: C — Covariate (distribution) shift: P_train(x) ≠ P_deploy(x)</div>
+    <div class="exp">Training accuracy 97.3% → high model capacity and sufficient data. Test accuracy in same terrain 94.1% → no significant overfitting in Afghan domain. Test accuracy in Iraqi terrain 58.7% → catastrophic generalisation failure due to input distribution mismatch (soil composition, moisture, texture, electromagnetic properties differ between terrains). This is covariate shift, not label noise (labels were accurate), not selection bias (training was representative of Afghan terrain), and not underfitting (training accuracy was high).</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q10</div>
+    <div class="qtext">Catering quality vs win rate correlation drops to r=0.09 after controlling for budget</div>
+    <div class="ans-line">✅ Correct Answer: B — Spurious correlation: unit budget is the confounding variable</div>
+    <div class="exp">The partial correlation technique isolates the direct relationship between two variables by statistically removing the effect of a third (confounder). Here, r_partial(catering, win | budget) = 0.09 (p=0.42 — not significant). This shows the original r=0.71 was entirely explained by budget driving both. If we train an ML model on catering quality to predict win rate without controlling for budget, the model will learn this spurious association and give misleading predictions in new exercises with different budget distributions.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q11</div>
+    <div class="qtext">Why does SSL pre-training + fine-tuning outperform from-scratch with same 1,000 labels?</div>
+    <div class="ans-line">✅ Correct Answer: C — SSL learns transferable feature representations through pretext tasks on 500K unlabelled samples</div>
+    <div class="exp">SSL (self-supervised learning) trains a model to solve a pretext task (e.g., predict masked signal portions) on large unlabelled data. This forces the model to learn semantically rich, generalisable representations. When fine-tuned with only 1,000 labelled examples, the pre-trained feature extractor provides a much better starting point than random initialisation, requiring fewer labels to reach high accuracy. Options A and B are factually incorrect about the mechanism. Option D is factually wrong: SSL uses NO labels during pre-training.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q12</div>
+    <div class="qtext">Interpretation of a large positive TD error in Q-Learning</div>
+    <div class="ans-line">✅ Correct Answer: B — Current Q-value is an underestimate; agent performed better than expected → increase Q(s,a)</div>
+    <div class="exp">TD error δ = r + γ max_{a'} Q(s',a') − Q(s,a). Large positive δ means the target [r + γ max Q(s',a')] exceeds the current estimate Q(s,a). The agent received more cumulative value from this action than it predicted → the current Q-value underestimates the true value. The update Q(s,a) ← Q(s,a) + α·δ increases Q(s,a) toward the target. A large negative δ would indicate overestimation, requiring a downward correction.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q13</div>
+    <div class="qtext">Most dangerous form of data poisoning in defence AI</div>
+    <div class="ans-line">✅ Correct Answer: B — Targeted backdoor: inject mislabelled samples to cause specific controlled misclassifications</div>
+    <div class="exp">Targeted (backdoor) poisoning is far more dangerous than random noise addition because: (1) it creates a specific, controllable misclassification on demand, (2) it can be triggered by a specific input pattern the adversary controls, (3) overall model accuracy remains near-normal (making detection difficult), and (4) the effect persists after model deployment. At 3% poisoning rate, 94% of target class samples can be flipped — e.g., an adversary's specific aircraft signature always classified as 'Friendly' by our IADS.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q14</div>
+    <div class="qtext">Core advantage of Transformer self-attention over RNNs for long intelligence reports</div>
+    <div class="ans-line">✅ Correct Answer: C — Direct O(n²) attention between any positions resolves RNN vanishing gradient problem</div>
+    <div class="exp">Attention(Q,K,V) = softmax(QK^T/√d_k)·V computes pairwise relationships between ALL token positions in a single matrix operation. A relationship between token 1 and token 500 in a report is computed with the same weight as token 499 to 500. RNNs process sequentially: to connect token 1 to token 500, information must flow through 499 timesteps with multiplicative gradient updates — leading to vanishing (or exploding) gradients. Long documents cause RNNs to 'forget' early context, while Transformers have no such distance limitation.</div>
+  </div>
+  <div class="q-item">
+    <div class="qtag">Q15</div>
+    <div class="qtext">CGF AI agent: 91% win rate in simulation → 58% in field exercise</div>
+    <div class="ans-line">✅ Correct Answer: C — Simulation-to-reality gap: unrealistic physics exploitation + distribution shift from fog-of-war and adversarial adaptation</div>
+    <div class="exp">The sim-to-real gap is the most important practical challenge for RL wargame agents. Three compounding factors: (1) Simulation physics exploitation: RL agents often exploit bugs or simplifications in simulation models that don't correspond to real-world behaviour. (2) Covariate shift: Real-world input distributions (terrain friction, comms degradation, weather, fatigue) differ from simulation inputs. (3) Adversarial non-stationarity: Human opponents in field exercises adapt, unlike static scripted environments. The specific RL algorithm used (Q-Learning vs PPO) rarely accounts for this magnitude of gap.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SECTION C: ASSIGNMENT -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="section-head"><div class="badge">C</div><h2>Assignment 1 — AI & ML Foundations (Defence Applications)</h2></div>
+<div class="section-body">
+  <div class="assign-intro">
+    <strong>📋 Instructions:</strong> Attempt ALL questions. Show full working for numerical problems. Submit before start of Lecture 2. <em>Answers are provided at the end of each question for self-assessment — attempt before revealing!</em><br>
+    <strong>Total Marks: 40</strong> &nbsp;|&nbsp; <strong>Estimated Time: 90 minutes</strong>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q1 — Short Answer [5 Marks]</div>
+    <div class="qtxt">Explain the key differences between the five ML paradigms (Supervised, Unsupervised, Semi-supervised, Self-supervised, Reinforcement Learning) in terms of: (a) training signal, (b) data requirements, and (c) one specific defence application for each. Present your answer as a structured table.</div>
+    <details>
+      <summary>Show Answer & Mark Scheme</summary>
+      <div class="sol">
+        <table>
+          <tr><th>Paradigm</th><th>Training Signal</th><th>Data Required</th><th>Defence Application</th></tr>
+          <tr><td>Supervised</td><td>Labelled (x,y) pairs</td><td>1K–10M labelled</td><td>Radar threat classification (Fighter/Missile/UAV)</td></tr>
+          <tr><td>Unsupervised</td><td>None (self-discovery)</td><td>Any unlabelled</td><td>OPFOR tactic clustering in wargame logs</td></tr>
+          <tr><td>Semi-supervised</td><td>Small D_L + large D_U</td><td>5–10% labelled</td><td>SAR image segmentation with limited PHOTINT labels</td></tr>
+          <tr><td>Self-supervised</td><td>Derived from data (pretext task)</td><td>Large unlabelled corpus</td><td>Pre-training on 500K unlabelled radar sweeps (BERT-style)</td></tr>
+          <tr><td>Reinforcement</td><td>Reward signal (no labels)</td><td>Simulation episodes</td><td>DQN agent for tactical wargame decision support</td></tr>
+        </table>
+        <div class="key-finding">Mark Scheme: 1 mark per paradigm (correct training signal + application). Partial credit: 0.5 if one element is wrong.</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q2 — Numerical Problem [10 Marks]</div>
+    <div class="qtxt">
+      A radar classification system for IADS is trained on N = 10,000 samples across 5 classes. The confusion matrix from the test set (N = 2,000) is given below:<br><br>
+      <table class="dataset-table">
+        <thead><tr><th>Actual\Predicted</th><th>FF (Friend. Fighter)</th><th>AB (Adv. Bomber)</th><th>CM (Cruise Missile)</th><th>UV (UAV)</th><th>NZ (Noise)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>FF (400)</strong></td><td>391</td><td>4</td><td>2</td><td>2</td><td>1</td></tr>
+          <tr><td><strong>AB (400)</strong></td><td>8</td><td>382</td><td>5</td><td>3</td><td>2</td></tr>
+          <tr><td><strong>CM (400)</strong></td><td>3</td><td>6</td><td>385</td><td>4</td><td>2</td></tr>
+          <tr><td><strong>UV (400)</strong></td><td>2</td><td>4</td><td>3</td><td>388</td><td>3</td></tr>
+          <tr><td><strong>NZ (400)</strong></td><td>1</td><td>2</td><td>2</td><td>3</td><td>392</td></tr>
+        </tbody>
+      </table>
+      <strong>Questions:</strong><br>
+      (a) Calculate the Overall Accuracy of the classifier. [2 marks]<br>
+      (b) Calculate Precision, Recall, and F1-Score for the Adversary Bomber (AB) class. [4 marks]<br>
+      (c) In an operational IADS context, which metric (Precision or Recall for AB) should be MAXIMISED and why? What is the cost of getting this wrong? [2 marks]<br>
+      (d) If label noise of 15% is introduced into the training set, estimate the approximate expected accuracy drop based on the data pitfall study (which showed: 10% noise → −9.1%, 20% noise → −20.8%). Use linear interpolation. [2 marks]
+    </div>
+    <details>
+      <summary>Show Answer & Mark Scheme</summary>
+      <div class="sol">
+        <p><strong>(a) Overall Accuracy:</strong></p>
+        <div class="formula">Correct predictions = 391 + 382 + 385 + 388 + 392 = 1938<br>Total = 2000<br>Accuracy = 1938/2000 = 0.969 = <strong>96.9%</strong></div>
+        <p style="margin-top:10px"><strong>(b) Precision, Recall, F1 for Adversary Bomber (AB):</strong></p>
+        <div class="formula">TP(AB) = 382 (correctly predicted AB)<br>FP(AB) = 4+6+4+2 = 16 (non-AB predicted as AB)<br>FN(AB) = 8+5+3+2 = 18 (AB predicted as non-AB)<br>
+          <br>Precision(AB) = TP/(TP+FP) = 382/(382+16) = 382/398 = <strong>0.960 (96.0%)</strong><br>
+          Recall(AB)    = TP/(TP+FN) = 382/(382+18) = 382/400 = <strong>0.955 (95.5%)</strong><br>
+          F1(AB) = 2 × P × R / (P+R) = 2 × 0.960 × 0.955 / (0.960+0.955) = 1.8336/1.915 = <strong>0.957</strong>
+        </div>
+        <p style="margin-top:10px"><strong>(c) Operational Priority — RECALL for AB:</strong></p>
+        <div class="formula-display">$$
+RECALL (AB) must be maximised. A missed Adversary Bomber (FN) means an undetected enemy bomber is classified as non-threat or friendly → potential catastrophic strike on protected assets. A False Positive (non-bomber misclassified as AB) triggers an alert/intercept → costly but recoverable. In asymmetric cost scenarios, Recall on the threat class is prioritised. The 18 missed AB in this test set represents 4.5% of actual bombers going undetected.
+$$</div>
+        <p style="margin-top:10px"><strong>(d) Label Noise Interpolation (15%):</strong></p>
+        <div class="formula">At 10% noise: accuracy drop = −9.1%  →  Accuracy ≈ 96.9 − 9.1 = 87.8%<br>At 20% noise: accuracy drop = −20.8% →  Accuracy ≈ 96.9 − 20.8 = 76.1%<br><br>Linear interpolation at 15% (midpoint between 10% and 20%):<br>Drop at 15% ≈ (9.1 + 20.8)/2 = 14.95% ≈ <strong>~15%</strong><br>Expected accuracy ≈ 96.9 − 15.0 = <strong>~81.9%</strong></div>
+        <div class="key-finding">Mark Scheme: (a) 2 marks — deduct 1 if arithmetic error. (b) 1 mark each for Precision, Recall, F1. (c) 2 marks: 1 for correct identification (Recall), 1 for operational justification. (d) 2 marks: 1 for method, 1 for final answer.</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q3 — Conceptual [5 Marks]</div>
+    <div class="qtxt">
+      A defence analyst notices that in wargame exercise data from the past 3 years, units from Brigade X consistently outperform Brigade Y across all terrain types (urban: 87% vs 72%, desert: 91% vs 79%, jungle: 83% vs 68%). However, when the data is combined, Brigade X's overall win rate is only 0.5% higher than Brigade Y's overall win rate.<br><br>
+      (a) What statistical phenomenon does this represent? [1 mark]<br>
+      (b) Identify the most likely confounding variable that could explain this paradox in a military exercise context. [2 marks]<br>
+      (c) If an ML model is trained on the combined data without controlling for this confounder, what erroneous conclusion might the model's feature importance output suggest? And why is this dangerous for operational planning? [2 marks]
+    </div>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="sol">
+        <p><strong>(a) Statistical Phenomenon:</strong> Simpson's Paradox — a trend appears consistently in subgroups but reverses or disappears in the combined aggregate analysis.</p>
+        <br>
+        <p><strong>(b) Most Likely Confounder:</strong> Mission/terrain assignment distribution. Brigade Y has likely been assigned to disproportionately EASIER exercises or terrain types (e.g., open desert, lower threat density), while Brigade X was assigned to harder operational environments. When all exercises are combined, the easier missions inflate Brigade Y's aggregate win rate to near parity with Brigade X, despite Brigade X performing better in every specific terrain category. Alternative valid answers: opponent quality differences, exercise timing (fatigue), weather conditions.</p>
+        <br>
+        <p><strong>(c) Erroneous ML Conclusion & Operational Danger:</strong> The ML model's feature importance output might show that Brigade X's unit identifier or equipment type has near-zero importance (since the combined win rate difference is only 0.5%), suggesting that Brigade X's training/doctrine/equipment provides no operational advantage. An operational planner relying on this could: (1) allocate resources uniformly between brigades despite Brigade X's demonstrable superiority in all terrain types, (2) deny Brigade X additional resources believing the advantage is negligible, (3) assign Brigade X to simpler missions "since it wins at about the same rate." All of these are wrong decisions caused by Simpson's Paradox in the training data.</p>
+        <div class="key-finding">Key Lesson: Always analyse data within relevant subgroups before combining. In defence ML, aggregate performance metrics can hide systematic advantages or disadvantages that are only visible in disaggregated analysis.</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q4 — Mathematical Derivation [10 Marks]</div>
+    <div class="qtxt">
+      A RL agent is being trained for a tactical wargame using Q-Learning. The current Q-table has the following values for state s1:<br><br>
+      <table class="dataset-table">
+        <thead><tr><th>Action</th><th>Q(s1, a)</th></tr></thead>
+        <tbody>
+          <tr><td>Move North (a1)</td><td>12.4</td></tr>
+          <tr><td>Attack (a2)</td><td>18.7</td></tr>
+          <tr><td>Defend (a3)</td><td>9.2</td></tr>
+          <tr><td>Resupply (a4)</td><td>6.1</td></tr>
+        </tbody>
+      </table>
+      <br>The agent takes action a2 (Attack) from state s1. It receives reward r = +10 (objective captured) and transitions to state s2. The Q-values for state s2 are: Q(s2, a1) = 22.3, Q(s2, a2) = 15.6, Q(s2, a3) = 19.8, Q(s2, a4) = 8.4.<br><br>
+      Parameters: Learning rate α = 0.15, Discount factor γ = 0.90.<br><br>
+      (a) Using the Q-Learning update rule, calculate the TD error (temporal difference error). [3 marks]<br>
+      (b) Calculate the updated Q(s1, a2) after this one experience. [2 marks]<br>
+      (c) If the agent uses an ε-greedy policy with ε = 0.1, what is the probability that it chooses action a2 (Attack) in state s1 BEFORE this update? [2 marks]<br>
+      (d) After 100 more experiences from state s1 all showing attack is optimal, the TD errors converge to ≈ 0. What does this indicate about convergence, and what is the approximate new Q(s1, a2) assuming the Bellman equation is satisfied? [3 marks]
+    </div>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="sol">
+        <p><strong>(a) TD Error Calculation:</strong></p>
+        <div class="formula">Q-Learning update: Q(s,a) ← Q(s,a) + α[r + γ·max_{a'} Q(s',a') − Q(s,a)]<br><br>
+          max_{a'} Q(s2, a') = max(22.3, 15.6, 19.8, 8.4) = <strong>22.3</strong>  (action a1 in s2)<br><br>
+          TD Target  = r + γ · max Q(s2,·) = 10 + 0.90 × 22.3 = 10 + 20.07 = <strong>30.07</strong><br><br>
+          TD Error δ = TD Target − Q(s1, a2) = 30.07 − 18.7 = <strong>11.37</strong>
+        </div>
+        <p style="margin-top:10px"><strong>(b) Updated Q(s1, a2):</strong></p>
+        <div class="formula">Q(s1, a2)_new = Q(s1, a2)_old + α × δ<br>
+          = 18.7 + 0.15 × 11.37<br>
+          = 18.7 + 1.706<br>
+          = <strong>20.406</strong>
+        </div>
+        <p style="margin-top:10px"><strong>(c) ε-greedy Action Selection Probability:</strong></p>
+        <div class="formula">In state s1, Q(s1, a2) = 18.7 is the HIGHEST Q-value (18.7 > 12.4 > 9.2 > 6.1).<br>
+          a2 is the greedy (optimal) action.<br><br>
+          P(select a2) = P(exploit) × P(a2 | exploit) + P(explore) × P(a2 | explore)<br>
+          = (1-ε) × 1 + ε × (1/4)<br>
+          = (0.90) × 1 + (0.10) × 0.25<br>
+          = 0.90 + 0.025 = <strong>0.925 (92.5%)</strong>
+        </div>
+        <p style="margin-top:10px"><strong>(d) Convergence Analysis:</strong></p>
+        <div class="formula">TD error → 0 means: r + γ · max Q(s',a') ≈ Q(s,a)<br>
+          This is the Bellman optimality condition — Q* satisfies it exactly.<br><br>
+          When satisfied: Q*(s1, a2) = r + γ · max_{a'} Q*(s2, a')<br><br>
+          Assuming max Q*(s2,·) ≈ 22.3 (still approximately valid after convergence):<br>
+          Q*(s1, a2) ≈ 10 + 0.90 × 22.3 = <strong>30.07</strong><br><br>
+          (The value increased from 18.7 → ~30.07, reflecting the true long-term value<br>
+          of capturing objectives from this state with γ-discounted future rewards.)</div>
+        <div class="key-finding">Convergence (TD error ≈ 0) guarantees Q-table represents the true optimal value function Q*. In practice, DQN achieves this approximately after 50,000–100,000 episodes in complex wargame environments.</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-box">
+    <div class="qnum">Assignment Q5 — Critical Analysis [10 Marks]</div>
+    <div class="qtxt">
+      A research paper claims: "Our AI-powered ammunition demand forecasting system achieved 96.3% accuracy when tested on 2021 data, validating its readiness for deployment in the 2024 campaign." The system was trained on Indian Army logistics data from 2015–2020.<br><br>
+      (a) Identify FOUR distinct data pitfalls or validity concerns with this evaluation and claim. [4 marks]<br>
+      (b) For EACH pitfall, describe one specific example of how it could manifest in this ammunition forecasting context. [4 marks]<br>
+      (c) Propose two improvements to the evaluation methodology that would provide stronger evidence of deployment readiness. [2 marks]
+    </div>
+    <details>
+      <summary>Show Answer</summary>
+      <div class="sol">
+        <p><strong>(a) & (b) Four Pitfalls with Examples:</strong></p>
+        <p style="margin-top:8px"><strong>①  Temporal Distribution Shift (train: 2015–2020, test: 2021):</strong><br>
+        The model is trained and tested on data from the SAME strategic period. The claim "ready for 2024" requires testing on 2022–2024 data, which likely reflects different geopolitical context, updated weapon systems, changed logistics doctrine, inflation effects on resource consumption, and potential new conflict types. A model trained on peacetime consumption patterns (2015–2020) may fail catastrophically if 2024 involves active operations with radically different consumption rates.</p>
+
+        <p style="margin-top:8px"><strong>②  Survivorship Bias / Selection Bias in Training Data:</strong><br>
+        Training data from 2015–2020 likely represents "normal operations" — the system worked as intended. High-consumption outlier events (exercises, border escalations, equipment failures causing resupply spikes) may be under-represented or excluded as "anomalies" during data cleaning. The model won't predict these rare but critical high-demand events accurately.</p>
+
+        <p style="margin-top:8px"><strong>③  Overfitting to Seasonal/Peacetime Patterns:</strong><br>
+        Ammunition consumption has seasonal patterns (winter exercises, summer border activity). A model that achieves 96.3% on 2021 data may be overfitting to these patterns rather than learning genuine demand drivers. If 2024 operations don't follow the same seasonal calendar (e.g., operations during monsoon), the model fails.</p>
+
+        <p style="margin-top:8px"><strong>④  P-Hacking / Metric Selection Bias:</strong><br>
+        96.3% accuracy is an overall metric. Ammunition forecasting errors are not symmetric — underestimating demand (shortage) is operationally catastrophic while overestimating (excess stock) is merely costly. If the model achieves 96.3% accuracy but has 40% error rates on high-consumption spikes (rare but critical), the headline accuracy is misleading. The paper likely selected accuracy (a metric that looks good) rather than reporting separate metrics for high-demand event prediction.</p>
+
+        <p style="margin-top:10px"><strong>(c) Improved Evaluation Methodology:</strong></p>
+        <p style="margin-top:6px"><strong>Improvement 1:</strong> Walk-forward validation across time — train on 2015–2018, test on 2019; train on 2015–2019, test on 2020; train on 2015–2020, test on 2021–2022. This tests generalisability across time and reveals performance degradation trends. Include separate metrics for high-demand event recall.</p>
+        <p style="margin-top:6px"><strong>Improvement 2:</strong> Out-of-distribution (OOD) robustness testing — deliberately test on data from fundamentally different operational scenarios (high-intensity operations, equipment changeover, new weapon system introduction). Also calculate prediction uncertainty intervals and evaluate calibration: does "90% confident" correspond to 90% actual accuracy?</p>
+
+        <div class="key-finding">Core Lesson: A single test accuracy number on in-distribution data tells you very little about deployment readiness. Operational AI systems require multi-temporal validation, cost-asymmetric metrics, OOD testing, and uncertainty quantification before deployment claims are valid.</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Mark Summary -->
+  <div class="mark-scheme">
+    <table>
+      <tr><th>Question</th><th>Topic</th><th>Marks</th><th>Difficulty</th></tr>
+      <tr><td>Q1</td><td>ML Paradigms Comparison Table</td><td>5</td><td>Easy</td></tr>
+      <tr><td>Q2</td><td>Confusion Matrix & Metrics (Numerical)</td><td>10</td><td>Medium</td></tr>
+      <tr><td>Q3</td><td>Simpson's Paradox in Wargame Data</td><td>5</td><td>Medium</td></tr>
+      <tr><td>Q4</td><td>Q-Learning Update (Mathematical)</td><td>10</td><td>Hard</td></tr>
+      <tr><td>Q5</td><td>Critical Analysis of AI Evaluation Claims</td><td>10</td><td>Hard</td></tr>
+      <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>40</strong></td><td></td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4: AI & ML in Warfare &nbsp;|&nbsp;
+  Lecture 1, Part 3: Quiz Answers & Assignment
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

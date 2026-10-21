@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 6 Quiz — Q-Learning & DQN</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--indigo:#2C3E80;--indig2:#3D55B8;--lblue:#BDD7EE;
+    --green:#1E7A45;--orange:#E05218;--red:#C0392B;--amber:#C98A12;
+    --white:#FFFFFF;--light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--yellow:#FFF2A0;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html,body{height:100%;background:var(--navy);font-family:'Segoe UI',Arial,sans-serif;color:var(--white);}
+  #intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:28px 18px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#050510 100%);}
+  #intro .badge{background:var(--indigo);color:#fff;padding:6px 20px;border-radius:20px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:16px;}
+  #intro h1{font-size:clamp(20px,4.5vw,32px);font-weight:800;line-height:1.2;margin-bottom:10px;}
+  #intro .sub{font-size:clamp(12px,2.5vw,15px);color:var(--lblue);margin-bottom:26px;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:11px;max-width:620px;width:100%;margin:0 auto 24px;}
+  .info-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:11px;padding:12px;text-align:center;}
+  .info-card .val{font-size:clamp(20px,4.5vw,28px);font-weight:800;color:var(--indig2);}
+  .info-card .lbl{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .rules{background:rgba(255,255,255,0.06);border:1px solid rgba(255,242,160,0.3);border-radius:11px;padding:14px 18px;max-width:580px;width:100%;margin:0 auto 24px;text-align:left;}
+  .rules h3{color:var(--yellow);font-size:13px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+  .rules li{font-size:12.5px;color:#D0E8F5;margin-bottom:5px;list-style:none;padding-left:16px;position:relative;}
+  .rules li::before{content:"▸";position:absolute;left:0;color:var(--indig2);}
+  .btn-start{background:var(--indigo);color:#fff;border:none;padding:13px 44px;border-radius:28px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(44,62,128,0.5);transition:transform .15s;}
+  .btn-start:hover{transform:scale(1.04);}
+  .footer-info{margin-top:20px;font-size:11px;color:var(--grey);}
+  #quiz{display:none;flex-direction:column;min-height:100vh;background:var(--light);}
+  .qheader{background:var(--navy);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .qheader .qtag{background:var(--indigo);color:#fff;padding:4px 14px;border-radius:14px;font-size:12px;font-weight:700;}
+  .qheader .qcourse{font-size:11px;color:var(--lblue);margin-top:3px;}
+  .timer-circle{width:48px;height:48px;position:relative;}
+  .timer-circle svg{transform:rotate(-90deg);}
+  .timer-circle .bg{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:4;}
+  .timer-circle .fg{fill:none;stroke:var(--indig2);stroke-width:4;stroke-linecap:round;stroke-dasharray:126;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+  .timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:800;color:var(--white);}
+  .qbody{flex:1;display:flex;flex-direction:column;padding:20px;max-width:900px;width:100%;margin:0 auto;}
+  .qnum{font-size:12px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+  .qtext{font-size:clamp(14px,2.6vw,18px);font-weight:700;color:var(--dark);line-height:1.45;margin-bottom:18px;padding:14px 16px;background:#fff;border-left:5px solid var(--indigo);border-radius:0 10px 10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+  .options{display:grid;gap:10px;grid-template-columns:1fr 1fr;}
+  .opt{background:#fff;border:2px solid #D0DCE8;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 5px rgba(0,0,0,0.04);}
+  .opt-key{min-width:27px;height:27px;border-radius:50%;background:var(--indigo);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+  .opt-text{font-size:13px;color:var(--dark);line-height:1.4;padding-top:4px;}
+  .opt.correct{border-color:var(--green);background:#E8F7EE;}.opt.correct .opt-key{background:var(--green);}
+  .opt.wrong{border-color:var(--red);background:#FDE8E8;}.opt.wrong .opt-key{background:var(--red);}
+  .qfooter{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .progress-wrap{flex:1;margin:0 16px;}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--indigo);border-radius:3px;transition:width .4s ease;}
+  .qfooter .qinfo{font-size:11px;color:var(--lblue);}
+  #end{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:26px 16px;text-align:center;background:linear-gradient(160deg,#1B3A5E 0%,#050510 100%);}
+  #end h2{font-size:clamp(20px,5vw,30px);font-weight:800;margin-bottom:8px;}
+  .score-box{background:rgba(255,255,255,0.08);border:2px solid var(--indig2);border-radius:16px;padding:20px 36px;margin:14px 0 20px;}
+  .score-box .score-val{font-size:50px;font-weight:800;color:var(--indig2);}
+  .score-box .score-max{font-size:16px;color:var(--lblue);}
+  .score-box .score-grade{font-size:18px;color:var(--yellow);margin-top:6px;font-weight:700;}
+  .btn-restart{background:var(--indigo);color:#fff;border:none;padding:11px 32px;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px;}
+  @media(max-width:600px){.options{grid-template-columns:1fr;}.info-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div id="intro">
+  <div class="badge">LECTURE 6 QUIZ</div>
+  <h1>Reinforcement Learning Part 1:<br>Q-Learning & Deep Q-Networks</h1>
+  <p class="sub">RL Fundamentals for Wargame AI — Unit 4</p>
+  <div class="info-grid">
+    <div class="info-card"><div class="val">15</div><div class="lbl">Questions</div></div>
+    <div class="info-card"><div class="val">40s</div><div class="lbl">Per Question</div></div>
+    <div class="info-card"><div class="val">+1</div><div class="lbl">Correct</div></div>
+    <div class="info-card"><div class="val">−¼</div><div class="lbl">Wrong</div></div>
+  </div>
+  <div class="rules">
+    <h3>Instructions</h3>
+    <ul>
+      <li>Auto-advances at <strong>40 seconds</strong> — negative marking applies</li>
+      <li>Covers: MDP · Bellman Equations · Q-Learning · ε-Greedy · DQN · Replay · Target Networks · Double/Dueling DQN · Reward Shaping</li>
+      <li>Maximum: <strong>15 marks</strong></li>
+    </ul>
+  </div>
+  <button class="btn-start" onclick="startQuiz()">▶ BEGIN QUIZ</button>
+  <p class="footer-info">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></p>
+</div>
+
+<div id="quiz">
+  <div class="qheader">
+    <div><div class="qtag">LECTURE 6 QUIZ</div><div class="qcourse">Q-Learning & DQN</div></div>
+    <div class="timer-circle">
+      <svg width="48" height="48" viewBox="0 0 48 48">
+        <circle class="bg" cx="24" cy="24" r="20"/>
+        <circle class="fg" id="timerCircle" cx="24" cy="24" r="20"/>
+      </svg>
+      <div class="timer-text" id="timerNum">40</div>
+    </div>
+  </div>
+  <div class="qbody">
+    <div class="qnum" id="qnum">Question 1 of 15</div>
+    <div class="qtext" id="qtext">Loading…</div>
+    <div class="options" id="options"></div>
+  </div>
+  <div class="qfooter">
+    <div class="qinfo">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div>
+    <div class="qinfo" id="scoreDisplay">Score: 0</div>
+  </div>
+</div>
+
+<div id="end">
+  <h2>Quiz Complete!</h2>
+  <p style="color:var(--lblue);font-size:14px;margin-bottom:4px;">Lecture 6 — Q-Learning & Deep Q-Networks</p>
+  <div class="score-box">
+    <div class="score-val" id="finalScore">0</div>
+    <div class="score-max">out of 15 marks</div>
+    <div class="score-grade" id="finalGrade"></div>
+  </div>
+  <p style="color:var(--lblue);font-size:14px;">Full answers in <strong>Lecture 6 — Part 3</strong></p>
+  <button class="btn-restart" onclick="location.reload()">↺ Restart</button>
+  <p style="margin-top:14px;font-size:11px;color:var(--grey);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</p>
+</div>
+
+<script>
+const Qs=[
+  {q:"A Markov Decision Process for a wargame is defined as (S, A, P, R, γ). The Markov property states P(s_{t+1}|s_t, a_t, s_{t-1}, a_{t-1}, ...) = P(s_{t+1}|s_t, a_t). What must the state vector s_t include to ensure this property holds in a military simulation?",
+   opts:["Only the current positions of all units — historical positions are irrelevant because the terrain determines all future transitions","Everything operationally relevant to future outcomes: unit positions, ammunition levels, morale, OPFOR known dispositions, terrain status, weather, communications quality, and any other factor that affects P(s'|s,a). If any relevant variable is omitted from s, the MDP is incomplete — the missing variable creates hidden history-dependence that violates Markov","Only the current objective status (captured or not) and friendly unit count, since these are the two variables that determine the reward signal","Only the last three timesteps of state history, which is sufficient to approximate the Markov property in any finite-horizon military engagement"],
+   ans:1,exp:"The Markov property demands the future is conditionally independent of the past GIVEN the present state. If ammo level is not included in s, then two states with identical positions but different ammo levels look identical to the agent — but have different future dynamics. Omitting any relevant variable creates hidden state that violates Markov, turning the MDP into a POMDP (Partially Observable MDP), which is significantly harder to solve."},
+  {q:"The discount factor $\gamma=0.95$ is used in the wargame RL agent instead of γ=1.0 (undiscounted). A battle takes approximately 40 turns. How much less is a reward received at turn 40 worth compared to a reward received at turn 1, and what strategic behaviour does γ<1 encourage?",
+   opts:["A turn-40 reward is worth 0.95^39 ≈ 0.138 of a turn-1 reward (approximately 86% less). γ<1 encourages the agent to end battles quickly — capturing objectives sooner is preferred over identical outcomes reached later. This prevents infinite-horizon loops and makes training mathematically stable","A turn-40 reward is worth exactly 0.60 of a turn-1 reward regardless of γ, because military engagements are normalised by expected battle duration in the MDP formulation","$\gamma=0.95$ means the agent only plans 20 turns ahead. Beyond 20 turns, rewards are completely ignored, forcing the agent to focus exclusively on short-term tactical gains","γ<1 only affects the stability of the Bellman equation derivation and has no impact on the learned policy — the agent behaves identically whether $\gamma=0.95$ or γ=1.0"],
+   ans:0,exp:"γ^(t-1) where t is the turn: turn-1 reward has weight γ^0=1.0; turn-40 reward has weight γ^39=0.95^39≈0.138. The turn-40 reward is worth only 13.8% of an identical immediate reward. Consequence: the agent prefers capturing objectives SOONER over later, even if the final outcome is the same. This is strategically desirable — a 40-turn campaign costs more resources than a 22-turn one. γ also ensures mathematical convergence of the infinite-sum G_t."},
+  {q:"The Bellman Optimality Equation for Q*(s,a) is: $Q^*(s,a)=\mathbb{E}\!\left[R+\gamma\max_{a^{\prime}}Q^*(s^{\prime},a^{\prime})\right]$. Why is this equation RECURSIVE and what does this recursion mean operationally for a wargame commander?",
+   opts:["It is recursive because Q*(s,a) appears on both sides — the value of taking action a now depends on the value of future optimal actions, which in turn depend on further future optimal actions ad infinitum. Operationally: the value of 'Attack now' = immediate reward for the attack PLUS the best long-term value achievable from the resulting state, which includes all future optimal decisions. Q* encodes an entire future strategic plan, not just the next action","It is recursive because the state space S is infinite and the equation must be applied repeatedly until convergence in finite steps. Operationally: the wargame simulation must run exactly Q* iterations before the policy is valid","It is recursive solely because of the discount factor γ multiplying Q* — removing γ would eliminate the recursion and allow direct computation of Q* in a single pass over all state-action pairs","The recursion is only present in the finite-horizon formulation; in infinite-horizon wargames, Q* has a closed-form non-recursive solution via matrix inversion"],
+   ans:0,exp:"Q*(s,a) = f(..., Q*(s',a'), ...) — Q-values at (s,a) depend on Q-values at successor states (s',a'). This infinite regress is exactly the Bellman equation's power and challenge. Operationally: 'Attack' is valuable not just because of the immediate kill (+5) but because the resulting advantaged position allows future optimal actions (+objective capture, +strategic position). Q* encodes the complete future consequence of any action, making it the ideal decision basis for a commander."},
+  {q:"The Q-Learning update: $Q(s,a)\leftarrow Q(s,a)+\alpha\!\left[r+\gamma\max_{a^{\prime}}Q(s^{\prime},a^{\prime})-Q(s,a)\right]$. In the worked example: Q(s₁, MOVE N) updated from 5.0 to 5.778. After 1,000 episodes, it converges to ~11.8. The TRUE Q*(s₁, MOVE N) was computed as 12.78. Why doesn't Q-Learning converge to exactly 12.78 even after many episodes?",
+   opts:["Q-Learning always overestimates by exactly 7% due to the discount factor γ=0.9 and the max operator's inherent bias","The constant learning rate α=0.1 introduces a tradeoff: with constant α, Q-values track a running average of TD targets, which include stochastic variability from ε-greedy exploration. The converged value 11.8 reflects the average over random trajectories from s₁. True Q* (12.78) corresponds to the OPTIMAL trajectory — exploration sometimes takes suboptimal actions from s₂, reducing the average experienced return below Q*. Using α_t → 0 (satisfying Robbins-Monro) would achieve convergence to exactly Q*","The Q-table for the 10×10 simplified grid has insufficient memory capacity to store the exact Q* value for every state-action pair, causing truncation errors","Q-Learning converges to Q*(s₁, MOVE N)=11.8 exactly — 12.78 was an incorrect manual calculation of the Bellman target"],
+   ans:1,exp:"With constant α, Q-Learning tracks a running weighted average rather than converging to the fixed point. Each sample r + γ max Q(s',a') varies due to stochastic environment transitions and ε-greedy exploration (when ε>0, occasionally suboptimal actions from s₂ yield lower future returns). The converged value is E[sample] ≈ 11.8 < 12.78 = Q*. Robbins-Monro schedules (α_t = 1/visit_count(s,a)) guarantee convergence to Q* but adapt slowly. Constant α is preferred for non-stationary environments at the cost of small convergence error."},
+  {q:"ε-Greedy with ε=0.1 is used during training. In state s₁, Q(s₁, Attack)=18.7 is the highest Q-value. There are 7 possible actions. What is the probability that the agent selects 'Defend' (Q=9.2) under this policy?",
+   opts:["P(Defend) = 0, because 'Defend' is never selected — ε-greedy only selects the highest Q-value action and a random non-greedy action","P(Defend) = ε/|A| = 0.1/7 ≈ 0.0143 (1.43%). 'Defend' is a non-greedy action and is only selected during the 10% random exploration phase, chosen uniformly at random from all 7 actions","P(Defend) = 0.1 regardless of Q-values — ε determines the probability of any specific non-greedy action","P(Defend) = Q(s,Defend)/Σ Q(s,a) = 9.2/(18.7+12.4+9.2+8.1+6.1+4.8+3.2) = 0.144 — ε-greedy uses softmax over Q-values"],
+   ans:1,exp:"ε-Greedy: with probability ε=0.1, choose uniformly at random from all |A|=7 actions (including the greedy action). With probability 1-ε=0.9, choose the greedy action (Attack). P(Defend) = P(random exploration) × P(Defend | random) = 0.1 × 1/7 = 0.1/7 ≈ 0.0143. Note: P(Attack) = (1-ε) + ε/7 = 0.9 + 0.0143 = 0.9143. All non-greedy actions have equal probability ε/|A|=0.0143 in ε-greedy."},
+  {q:"Without Experience Replay, a DQN training on the wargame would process transitions (s_t, a_t, r_t, s_{t+1}) in the ORDER they were encountered during gameplay. Why does this temporal ordering cause training instability and what does Experience Replay do to fix it?",
+   opts:["Temporal ordering causes instability because the DQN network weights are updated too many times per episode. Replay randomly SKIPS transitions, reducing total updates and preventing gradient overflow","Sequential transitions are HIGHLY CORRELATED: consecutive states during a battle differ by only one action (e.g., unit moves north in a slow crawl through terrain). When the network is updated on correlated samples, it over-specialises on one region of the state space, catastrophically forgetting what it learned about other regions. Experience Replay stores all transitions in a buffer and samples RANDOMLY — decorrelating the training batch. Each transition is also reused ~1,000 times, dramatically improving sample efficiency","Experience Replay fixes temporal ordering by sorting transitions by reward magnitude — high-reward transitions are trained on first, ensuring the agent prioritises learning from its best experiences","Temporal correlations only matter for LSTM networks; for standard feed-forward DQN architectures, sequential updates have no stability impact and Experience Replay provides no benefit"],
+   ans:1,exp:"Without replay: state s_t and s_{t+1} share 99% of features (unit moved 1 hex out of 400). Training on s_t then immediately s_{t+1} performs two nearly identical gradient updates — the network updates to fit both in very similar directions, causing it to over-adapt to the current region of the battle map while losing quality estimates for states encountered 10,000 steps ago (catastrophic forgetting). Replay buffer breaks this: a batch of 32 random transitions from 100K stored experiences spans diverse game states, ensuring the network updates coherently across the full state space."},
+  {q:"The DQN target network computes y = r + γ max_{a'} Q(s', a'; θ⁻) where θ⁻ is the FROZEN target network updated every C=1,000 steps. Without the target network, using the SAME network θ for both sides: y = r + γ max_{a'} Q(s', a'; θ), what specific instability occurs?",
+   opts:["Without a target network, the DQN doubles its parameter count (since the same network is used twice per update), causing GPU memory overflow after approximately 10,000 gradient steps","The TD target y changes at EVERY gradient step because θ changes. When the network is updated to make Q(s,a;θ) closer to y, y itself shifts because it depends on the same θ. This creates a moving-target problem: the network chases a target that runs away with each step. In practice, Q-values oscillate wildly or diverge to ±∞ — the same instability as trying to stand on a skateboard that moves whenever you lean on it","Without a target network, the max operator in the TD target cannot be computed because the online network's Q-values are all identical at initialisation, creating a division-by-zero error in the advantage function computation","Using the same network for target and prediction causes the gradients from both computations to cancel exactly, resulting in zero updates and no learning"],
+   ans:1,exp:"Moving target problem: at step t, we compute y_t = r + γ max Q(s'; θ_t) and minimise (Q(s,a;θ_t) - y_t)². The gradient step changes θ_t → θ_{t+1}. At step t+1: y_{t+1} = r + γ max Q(s'; θ_{t+1}) is now DIFFERENT from y_t because θ changed. The network oscillates between fitting the current y and the shifted y'. The frozen θ⁻ keeps y stable for C=1,000 steps, allowing the online network to make consistent progress toward a fixed target before the target is refreshed."},
+  {q:"Double DQN uses the online network to SELECT the next action and the target network to EVALUATE it: y = r + γ Q(s', argmax_{a'} Q(s',a';θ); θ⁻). Standard DQN uses: y = r + γ max_{a'} Q(s',a';θ⁻). Why does standard DQN systematically OVERESTIMATE Q-values?",
+   opts:["Standard DQN uses the target network for both selection and evaluation, and target networks are known to produce Q-values 15-20% above their true values due to training lag","max_{a'} Q(s',a';θ⁻) uses the MAXIMUM of noisy estimates. If Q(s',a';θ⁻) has estimation noise for each action, the maximum picks the action with the highest noise realisation, not necessarily the highest TRUE value. E[max(Q̂)] > max(E[Q̂]) — the maximum of noisy estimates exceeds the true maximum. Double DQN separates selection (noisy θ) from evaluation (noisy θ⁻) — since the two networks have independent noise, the evaluation network is unlikely to also overestimate the action selected by noise in the selection network","Standard DQN overestimates because it uses the discount factor γ<1, which mathematically amplifies positive Q-values while suppressing negative ones","Standard DQN's max operator uses GPU parallelism which introduces floating-point rounding errors that accumulate over 100,000 training steps, causing systematic upward bias"],
+   ans:1,exp:"Jensen's inequality: for noisy estimates Q̂(s',a')=Q*(s',a')+ε_a (noise), max_a Q̂ = Q*(s',a*) + max_a ε_a. The max of the noise terms E[max ε_a] > 0 (it's the maximum of random variables, which is positive on average). So E[max Q̂] = max Q* + E[max ε] > max Q*. Double DQN: the selection network θ picks a* = argmax_a Q(s',a';θ) based on its noise. Then evaluation uses Q(s',a*;θ⁻) — the target network's estimate of Q at a*. Since θ and θ⁻ have INDEPENDENT noise, Q(s',a*;θ⁻) does not necessarily overestimate — the bias is dramatically reduced."},
+  {q:"Dueling DQN decomposes Q(s,a;θ) = V(s;θᵥ) + A(s,a;θ_A) − mean_{a'} A(s,a';θ_A). The centering term '− mean A' is added. Why is this centering NECESSARY for identifiability?",
+   opts:["Centering ensures Q-values remain in the range [0, 100] which prevents gradient explosion during backpropagation through the merged stream","Without centering, V(s) and A(s,a) are not uniquely identifiable: V(s)+c and A(s,a)−c produce the same Q(s,a) for any constant c. There are infinitely many (V,A) pairs representing the same Q. Centering by subtracting the mean of A enforces: mean_a A(s,a) = 0, which uniquely fixes the decomposition. This allows the network to properly learn the VALUE of states (V) and the ADVANTAGE of actions (A) as separate, meaningful quantities","Centering normalises the Q-values to have mean=0 across actions in each state, which is required for the argmax operation to be numerically stable on GPU hardware","Centering is a regularisation technique that prevents A(s,a) from growing to large positive values, which would destabilise the network's gradient flow during training"],
+   ans:1,exp:"Q(s,a) = V(s) + A(s,a) has infinite solutions: for any constant c, [V'=V+c, A'=A-c] gives the same Q. The network cannot distinguish which decomposition is 'correct.' Centering: subtract mean_a A. Now mean_a A(s,a) = 0 by construction. This uniquely fixes: A(s,a) = Q(s,a) − V(s) where V(s) = mean_a Q(s,a). Each value and advantage has a unique, interpretable meaning. Without centering, gradients from both streams mix arbitrarily, and neither V nor A converges to its intended semantic meaning."},
+  {q:"The Dueling DQN achieved 93% win rate vs random OPFOR, but only 54% against the Minimax AI opponent. Why does Minimax remain highly competitive against a trained DQN, despite DQN having 100,000 training episodes?",
+   opts:["Minimax AI cheats by having access to the DQN's Q-table at inference time, allowing it to perfectly counter every move the DQN makes","Minimax performs ADVERSARIAL lookahead: it explicitly searches the game tree, computing the worst-case outcome for the DQN agent at every node. For a tactical game with branching factor b and depth d, Minimax evaluates b^(d/2) positions (with alpha-beta) — each position assessed by the evaluation heuristic. The DQN learned a heuristic from experience but makes myopic decisions based on a single forward pass. Against the strongest adversary response, the DQN's policy exploits that Minimax did not anticipate are closed by Minimax's thorough search — resulting in only 54% win rate","DQN loses to Minimax because DQN was trained against random opponents and has never seen adversarial search-based opponents during training. With self-play training against Minimax, DQN would achieve >95% win rate","Minimax wins because it uses the exact game state while DQN only receives a feature representation of the state that loses information about critical tactical details"],
+   ans:1,exp:"DQN learns a stochastic policy from experience — it captures average-case strategic patterns but may have exploitable weaknesses. Minimax explicitly searches for the move that minimises the opponent's best response, eliminating any systematic exploits. It also has perfect game-tree evaluation in tactical positions. DQN's 54% vs Minimax suggests DQN has learned genuine strategic value but cannot fully match adversarial search depth. Note: AlphaGo/AlphaZero addresses this by combining DQN-style learning WITH Monte Carlo Tree Search — both pattern recognition and explicit search."},
+  {q:"Potential-based reward shaping uses F(s,s') = γΦ(s') − Φ(s) where Φ(s) is a potential function. This specific form guarantees that the OPTIMAL POLICY is UNCHANGED despite the modified rewards. What mathematical property ensures the optimal policy is preserved?",
+   opts:["The potential function Φ(s) is defined to be equal to V*(s) — the true optimal value function — making the shaped rewards equivalent to the original rewards for optimal trajectory evaluation","The potential-based form F=γΦ(s')−Φ(s) is a telescoping sum over any trajectory: Σ_t F(s_t,s_{t+1}) = γΦ(s_T) − Φ(s_0) — depends only on start and end states, not on intermediate choices. Any trajectory differences due to F are independent of the sequence of intermediate actions. Therefore, the ranking of trajectories under shaped rewards is identical to their ranking under original rewards, preserving π*","Potential-based shaping preserves the optimal policy because the shaping rewards always sum to exactly zero over any complete episode, adding nothing to the cumulative return","Preserving π* requires Φ(s) to be monotonically increasing — as long as the potential function satisfies this constraint, any reward shaping function maintains policy invariance"],
+   ans:1,exp:"The telescoping property is the key theorem (Ng, Russell, Harada 1999): for any trajectory τ = (s_0,a_0,s_1,...,s_T): Σ_t γ^t F(s_t,s_{t+1}) = Σ_t γ^t [γΦ(s_{t+1})-Φ(s_t)] = γ^T Φ(s_T) - Φ(s_0). This quantity depends ONLY on the start state s_0 and terminal state s_T — it is the same for every trajectory with the same start and end, regardless of intermediate actions. Therefore, the relative ordering of policy returns under R_shaped equals the ordering under R_original → same optimal policy."},
+  {q:"Curriculum learning for the wargame agent used 4 phases (5×5 → 10×10 → 20×20 → adaptive OPFOR). Without curriculum, direct training on 20×20 achieved only 51% win rate after 100K episodes vs 91% with curriculum. The key mechanism behind this improvement is:",
+   opts:["Curriculum learning reduces the state space from 20×20 to 5×5 during early training, which is equivalent to running 4× more episodes in the same wall-clock time, explaining all the performance difference","Transfer learning between phases initialises each phase with weights from the previous phase. A policy good for 5×5 combat provides a far better starting point than random initialisation for 10×10 — the basic tactical intuitions (attack when adjacent, defend when outnumbered) transfer. Random initialisation on 20×20 requires discovering these basic intuitions from scratch against full complexity, taking far longer. Curriculum provides the agent with a learning scaffold, allowing it to build competence progressively","Curriculum learning applies importance sampling to weight the 20×20 training experiences based on how similar they are to the simpler 5×5 scenarios, effectively increasing the sample weight of important transitions","Curriculum works because the OPFOR agents in earlier phases are weaker, allowing the agent to win more often early in training. More wins = more positive reinforcement = faster Q-value convergence regardless of grid size"],
+   ans:1,exp:"Curriculum learning exploits transfer: basic combat tactics (when to attack, how to protect units, terrain use) learned in 5×5 form the foundation for more complex 10×10 strategies, which build toward 20×20. The weights encoding these basic tactics are reused at each phase transition. Direct 20×20 training must simultaneously learn basic tactics + complex coordination — a much harder joint optimisation problem. The curriculum provides an ordered sequence of increasingly hard problems that guide exploration toward productive regions of policy space, dramatically accelerating convergence."},
+  {q:"Experience Replay buffer stores transitions (s, a, r, s', done). The buffer has size 100,000 and mini-batches of 32 are sampled uniformly at random. On average, how many gradient updates does each transition contribute to, and what does this imply about the sample efficiency of DQN vs standard online Q-Learning?",
+   opts:["Each transition is used exactly once and then discarded. The buffer stores 100,000 unique transitions and the network trains on each exactly once per episode, equivalent to standard online Q-Learning","The training process: let T=total training steps, B=100K buffer, b=32 batch size. Once the buffer is full, each new transition evicts the oldest. Total updates per transition ≈ (min(T,B)/B) × (T_batches × b / B). For T=1M steps, batch_ratio ≈ 1M×32/100K ≈ 320 updates per transition. Each experience is reused ~320 times. Standard Q-Learning: each experience used exactly once (online). DQN is ~320× more sample efficient — getting 320 gradient signal uses from each experience vs 1 for online methods","Each transition in the replay buffer contributes to exactly 1 gradient update — the buffer exists only to store transitions, not to reuse them. The benefit is purely from breaking temporal correlations, not from sample reuse","Replay buffer transitions are used 1,000 times each by design — the buffer size of 100,000 divided by the target network update frequency of C=1,000 steps gives exactly 100 uses per transition"],
+   ans:1,exp:"Buffer dynamics: when full (100K transitions), new experience overwrites oldest. At 1M total training steps with batch size 32: total gradient updates = 1M. Each update samples 32 transitions from 100K → each transition is sampled 1M×32/100K = 320 times on average. Online Q-Learning: each (s,a,r,s') used once immediately then discarded. DQN's replay thus achieves 320× sample reuse. For expensive real-world simulations where each episode takes hours, this 320× sample efficiency improvement is crucial for practical training."},
+  {q:"A defence researcher proposes adding a shaped reward of +2 for 'moving toward the objective' to the sparse wargame rewards (+100 win, −100 lose). A critic argues this is 'teaching the agent to walk into ambushes.' Under what condition would this shaped reward be HARMFUL rather than helpful?",
+   opts:["The +2 proximity reward is always harmful because it violates the potential-based shaping theorem — any reward that increases monotonically with proximity to the objective changes the optimal policy","If the optimal strategy in some states requires WITHDRAWING from the objective temporarily (e.g., flanking manoeuvre, feint, tactical retreat to draw OPFOR out of cover), the +2 proximity reward penalises these withdrawals (−2 per step away from objective). The agent may learn to approach the objective DIRECTLY rather than indirectly, sacrificing flanking opportunities and complex manoeuvres for the immediate shaped reward. The shaping reward is misaligned with the true objective (WIN) and could produce a locally optimal but globally suboptimal policy","The +2 reward is harmful only when γ < 0.9, because with high discount factors the agent can see far enough into the future to understand that short-term withdrawal serves the long-term objective","The critic is correct: any intermediate reward must be approved by a military doctrine expert before training, but the specific value of +2 can be safely changed to +0.1 to eliminate the ambush problem"],
+   ans:1,exp:"This is reward misalignment: the agent optimises the shaped reward, not the true objective. If a flanking approach requires 5 turns of moving AWAY from the objective (−2×5=−10 in shaped rewards) before a decisive assault (+100 win), the agent may prefer a direct but more costly frontal assault (never receives the −10 shaped penalty). The optimal policy under the true reward (win/lose) may include retreating, feinting, encircling — behaviours that the proximity reward discourages. Potential-based shaping with Φ=distance-to-objective DOES change the effective rewards but preserves π* only if done correctly; naive proximity rewards without the γΦ(s')−Φ(s) form may NOT preserve π*."},
+  {q:"After 100K training episodes with curriculum learning, the Dueling+Double DQN achieves 81% win rate vs novice human OPFOR but only 54% vs Minimax OPFOR. The operational recommendation was to use DQN as an 'advisor' rather than an 'autonomous commander.' What specific DQN output supports this advisory role, and what does the human commander contribute that DQN cannot?",
+   opts:["DQN's advisory role means it only suggests 'attack' or 'defend' as binary recommendations. The human commander's role is purely administrative — rubber-stamping the DQN's recommendations for legal accountability","DQN outputs Q(s, aᵢ; θ) for all 7 actions — these are interpretable as 'expected strategic value' for each option. The commander sees: Attack=18.7, Move N=12.4, Defend=9.2, etc., plus uncertainty estimates. The human contributes: (a) contextual judgment about factors the state encoding missed (intelligence reports, political constraints, ROE nuances, morale the model didn't see); (b) adversarial reasoning — anticipating that the HUMAN OPFOR will react to the DQN's patterns; (c) ethical and legal judgment on the proportionality and lawfulness of proposed actions; (d) accountability. Human+DQN outperforms either alone because each covers the other's blind spots","DQN outputs a single recommended action with 100% confidence. The human's role is to override this recommendation when intuition suggests otherwise, providing approximately 10-15% of tactical value in the combined system","DQN cannot be used as an advisor because outputting Q-values without the full Q-table context is meaningless — a standalone Q-value number carries no interpretable information for a human commander"],
+   ans:1,exp:"Q-values are the natural advisory output: Q(s,Attack)=18.7 vs Q(s,Defend)=9.2 tells a commander 'Attack has 2x higher strategic value in this position.' The commander doesn't need to understand the math — just that higher is better. Human contributions that DQN cannot replicate: (1) Intel not in the state vector (e.g., satellite imagery just received), (2) Political constraints ('we cannot attack before the ceasefire window'), (3) DQN's exploitable patterns — a human OPFOR who watched previous DQN matches will counter its tendencies; a human commander adapts in real-time, (4) Legal and ROE compliance — DQN optimises reward, not international law."}
+];
+
+let currentQ=0,score=0,timer=null,answered=false;
+const TOTAL_TIME=40,DASH=2*Math.PI*20;
+const $=id=>document.getElementById(id);
+function startQuiz(){$('intro').style.display='none';$('quiz').style.display='flex';loadQuestion();}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMath(el) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(el, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+}
+function loadQuestion(){
+  answered=false;const q=Qs[currentQ];
+  $('qnum').textContent=`Question ${currentQ+1} of ${Qs.length}`;
+  $('qtext').innerHTML = q.q;
+  renderMath($('qtext'));
+  $('progressFill').style.width=`${(currentQ/Qs.length)*100}%`;
+  $('scoreDisplay').textContent=`Score: ${score.toFixed(2)}`;
+  const optDiv=$('options');optDiv.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const d=document.createElement('div');d.className='opt';d.id=`opt${i}`;
+    d.innerHTML=`<div class="opt-key">${k}</div><div class="opt-text">${q.opts[i]}</div>`;
+    optDiv.appendChild(d);
+  });
+  renderMath(optDiv);
+  startTimer();
+}
+function startTimer(){
+  let remaining=TOTAL_TIME;
+  const circle=$('timerCircle'),numEl=$('timerNum');
+  circle.style.stroke='#3D55B8';circle.style.strokeDashoffset=0;numEl.textContent=TOTAL_TIME;
+  timer=setInterval(()=>{
+    remaining--;numEl.textContent=remaining;
+    circle.style.strokeDashoffset=DASH*(1-remaining/TOTAL_TIME);
+    if(remaining<=10)circle.style.stroke='#E05218';
+    else if(remaining<=20)circle.style.stroke='#C98A12';
+    if(remaining<=0){clearInterval(timer);revealAnswer(-1);}
+  },1000);
+}
+function revealAnswer(chosen){
+  if(answered)return;answered=true;clearInterval(timer);
+  const q=Qs[currentQ];
+  if(chosen===q.ans)score+=1;else if(chosen>=0)score-=0.25;
+  q.opts.forEach((_,i)=>{
+    const el=$(`opt${i}`);
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===chosen&&chosen!==q.ans)el.classList.add('wrong');
+  });
+  setTimeout(advance,2500);
+}
+function advance(){currentQ++;if(currentQ>=Qs.length){showEnd();return;}loadQuestion();}
+function showEnd(){
+  $('quiz').style.display='none';$('end').style.display='flex';
+  const s=parseFloat(score.toFixed(2));$('finalScore').textContent=s;
+  let g='';
+  if(s>=12)g='🏆 Outstanding (≥12/15)';
+  else if(s>=9)g='⭐ Proficient (9–11/15)';
+  else if(s>=6)g='📚 Developing (6–8/15)';
+  else g='🔄 Needs Review (<6/15)';
+  $('finalGrade').textContent=g;
+}
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>

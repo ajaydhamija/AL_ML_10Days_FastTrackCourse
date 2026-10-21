@@ -1,0 +1,347 @@
+\documentclass[11pt]{article}
+\usepackage{notes} % place notes.sty in the same folder
+\definecolor{AccN}{HTML}{9B5E1A}
+\fancyhead[L]{\small\color{NavyN}\nouppercase{\leftmark}}\fancyhead[R]{\small\color{GreyN}Instructor Manual --- Lecture 8}
+\usepackage{longtable,multicol,needspace}
+\setlength{\emergencystretch}{2em}
+\newtcolorbox{instr}[1]{nb,colback=AccN!6,colframe=AccN,title={#1}}
+\newtcolorbox{prob}{nb,colback=BluN!5,colframe=BluN,title={Problem statement}}
+\newtcolorbox{soln}{nb,colback=GrnN!5,colframe=GrnN,title={Model solution and marking points}}
+\newtcolorbox{sayit}{nb,colback=white,colframe=NavyN,title={Read aloud to students}}
+\newtcolorbox{live}[1]{nb,colback=AccN!4,colframe=AccN,title={#1}}
+\begin{document}
+\begin{titlepage}\centering\vspace*{2.2cm}
+{\color{AccN}\large\bfseries LECTURE 8\par}\vspace{0.6cm}
+{\color{NavyN}\Huge\bfseries Reinforcement Learning Part 3:\\Multi-Agent Systems \& Autonomous Combat Platforms\par}\vspace{0.6cm}
+{\color{AccN}\rule{0.7\textwidth}{1.5pt}}\par\vspace{0.6cm}
+{\LARGE Instructor Manual\par}\vspace{0.4cm}
+{\large\begin{minipage}{0.85\textwidth}\centering MARL \textbullet\ CTDE \textbullet\ QMIX \textbullet\ MAPPO \textbullet\ MADDPG \textbullet\ credit assignment \textbullet\ emergent tactics\\Case study: 6-unit combined arms (3 ground + 2 drones + 1 SEAD) --- emergent flanking and decoy tactics\end{minipage}\par}\vspace{2cm}
+{\large AK DHAMIJA, Researcher \& Instructor, AI \& Machine Learning\par}\vspace{0.2cm}
+{\normalsize \href{mailto:dhamija.ak@gmail.com}{dhamija.ak@gmail.com} \quad\textbullet\quad 9811453163\par}\vspace{0.3cm}
+{Unit 4: Simulation Strategies in Warfare --- AI \& Machine Learning in Warfare\par}\vfill
+\begin{tcolorbox}[colback=NavyN!4,colframe=NavyN,boxrule=0.6pt,arc=2pt,width=0.9\textwidth]\small
+\textbf{This manual contains:} the 45-minute session plan with timings; a slide-by-slide teaching guide for all 20 slides; key messages, facilitation tips, anticipated questions with model answers, misconceptions and in-class activities; live demonstrations with the interactive studio; consistency notes on the source material; the complete quiz answer key with rationale and scoring rules; and the assignment with marking scheme and full model solutions.
+\end{tcolorbox}
+\end{titlepage}
+\tableofcontents\newpage
+
+
+\needspace{12\baselineskip}\section{Lecture at a Glance}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{3.3cm}>{\raggedright\arraybackslash}X@{}}\toprule
+
+\textcolor{NavyN}{Lecture}&8 --- Reinforcement Learning Part 3: Multi-Agent Systems \& Autonomous Combat Platforms\\
+\textcolor{NavyN}{Duration}&45 minutes: 5 min opening Q\&A, 30 min teaching, 10 min auto-quiz\\
+\textcolor{NavyN}{Slides}&20 (Beamer PDF, 16:9), 10 sections\\
+\textcolor{NavyN}{Prerequisite}&Lecture~7; students should have attempted its quiz and assignment.\\
+\textcolor{NavyN}{Student materials}&\texttt{Lecture8\_Slides\_Beamer.pdf}; \texttt{Lecture8\_Reference\_Text.pdf}; \texttt{Lecture8\_Quiz.html}; \texttt{Lecture8\_Answers\_Assignment.html} (release after the quiz)\\
+\textcolor{NavyN}{Interactive studio}&\texttt{Lecture8\_Multi\_Agent\_Lab.html} (live demonstrations in Section~\ref{sec:live})\\
+\textcolor{NavyN}{Assessment}&Auto-quiz: 15 MCQs, 40~s each, $+1/-0.25$. Assignment: 5 problems, 100 marks, plus a 20-mark bonus problem.\\\bottomrule\end{tabularx}\end{center}
+
+\subsection*{Overview}Lecture~8 completes the RL block with \emph{multi-agent} reinforcement learning (MARL) and autonomous combat platforms. It explains why multiple learners break single-agent guarantees (non-stationarity, partial observability, credit assignment), introduces the Dec-POMDP and centralised training with decentralised execution (CTDE), and develops QMIX (monotonic value mixing), MAPPO (multi-agent PPO with a centralised critic), MADDPG and COMA (counterfactual credit). The case is a six-unit combined-arms scenario: IQL 58.3\%, QMIX 74.1\%, MADDPG 79.2\%, MAPPO 82.4\%, CommsMAPPO 88.1\% against a human-expert team at 81.3\%. Emergent communication and tactics are examined critically, and the lecture ends with levels of autonomy, manned--unmanned teaming and the ethical bright line on lethal force.
+
+\subsection*{Learning outcomes}By the end of the lecture students should be able to:\begin{enumerate}\item Explain non-stationarity and partial observability in MARL; define a Dec-POMDP.\item Explain CTDE and the IGM property; contrast VDN, QMIX and MAPPO.\item Compute COMA counterfactual advantages and explain the free-rider problem.\item Evaluate claims of AI-versus-human superiority statistically.\item Discuss levels of autonomy, MUM-T and IHL constraints on lethal autonomy.\end{enumerate}
+
+\subsection*{Syllabus mapping}\begin{itemize}\item Reinforcement learning for autonomous systems --- \textbf{multi-agent learning} (CTDE, QMIX, MAPPO, MADDPG, COMA, emergent communication)\end{itemize}
+
+\needspace{12\baselineskip}\section{Session Plan (45 Minutes)}
+
+\begin{center}\begin{tikzpicture}[x=0.3444cm,y=1cm]
+\fill[AmbN!40](0,0)rectangle(5,1);\node[font=\scriptsize\bfseries,align=center]at(2.5,0.5){Q\&A\\recap};
+\fill[AccN!25](5.00,0)rectangle(9.50,1);\draw[white,thick](5.00,0)--(5.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(7.25,0.5){\parbox{0.9cm}{\centering \S1}};
+\fill[NavyN!18](9.50,0)rectangle(12.50,1);\draw[white,thick](9.50,0)--(9.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(11.00,0.5){\parbox{0.9cm}{\centering \S2}};
+\fill[AccN!25](12.50,0)rectangle(15.50,1);\draw[white,thick](12.50,0)--(12.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(14.00,0.5){\parbox{0.9cm}{\centering \S3}};
+\fill[NavyN!18](15.50,0)rectangle(18.50,1);\draw[white,thick](15.50,0)--(15.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(17.00,0.5){\parbox{0.9cm}{\centering \S4}};
+\fill[AccN!25](18.50,0)rectangle(21.50,1);\draw[white,thick](18.50,0)--(18.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(20.00,0.5){\parbox{0.9cm}{\centering \S5}};
+\fill[NavyN!18](21.50,0)rectangle(24.50,1);\draw[white,thick](21.50,0)--(21.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(23.00,0.5){\parbox{0.9cm}{\centering \S6}};
+\fill[AccN!25](24.50,0)rectangle(27.50,1);\draw[white,thick](24.50,0)--(24.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(26.00,0.5){\parbox{0.9cm}{\centering \S7}};
+\fill[NavyN!18](27.50,0)rectangle(30.50,1);\draw[white,thick](27.50,0)--(27.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(29.00,0.5){\parbox{0.9cm}{\centering \S8}};
+\fill[AccN!25](30.50,0)rectangle(32.00,1);\draw[white,thick](30.50,0)--(30.50,1);
+\node[font=\tiny,rotate=90,anchor=center]at(31.25,0.5){\parbox{0.9cm}{\centering \S9}};
+\fill[NavyN!18](32.00,0)rectangle(35.00,1);\draw[white,thick](32.00,0)--(32.00,1);
+\node[font=\tiny,rotate=90,anchor=center]at(33.50,0.5){\parbox{0.9cm}{\centering \S10}};
+\fill[RedN!30](35,0)rectangle(45,1);\node[font=\scriptsize\bfseries,align=center]at(40,0.5){Auto-quiz\\15 Q $\times$ 40 s};
+\draw[NavyN](0,0)rectangle(45,1);
+\foreach \tt in {0,5,10,15,20,25,30,35,40,45}{\draw[NavyN](\tt,0)--(\tt,-0.12);\node[font=\tiny,below]at(\tt,-0.12){\tt};}
+\node[font=\scriptsize,below]at(22.5,-0.45){minutes};
+\end{tikzpicture}\end{center}
+
+\begin{center}\small\renewcommand{\arraystretch}{1.2}\begin{tabularx}{\textwidth}{@{}l l X r@{}}\toprule\textbf{Clock} & \textbf{Slides} & \textbf{Segment} & \textbf{Min}\\\midrule
+
+0:00--5:00 & --- & \textbf{Opening Q\&A and recap} (see prompts below) & 5\\
+
+5:00--9:30 & 2--3 & 1. Why MARL (2 slides) & 4.5\\
+
+9:30--12:30 & 4--5 & 2. CTDE (2 slides) & 3\\
+
+12:30--15:30 & 6--7 & 3. QMIX (2 slides) & 3\\
+
+15:30--18:30 & 8--9 & 4. MAPPO (2 slides) & 3\\
+
+18:30--21:30 & 10--11 & 5. Credit Assignment (2 slides) & 3\\
+
+21:30--24:30 & 12--13 & 6. Emergent Behaviour (2 slides) & 3\\
+
+24:30--27:30 & 14--15 & 7. Comparison \& Safety (2 slides) & 3\\
+
+27:30--30:30 & 16--17 & 8. Autonomous Platforms (2 slides) & 3\\
+
+30:30--32:00 & 18 & 9. Across Disciplines (1 slide) & 1.5\\
+
+32:00--35:00 & 19--20 & 10. Summary (2 slides) & 3\\
+
+35:00--45:00 & --- & \textbf{Auto-quiz} (instructions 1 min, 15 questions $\times$ 40 s = 10 min of answering; collect scores) & 10\\\bottomrule\end{tabularx}\end{center}
+
+Slide 1 is the title slide and is shown while students settle. The teaching segment covers 19 content slides in 30 minutes, an average pace of 0.6 slides per minute. 
+
+Minute allocations are proportional to slide counts; shift time towards the sections students find hardest.
+
+\begin{instr}{Opening Q\&A prompts (first 5 minutes)}\begin{enumerate}\item From Lecture~7: what does PPO clip, and why?\item Why does SAC hold up better under wind disturbance?\item What is domain randomisation?\end{enumerate}Take two or three answers per prompt; correct misconceptions briefly and note any topic that needs revisiting.\end{instr}
+
+\needspace{12\baselineskip}\section{Slide-by-Slide Teaching Guide}
+
+Each subsection gives the slide range, the suggested time, what to emphasise, and the slide titles in order. Numbers refer to pages of the Beamer PDF.
+
+\needspace{8\baselineskip}\subsection{1. Why MARL \normalfont\small\color{GreyN}(slides 2--3, about 4.5 min)}
+
+\textbf{Teaching note.} Why one agent is not enough; the MARL paradigm with $N$ learners; non-stationarity.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}2 & Why Multi-Agent RL? --- The Limits of Single-Agent Approaches\\
+3 & The MARL Paradigm --- $N$ Learning Agents in One Shared World\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{2. CTDE \normalfont\small\color{GreyN}(slides 4--5, about 3 min)}
+
+\textbf{Teaching note.} CTDE as mission command: rehearse with full information, execute on local observations. Overview of QMIX, MAPPO and MADDPG.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}4 & CTDE --- Centralised Training, Decentralised Execution\\
+5 & Three CTDE Algorithms --- QMIX, MAPPO and MADDPG\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{3. QMIX \normalfont\small\color{GreyN}(slides 6--7, about 3 min)}
+
+\textbf{Teaching note.} IGM; monotonic mixing via hypernetworks with non-negative weights; what QMIX cannot represent; the six-agent combined-arms case.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}6 & QMIX --- Global $Q$ as a Monotonic Mix of Local $Q$-Values\\
+7 & QMIX Case Study --- Combined Arms with 6 Agents\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{4. MAPPO \normalfont\small\color{GreyN}(slides 8--9, about 3 min)}
+
+\textbf{Teaching note.} Shared actor with agent ID, centralised critic; MAPPO versus QMIX and the human benchmark --- treat 82.4\% vs 81.3\% as comparable, not superior.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}8 & MAPPO --- Multi-Agent PPO with a Shared Centralised Critic\\
+9 & MAPPO vs QMIX --- and the Human-Expert Benchmark\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{5. Credit Assignment \normalfont\small\color{GreyN}(slides 10--11, about 3 min)}
+
+\textbf{Teaching note.} Free-riding under shared reward; COMA's counterfactual baseline $A_i=Q(s,\mathbf a)-\sum_{a'}\pi_i(a')Q(s,(a',\mathbf a_{-i}))$.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}10 & Credit Assignment --- Who Deserves Credit for a Joint Victory?\\
+11 & COMA --- Counterfactual Credit: ``What If Only I Had Acted Differently?''\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{6. Emergent Behaviour \normalfont\small\color{GreyN}(slides 12--13, about 3 min)}
+
+\textbf{Teaching note.} Emergent communication (8-D messages encoding enemy positions, SAM lock-on and fuel); emergent tactics such as SEAD-first; reward mis-specification (conserving ammunition by not firing).
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}12 & Emergent Communication --- Agents Invent a Language\\
+13 & Emergent Tactics --- What MARL Discovers from Reward Alone\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{7. Comparison \& Safety \normalfont\small\color{GreyN}(slides 14--15, about 3 min)}
+
+\textbf{Teaching note.} Algorithm comparison and when to use which; MARL safety warnings.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}14 & Algorithm Comparison --- All MARL Methods vs the Human Expert Team\\
+15 & When to Use Which --- and a MARL Safety Warning\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{8. Autonomous Platforms \normalfont\small\color{GreyN}(slides 16--17, about 3 min)}
+
+\textbf{Teaching note.} Levels of autonomy; manned--unmanned teaming; the ethical bright line: humans decide on lethal force.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}16 & Autonomous Combat Platforms --- Levels of Autonomy\\
+17 & Manned--Unmanned Teaming (MUM-T) --- and the Ethical Bright Line\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{9. Across Disciplines \normalfont\small\color{GreyN}(slide 18, about 1.5 min)}
+
+\textbf{Teaching note.} Multi-agent systems in biology (swarms, ant colonies), economics and game theory, air-traffic management and team psychology.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}18 & Multi-Agent Systems Across the Disciplines\\\end{tabularx}\end{center}
+
+\needspace{8\baselineskip}\subsection{10. Summary \normalfont\small\color{GreyN}(slides 19--20, about 3 min)}
+
+\textbf{Teaching note.} Summary and look-ahead to the revision lecture.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.1}\begin{tabularx}{\textwidth}{@{}r X@{}}19 & Lecture 8 Summary --- From CTDE to Emergent Combined-Arms Tactics\\
+20 & Looking Ahead --- Lecture 9: Culmination \& Revision\\\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{Key Messages}Students should leave the room able to state these in their own words:\begin{keypoint}\begin{enumerate}\item Other learning agents make each agent's world non-stationary; CTDE is the practical answer.\item Value factorisation (QMIX) and centralised critics (MAPPO, MADDPG) are the two main CTDE families.\item Credit assignment decides whether a team learns; counterfactual baselines target each agent's contribution.\item Emergent behaviour must be inspected: it can be brilliant, opaque or exploitative of reward flaws.\item MARL is decision support; lethal decisions remain with accountable humans under IHL.\end{enumerate}\end{keypoint}
+
+\needspace{12\baselineskip}\section{Facilitation Tips}\begin{itemize}\item Use the mission-command analogy for CTDE --- officers grasp it immediately.\item Run the MAPPO-vs-human significance check live: with about 300 episodes each, standard errors are about 2.2 points and the 1.1-point gap gives $z\approx0.35$.\item Leave time for the autonomy and ethics slides; they generate the best discussion.\end{itemize}
+
+\needspace{12\baselineskip}\section{Anticipated Questions and Model Answers}
+
+\begin{question}{anticipated question}\textbf{Q:} Can't we just train one big agent controlling all units?\par\smallskip\textbf{A:} The joint action space grows exponentially, and at execution units may not be able to communicate; CTDE keeps execution decentralised.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} Should we trust emergent communication?\par\smallskip\textbf{A:} Only after decoding (probing), testing under jamming and spoofing, and securing the channel; opaque codes are an attack surface.\end{question}
+
+\begin{question}{anticipated question}\textbf{Q:} If the AI matched the humans, why not let it command?\par\smallskip\textbf{A:} Matching a simulation benchmark is not field validation; IHL judgements of distinction and proportionality require accountable humans.\end{question}
+
+\needspace{12\baselineskip}\section{Common Misconceptions}\begin{center}\small\renewcommand{\arraystretch}{1.35}\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}\toprule\textbf{Misconception} & \textbf{Correction}\\\midrule``MAPPO beat the human experts.'' & 82.4\% vs 81.3\% from one evaluation is within sampling error.\\
+``COMA advantages sum to zero across agents.'' & They have zero mean over each agent's own action distribution, not across agents.\\
+``Emergent tactics are doctrine.'' & They are hypotheses produced by a reward in a simulator; validate before adoption.\\\bottomrule\end{tabularx}\end{center}
+
+\needspace{12\baselineskip}\section{In-Class Activities and Discussion Prompts}\label{sec:act}\begin{itemize}\item \textbf{Credit split:} give a team reward of $+100$ and a table of counterfactual values; teams compute each agent's COMA advantage and discuss the free rider.\item \textbf{Autonomy ladder debate:} assign platforms (logistics UGV, ISR drone, loitering munition) to autonomy levels and justify.\end{itemize}
+
+\needspace{12\baselineskip}\section{Run It Live: Studio Demonstrations}\label{sec:live}
+
+Project \texttt{Lecture8\_Multi\_Agent\_Lab.html} (it is a single HTML file and runs offline in any browser; every result updates as an input changes). Each demonstration below follows the same rhythm: \textbf{set} the inputs, \textbf{ask} the class to commit to a prediction (a show of hands or a one-word answer), then \textbf{reveal} the result and \textbf{land} the point. The numbers are exactly what the page shows for the settings given; simulations use fixed random seeds, so they repeat every time. The 45-minute plan has little slack: choose the one demonstration marked \emph{first choice} for class, and use the others in a tutorial, a second session, or as homework with the drill cards at the bottom of the page.
+
+\begin{live}{Demo 1: A coordination peak that VDN misses (about 3 min, with \S3 QMIX) --- \emph{first choice}}\textbf{Set.} Demo~1 defaults: the lecture's penalty game: 8 if both agents choose action~1, $-12$ if only one does, 0 otherwise.\par\smallskip\textbf{Ask.} ``Each agent acts greedily on its own learned value. Do they coordinate on the 8?''\par\smallskip\textbf{Reveal.} VDN gives $Q_1=Q_2=(-3.11,-1.78,-1.78)$, so both pick action~2: joint reward \textbf{0}. Independent learners reach the 8 in only \textbf{6 of 40} runs; a joint learner in 40 of 40. Press \textsf{Mild penalty}: VDN now finds the 8, but independent learners still manage only 15 of 40.\par\smallskip\textbf{Land the point.} Additive (and monotonic) factorisations average a narrow peak away. Centralised critics, richer mixers or communication are needed.\end{live}
+
+\begin{live}{Demo 2: Never guard the depot every night (about 3 min, with \S7 Comparison \& Safety (reference text, security games))}\textbf{Set.} Demo~2 defaults: the fuel-depot and bridge payoffs from the reference text.\par\smallskip\textbf{Ask.} ``Should the patrol always cover the more valuable depot?''\par\smallskip\textbf{Reveal.} $c=1$: the attacker hits the bridge and the defender gets \textbf{$-6.000$}. $c=0.5$: the attacker hits the depot, $-2.500$. Optimum $c^*=0.542$: \textbf{$-1.875$}, with the attacker almost indifferent (1.90 vs 1.86 at $c=0.54$).\par\smallskip\textbf{Land the point.} An observed, predictable policy is exploitable. The best commitment is randomised and makes the attacker indifferent.\end{live}
+
+\begin{live}{Demo 3: Is 58\% a real improvement? (about 2 min, with \S7 Comparison \& Safety)}\textbf{Set.} Demo~5 defaults: 58 wins, 42 losses.\par\smallskip\textbf{Ask.} ``The new agent won 58 of 100 games. Is it better?''\par\smallskip\textbf{Reveal.} Score 58.0\%, 95\% interval \textbf{48.2--67.2\%}, $p=0.110$; about 305 games are needed to confirm it. Enter 290 wins and 210 losses (the same rate): 53.6--62.2\%, $p<0.001$.\par\smallskip\textbf{Land the point.} Report the interval, not the rate. Then test against a pool of opponents: a win rate against one opponent says nothing about exploitability.\end{live}
+
+\needspace{12\baselineskip}\section{Consistency Notes on the Source Material}These notes record where the original PowerPoint deck contained an inconsistency and how the current slides, reference text, quiz and assignment handle it. Students who have seen the old deck may raise them.\begin{itemize}\item The source deck states that COMA advantages ``sum to approximately zero''; in its own example they sum to $+37.4$. The reference text explains the correct property.\item The source deck presents MAPPO's 82.4\% as exceeding the human team's 81.3\%. The difference is not statistically demonstrated; the new materials (and Quiz Q9) treat it as comparable performance.\end{itemize}
+
+\needspace{12\baselineskip}\section{Quiz Administration and Answer Key}
+
+\begin{sayit}``You will now take a 15-question quiz. Each question has four options and exactly one correct answer. You have 40 seconds per question; the quiz advances automatically when time runs out. A correct answer scores $+1$, a wrong answer $-0.25$, and an unanswered question 0. The maximum is 15 and the minimum is $-3.75$. Because of the negative marking, guessing blindly among four options gains nothing on average --- answer when you can eliminate options. Your score and a full review appear at the end.''\end{sayit}
+
+\textbf{Delivery.} Open \texttt{Lecture8\_Quiz.html} on each student device (or project it and collect answers on paper). The page enforces the timer and computes the score with negative marking. Release \texttt{Lecture8\_Answers\_Assignment.html} only after all students have finished.
+
+\subsection*{Answer key}\begin{center}\small\renewcommand{\arraystretch}{1.3}\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}\hline \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{11} & \textbf{12} & \textbf{13} & \textbf{14} & \textbf{15}\\\hline D & C & A & B & A & C & D & D & A & C & A & B & D & B & B\\\hline\end{tabular}\end{center}
+
+\textbf{Interpreting scores.} 12 or more: secure command of the lecture. 9--11.75: good, review missed items. Below 9: revisit the reference text before the assignment. If more than half the class misses a question, revisit that point in the next lecture's opening Q\&A.
+
+\subsection*{Questions, options and rationale}
+
+{\small
+
+\noindent\textbf{Q1.} The core difficulty that breaks single-agent convergence guarantees in MARL is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Large networks\item[B.] Continuous actions\item[C.] Discounting\item[\textbf{D.}] \textbf{Non-stationarity: other agents are learning, so each agent's environment keeps changing}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} From one agent's view, teammates and opponents are part of a changing environment.\par\medskip
+
+\noindent\textbf{Q2.} In a Dec-POMDP each agent acts on:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] The full global state\item[B.] The other agents' rewards\item[\textbf{C.}] \textbf{Its own private observation (or history)}~{\color{GrnN}$\checkmark$}\item[D.] A shared policy only\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Partial observability per agent: a drone sees 200 m, a tank 500 m.\par\medskip
+
+\noindent\textbf{Q3.} CTDE means:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Global information is used in training; each agent acts on local observations at execution}~{\color{GrnN}$\checkmark$}\item[B.] Centralised execution\item[C.] No training\item[D.] Communication is mandatory in the field\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Like mission command: rehearse with full intelligence, execute under radio silence.\par\medskip
+
+\noindent\textbf{Q4.} Independent Q-learning scored 58.3\% because it:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Used too many parameters\item[\textbf{B.}] \textbf{Ignores teammates' learning and coordination}~{\color{GrnN}$\checkmark$}\item[C.] Uses CTDE\item[D.] Uses communication\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} It is the baseline floor for MARL.\par\medskip
+
+\noindent\textbf{Q5.} The IGM property ensures that:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Each agent acting greedily on its own Q gives the joint greedy action of $Q_{tot}$}~{\color{GrnN}$\checkmark$}\item[B.] Agents share rewards\item[C.] Agents communicate\item[D.] Learning is on-policy\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Decentralised execution consistent with centralised training.\par\medskip
+
+\noindent\textbf{Q6.} QMIX guarantees IGM by enforcing:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] $Q_{tot}=\sum Q_i$\item[B.] Zero-sum rewards\item[\textbf{C.}] \textbf{$\partial Q_{tot}/\partial Q_i\ge0$ via non-negative mixing weights from hypernetworks}~{\color{GrnN}$\checkmark$}\item[D.] A shared actor\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Monotonic, state-conditioned non-linear mixing; strictly more expressive than VDN's sum.\par\medskip
+
+\noindent\textbf{Q7.} Which situation can QMIX NOT represent well?\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Every agent's best action is independent\item[B.] Discrete actions\item[C.] Agents share a reward\item[\textbf{D.}] \textbf{One agent's best action depends on another's choice (advance only if the other holds)}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Non-monotonic coordination violates the mixing constraint.\par\medskip
+
+\noindent\textbf{Q8.} MAPPO's parameter sharing means:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Agents share rewards\item[B.] The critic is shared with the enemy\item[C.] Agents share observations at execution\item[\textbf{D.}] \textbf{All agents use one actor network (with an agent ID input), so every agent's experience trains it}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Fewer parameters, better sample efficiency.\par\medskip
+
+\noindent\textbf{Q9.} MAPPO 82.4\% vs human team 81.3\% from one evaluation shows:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Comparable performance; the gap is within likely sampling error and simulation caveats apply}~{\color{GrnN}$\checkmark$}\item[B.] AI is clearly superior\item[C.] Humans are superior\item[D.] The test is invalid\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} With \textasciitilde{}300 episodes each rate has a standard error near 2.2 points.\par\medskip
+
+\noindent\textbf{Q10.} MADDPG gives each agent:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] A shared Q-table\item[B.] No critic\item[\textbf{C.}] \textbf{Its own centralised critic conditioned on all agents' actions}~{\color{GrnN}$\checkmark$}\item[D.] A mixing network\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Suits continuous actions and mixed cooperative-competitive settings.\par\medskip
+
+\noindent\textbf{Q11.} The free-rider problem in a shared team reward is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[\textbf{A.}] \textbf{Idle or unhelpful agents receive the same credit as critical ones}~{\color{GrnN}$\checkmark$}\item[B.] Agents over-explore\item[C.] Rewards are too sparse\item[D.] Communication is jammed\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Naive equal split gives +16.7 to every agent.\par\medskip
+
+\noindent\textbf{Q12.} COMA's counterfactual baseline for agent i is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] The team's average reward\item[\textbf{B.}] \textbf{The expected joint value if agent i acted according to its policy while others' actions stay fixed}~{\color{GrnN}$\checkmark$}\item[C.] Agent i's last reward\item[D.] Zero\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} $A_i=Q(s,\mathbf a)-\sum_{a'}\pi_i(a')Q(s,(a',\mathbf a_{-i}))$.\par\medskip
+
+\noindent\textbf{Q13.} CommsMAPPO's learned 8-D messages were found (by probes) to encode:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Random noise\item[B.] Reward values\item[C.] Exact coordinates of the objective\item[\textbf{D.}] \textbf{Enemy positions, SAM lock-on status and fuel state}~{\color{GrnN}$\checkmark$}\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} An emergent code; it must be decoded and secured against spoofing.\par\medskip
+
+\noindent\textbf{Q14.} Agents learning to conserve ammunition by not firing is an example of:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Correct doctrine\item[\textbf{B.}] \textbf{Reward mis-specification producing locally rational but tactically bad behaviour}~{\color{GrnN}$\checkmark$}\item[C.] Communication failure\item[D.] Overfitting to humans\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Agents optimise what you reward, not what you meant.\par\medskip
+
+\noindent\textbf{Q15.} The course's position on lethal autonomy is:\begin{itemize}[leftmargin=2.2em,itemsep=0pt,topsep=1pt]\item[A.] Level 4 is acceptable with good rewards\item[\textbf{B.}] \textbf{MARL as Level-2 decision support; humans decide on lethal force, because IHL judgements cannot be encoded in rewards}~{\color{GrnN}$\checkmark$}\item[C.] Level 3 by default\item[D.] No AI in defence\end{itemize}\noindent{\color{GreyN}\textit{Rationale:}} Distinction and proportionality are contextual legal judgements requiring accountable humans.\par\medskip
+
+}
+
+\needspace{12\baselineskip}\section{Assignment: Marking Scheme and Model Solutions}
+
+\textbf{Instructions.} Five problems, 100 marks, plus a 20-mark bonus problem (Problem 6). Reference: Lecture 8 reference text.
+
+\begin{center}\small\renewcommand{\arraystretch}{1.25}\begin{tabularx}{0.85\textwidth}{@{}l X r@{}}\toprule\textbf{\#} & \textbf{Problem} & \textbf{Marks}\\\midrule1 & IGM: VDN versus QMIX & 20\\
+2 & Counterfactual credit & 20\\
+3 & Is the AI really better than the experts? & 20\\
+4 & Designing a MARL system & 20\\
+5 & Autonomy and IHL & 20\\
+6 & Problem 6 (bonus): Credit, commitment and claims & 20\\\midrule & \textbf{Total} & \textbf{100} + 20 bonus\\\bottomrule\end{tabularx}\end{center}
+
+\begin{instr}{General marking guidance}\begin{itemize}
+\item Marks for each part are shown in square brackets in the problem statement.
+\item Award method marks for correct working even when an arithmetic slip carries through; deduct once for the slip, not again for its consequences.
+\item For interpretive parts, full marks need (i) the correct conclusion, (ii) the reason, and (iii) an operational implication or caveat.
+\item Answers that state a number without uncertainty, baseline or caveat where one is required lose a mark per part.
+\item Suggested deadline: one week after the lecture; return marked work before the next quiz on the same topic.
+\end{itemize}\end{instr}
+
+\needspace{8\baselineskip}\subsection{Problem 1: IGM: VDN versus QMIX \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Two agents each choose A or B. Individual values: $Q_1(A)=3$, $Q_1(B)=1$; $Q_2(A)=2$, $Q_2(B)=4$.
+
+(a) Under VDN compute $Q_{tot}$ for all four joint actions and verify IGM. [6]\newline (b) A monotonic mixer is $Q_{tot}=Q_1^2/2+3Q_2$ (with $Q_i\ge0$). Is IGM preserved? Show the joint values. [6]\newline (c) The true team values are (A,A)=10, (A,B)=2, (B,A)=2, (B,B)=8. Can any monotonic mixer of these individual Qs reproduce this ranking? Explain. [8]\end{prob}
+
+\begin{soln}\textbf{(a)} (A,A) 5; (A,B) \textbf{7}; (B,A) 3; (B,B) 5. Joint max (A,B) = (argmax $Q_1$, argmax $Q_2$) = (A,B): IGM holds.
+
+\textbf{(b)} (A,A) $4.5+6=10.5$; (A,B) $4.5+12=\mathbf{16.5}$; (B,A) $0.5+6=6.5$; (B,B) $0.5+12=12.5$. The mixer increases in both arguments, so the maximum is again (A,B): IGM preserved.
+
+\textbf{(c)} The true optimum (A,A) needs agent 2 to pick A, but agent 2's individual value prefers B whatever agent 1 does. A monotonic $f(Q_1,Q_2)$ always ranks (A,B) above (A,A) because $Q_2(B)>Q_2(A)$. The team value depends on the combination (coordination: both A or both B), which is non-monotonic in the individual values. QMIX cannot represent it with these utilities; it must learn different individual utilities, or a richer factorisation or communication is needed.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 2: Counterfactual credit \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}A team succeeds. For the drone agent the centralised critic gives $Q=70$ for the actual joint action (drone held position). With the other agents fixed, values for the drone's alternatives are: hold 70, overwatch 82, return 60, with policy probabilities 0.5, 0.3, 0.2.
+
+(a) Compute the counterfactual baseline and advantage. [8]\newline (b) Compare with an equal split of a +120 team reward among 6 agents. [6]\newline (c) Why does the counterfactual advantage reduce free-riding? [6]\end{prob}
+
+\begin{soln}\textbf{(a)} $b=0.5(70)+0.3(82)+0.2(60)=35+24.6+12=71.6$; $A=70-71.6=\mathbf{-1.6}$: holding was slightly worse than the drone's average choice.
+
+\textbf{(b)} An equal split gives every agent +20, so the drone would be rewarded for holding position when overwatch was better.
+
+\textbf{(c)} Each agent is credited only for the difference its own action made relative to its alternatives, with teammates held fixed. An idle agent gains nothing from teammates' successes and is pushed toward helpful actions.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 3: Is the AI really better than the experts? \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}MAPPO succeeded in 247 of 300 evaluation missions; the human planner team in 122 of 150.
+
+(a) Compute both success rates and their standard errors. [6]\newline (b) Test whether the difference is significant (two-proportion z-test). [8]\newline (c) List three further reasons to be cautious before claiming the AI outperforms humans. [6]\end{prob}
+
+\begin{soln}\textbf{(a)} MAPPO $247/300=82.3\%$, SE $=\sqrt{0.823(0.177)/300}=2.2\%$. Humans $122/150=81.3\%$, SE $=\sqrt{0.813(0.187)/150}=3.2\%$.
+
+\textbf{(b)} Pooled $\hat p=369/450=0.82$; SE $=\sqrt{0.82(0.18)(1/300+1/150)}=0.0384$; $z=0.010/0.0384=0.26$; $p\approx0.79$. No evidence of a difference.
+
+\textbf{(c)} Simulation vs reality (sim-to-real gap); a fixed scenario and opponent (humans adapt across scenarios, the AI may not); humans worked with communications while MAPPO is evaluated without; possible exploitability of a fixed learned policy; one training seed, with no variance across runs reported.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 4: Designing a MARL system \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}Design a MARL system for a naval task group: three escorts and two helicopters defending a high-value unit against air and surface threats, with intermittent communications.
+
+(a) Formulate the Dec-POMDP: agents, observations, actions, reward. [8]\newline (b) Choose between QMIX and MAPPO and justify. [6]\newline (c) How will you detect and prevent degenerate emergent behaviour? [6]\end{prob}
+
+\begin{soln}\textbf{(a)} Agents: 5 platforms. Observations: own sensors (radar/sonar tracks within range), own weapons and fuel state, last received allied picture. Actions: manoeuvre, sensor mode, engage/hold, launch/recover helicopter, communicate (if available). Team reward: survival of the high-value unit, threats neutralised, minus own losses, minus fuel and munitions use, with large penalties for engaging neutral contacts.
+
+\textbf{(b)} MAPPO with a centralised critic and parameter sharing (an agent-type ID distinguishes escorts from helicopters): it is robust, handles heterogeneous agents and mixed discrete actions, and policies execute decentrally when communications drop. QMIX is attractive if actions are purely discrete and off-policy data reuse is critical, but its monotonic mixing may miss the strongly coordinated behaviours (e.g. layered engagement sequencing) this task needs.
+
+\textbf{(c)} Audit replays for exploits (holding fire, hiding behind the high-value unit); add explicit constraints rather than penalties for safety-critical rules; evaluate against diverse and adaptive opponents (league play); red-team; probe learned messages; deploy only at Level 2 with human approval of engagements and full logging.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 5: Autonomy and IHL \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}A programme office proposes deploying the CommsMAPPO policy at Level 3 because it ``beats human experts''.
+
+(a) Write a structured brief (around 250 words) recommending an autonomy level, citing at least four technical and legal arguments. [14]\newline (b) Specify the human--machine interface and audit requirements for your recommended level. [6]\end{prob}
+
+\begin{soln}\textbf{(a)} A model answer recommends \textbf{Level 2}. Arguments: (1) the performance claim rests on simulation; transfer gaps of 15--20 points are typical (drones 94\% $\rightarrow$ 78\%); (2) the human-vs-AI difference is not statistically established; (3) a learned fixed policy can be probed and exploited by an adaptive adversary, and emergent communication can be spoofed; (4) reward penalties cannot guarantee IHL distinction and proportionality, which are contextual legal judgements; (5) accountability requires an identifiable human decision for each lethal action; (6) degenerate behaviours (e.g. holding fire) show that reward mis-specification persists. Level 2 captures the speed benefit of AI planning while retaining human judgement for engagements.
+
+\textbf{(b)} The interface should present the top recommended actions with their values, confidence or uncertainty, and reasons (salient threats, SHAP-style attributions); require explicit approval for any engagement; provide override and abort; flag out-of-distribution situations. Audit: log sensor inputs, AI recommendations, human decisions, timestamps and outcomes, retained for after-action and legal review.\end{soln}
+
+\needspace{8\baselineskip}\subsection{Problem 6 (bonus): Credit, commitment and claims \normalfont\small\color{GreyN}(20 marks)}
+
+\begin{prob}(a) A four-agent team earns $G=80$. Re-simulating with each agent replaced by an idle default gives 30 (without A), 74 (without B), 55 (without C) and 80 (without D). Compute the difference rewards and comment. [5]\newline (b) One patrol covers target 1 with probability $c$ and target 2 otherwise. Attacker payoffs: target 1 uncovered $+8$, covered $-4$; target 2 uncovered $+5$, covered $-2$. Defender: target 1 $-8$/$+4$; target 2 $-5$/$+2$. Find the optimal coverage, and compare the defender's payoff with a 50/50 patrol. [7]\newline (c) A MARL team won 85\% of 120 engagements; the human team won 79\% of 120. Test the difference, and estimate roughly how many engagements per side would be needed for it to reach significance at the 5\% level if the rates held. [5]\newline (d) Agent X (Elo 1580) plays agent Y (1450). Give X's expected score, and X's new rating after a loss with $K=24$. [3]\end{prob}
+
+\begin{soln}\textbf{(a)} A $\mathbf{50}$, B $\mathbf{6}$, C $\mathbf{25}$, D $\mathbf{0}$. D is a free rider: a shared reward would pay it 80 for contributing nothing, and difference rewards remove that incentive. These one-at-a-time differences do not sum to $G$ ($81\ne80$) because contributions interact; Shapley values would divide $G$ exactly.
+
+\textbf{(b)} Attacker payoffs: target 1 $8-12c$; target 2 $-2(1-c)+5c=-2+7c$. Indifference: $8-12c=-2+7c\Rightarrow c=10/19=\mathbf{0.53}$. The attacker then gets 1.68 at either target, and the defender $-1.68$. With a 50/50 patrol the attacker strikes target 1 (payoff 2.0 versus 1.5) and the defender gets $0.5(4)+0.5(-8)=\mathbf{-2.0}$. Optimal randomised commitment improves the defender's expected payoff by 0.32.
+
+\textbf{(c)} $SE=\sqrt{0.85(0.15)/120+0.79(0.21)/120}=0.049$; $z=0.06/0.049=1.21$, $p\approx0.22$: not demonstrated. At about 300 per side $z\approx1.92$ (borderline); at about 500, $z\approx2.48$. The simulation's fidelity and the opponents used matter as much as the sample size.
+
+\textbf{(d)} $E_X=1/(1+10^{-130/400})=\mathbf{0.68}$. After a loss: $1580+24(0-0.68)=\mathbf{1563.7}$.\end{soln}
+
+\end{document}

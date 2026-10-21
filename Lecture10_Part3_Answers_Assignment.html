@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lecture 10 — Part 3: Q&A Bank & Project Guides</title>
+<style>
+  :root{
+    --navy:#1B3A5E;--gold:#C9A227;--gold2:#E8C040;--lblue:#BDD7EE;
+    --green:#1E7A45;--red:#C0392B;--amber:#C98A12;
+    --light:#EFF6FB;--dark:#152744;--grey:#6A7A8A;--lgrey:#E0EBF5;
+    --yellow:#FFF3B0;--white:#FFFFFF;
+    --l1:#E05218;--l2:#1E7A45;--l3:#6B2D8B;--l4:#0D5C6F;
+    --l5:#A93226;--l6:#2C3E80;--l7:#1B7A5E;--l8:#9B5E1A;--l9:#5E1F6A;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6;}
+  .top-bar{background:var(--navy);color:#fff;padding:13px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+  .top-bar .badge{background:var(--gold);color:var(--dark);padding:4px 14px;border-radius:14px;font-size:12px;font-weight:800;}
+  .top-bar h1{font-size:16px;font-weight:700;}
+  .top-bar .meta{font-size:11px;color:var(--lblue);}
+  .container{max-width:1000px;margin:0 auto;padding:22px 16px;}
+  .section-head{background:var(--navy);color:#fff;padding:11px 17px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:9px;}
+  .section-head .badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;color:var(--dark);}
+  .section-head h2{font-size:14px;font-weight:700;}
+  .section-body{background:#fff;border:1px solid var(--lgrey);border-top:none;border-radius:0 0 8px 8px;padding:16px;margin-bottom:22px;}
+  .ans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:12px;}
+  .ans-card{background:var(--light);border:1px solid var(--lgrey);border-radius:8px;padding:10px;border-left:4px solid var(--gold);}
+  .ans-card .qn{font-size:10px;font-weight:700;color:var(--grey);text-transform:uppercase;margin-bottom:2px;}
+  .ans-card .ans{font-size:15px;font-weight:800;color:var(--gold);}
+  .ans-card .key{font-size:10px;color:var(--dark);}
+  .qa-item{margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--lgrey);}
+  .qa-q{background:var(--navy);color:#fff;padding:10px 14px;font-size:13px;font-weight:700;}
+  .qa-q .cat{display:inline-block;background:var(--gold);color:var(--dark);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:800;margin-right:6px;}
+  .qa-model{background:var(--white);padding:12px 14px;font-size:12.5px;color:var(--dark);border-top:3px solid var(--gold);}
+  .qa-model .stare{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .stare-tag{padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;}
+  .qa-model .key-sentence{background:var(--yellow);border-left:4px solid var(--gold);padding:7px 11px;font-weight:700;font-size:12.5px;margin-bottom:6px;border-radius:0 6px 6px 0;}
+  .project-card{border:1px solid var(--lgrey);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+  .project-header{display:flex;align-items:center;gap:10px;padding:10px 14px;}
+  .project-header .num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
+  .project-header h3{font-size:14px;font-weight:700;flex:1;}
+  .project-body{padding:12px 14px;border-top:1px solid var(--lgrey);background:#fff;}
+  .project-body .section-label{font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-top:10px;margin-bottom:3px;}
+  .project-body .section-label:first-child{margin-top:0;}
+  .project-body p{font-size:12.5px;color:var(--dark);margin-bottom:4px;}
+  .metric-badge{display:inline-block;background:var(--light);border:1px solid var(--lgrey);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--navy);margin:2px;}
+  .bot-bar{background:var(--navy);color:var(--lblue);text-align:center;padding:12px;font-size:11px;margin-top:8px;}
+  details summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--gold);padding:7px 10px;background:var(--lgrey);border-radius:6px;list-style:none;margin-top:8px;}
+  details summary::before{content:"▶ ";}
+  details[open] summary::before{content:"▼ ";}
+  details .inner{background:#FFFAE8;border:1px solid #DEB887;border-radius:0 0 6px 6px;padding:11px 13px;font-size:12.5px;}
+</style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+  <!-- KaTeX Math Rendering (Computer Modern quality) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 0.4em 0; overflow-x: auto; overflow-y: hidden; }
+    .formula-display { display: block; padding: 6px 2px; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <div>
+    <div class="badge" style="display:inline-block;margin-bottom:4px;">PART 3 — Q&A BANK & PROJECT GUIDES</div>
+    <h1>Lecture 10: Q&A Panel Bank with Model Answers + Project Topic Guides</h1>
+    <div class="meta">Simulation Strategies in Warfare | Unit 4</div>
+  </div>
+  <div style="text-align:right;font-size:11px;color:var(--lblue);"><strong>AK DHAMIJA</strong><br>Researcher &amp; Instructor, AI &amp; Machine Learning &middot; <a href="mailto:dhamija.ak@gmail.com" style="color:inherit">dhamija.ak@gmail.com</a> &middot; <a href="tel:+919811453163" style="color:inherit">9811453163</a></div>
+</div>
+
+<div class="container">
+
+<!-- SECTION A: QUIZ ANSWER KEY -->
+<div class="section-head"><div class="badge" style="background:var(--gold)">A</div><h2>Panel Simulation Quiz — Answer Key</h2></div>
+<div class="section-body">
+  <div class="ans-grid">
+    <div class="ans-card"><div class="qn">Q1</div><div class="ans">A</div><div class="key">AUROC = threshold-independent ranking measure</div></div>
+    <div class="ans-card"><div class="qn">Q2</div><div class="ans">B</div><div class="key">Criticism partially valid; DBSCAN noise handles novelty</div></div>
+    <div class="ans-card"><div class="qn">Q3</div><div class="ans">B</div><div class="key">Non-linear→EKF; non-Gaussian→Particle Filter</div></div>
+    <div class="ans-card"><div class="qn">Q4</div><div class="ans">B</div><div class="key">Q* = expected cumulative discounted reward (reward units, not %)</div></div>
+    <div class="ans-card"><div class="qn">Q5</div><div class="ans">B</div><div class="key">CTDE: actor only uses oᵢ; V(s) discarded at deployment</div></div>
+    <div class="ans-card"><div class="qn">Q6</div><div class="ans">B</div><div class="key">Tighter τ: lower FPR AND lower TPR; adversarial threshold gaming</div></div>
+    <div class="ans-card"><div class="qn">Q7</div><div class="ans">B</div><div class="key">RF averaging reduces variance, not bias; bias² stays</div></div>
+    <div class="ans-card"><div class="qn">Q8</div><div class="ans">B</div><div class="key">K-epoch cumulative drift; KL early stopping fix</div></div>
+    <div class="ans-card"><div class="qn">Q9</div><div class="ans">B</div><div class="key">Near-identical centroids; Silhouette=0.49 is moderate (not strong)</div></div>
+    <div class="ans-card"><div class="qn">Q10</div><div class="ans">B</div><div class="key">SAC entropy: adversarial unpredictability vs friendly coordination tradeoff</div></div>
+    <div class="ans-card"><div class="qn">Q11</div><div class="ans">B</div><div class="key">INFILTRATION archetype maps to F3EAD: Find→Fix→Exploit→Analyse</div></div>
+    <div class="ans-card"><div class="qn">Q12</div><div class="ans">B</div><div class="key">Latency + Explainability + Calibration — the three deployment criteria</div></div>
+    <div class="ans-card"><div class="qn">Q13</div><div class="ans">B</div><div class="key">WCSS is a clustering metric; correct convergence = TD error + return plateau</div></div>
+    <div class="ans-card"><div class="qn">Q14</div><div class="ans">B</div><div class="key">Calibration/UQ for classification; explainable RL for RL projects</div></div>
+    <div class="ans-card"><div class="qn">Q15</div><div class="ans">B</div><div class="key">3-tier pipeline: IF→RF→DQN advisory; Level 2; ≤3s total</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--grey);">Scoring: +1 correct | −0.25 incorrect | 0 skipped | Maximum 15 marks</p>
+</div>
+
+<!-- SECTION B: Q&A BANK -->
+<div class="section-head"><div class="badge" style="background:var(--gold)">B</div><h2>Q&A Panel Bank — 20 Questions with STARE Model Answers</h2></div>
+<div class="section-body">
+  <p style="font-size:13px;color:var(--grey);margin-bottom:14px;">These are the questions most likely to be posed by the external panel. Each model answer uses the STARE framework: State what you know → Tie to project → Acknowledge gap → Reason with theory → End with what you'd do.</p>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="cat">DATA</span>How do you know your training data does not have survivorship bias?</div>
+    <div class="qa-model">
+      <div class="key-sentence">S — State: "Our dataset was collected from [X system] over [Y period]. We checked the collection methodology and confirmed [specific mechanism]."</div>
+      <p>T — Tie: "In our IADS dataset, we verified that all 8,500 tracks include both successful detections AND near-miss events where the target evaded — so we are not only learning from cases where the system succeeded."</p>
+      <p>A — Acknowledge: "We cannot fully rule out selection bias in which engagements were included in the training archive — this is a standing limitation of historically-collected military datasets."</p>
+      <p>R — Reason: "Survivorship bias would manifest as the model performing well on 'clean' canonical threats but failing on degraded-mode signatures, electronic countermeasure profiles, or low-observable variants. We tested this by holding out all ECM-environment tracks and checking performance degradation."</p>
+      <p>E — End: "To fully address this, we would need access to the raw sensor logs before any filtering was applied by the collection system — a request we have flagged for the data custodian."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="cat">METRICS</span>Your classifier achieves 97.5% accuracy. What if an adversary simply saturates your system with 200 simultaneous tracks — can it maintain this?</div>
+    <div class="qa-model">
+      <div class="key-sentence">Saturation is a latency problem, not an accuracy problem — and they require different answers.</div>
+      <p>S — "Our RF classifier at 97.5% accuracy has a measured inference time of 0.8ms per track on [target hardware]." T — "At 200 simultaneous tracks, total classification load is 200 × 0.8ms = 160ms — well within our 500ms tier-2 latency budget." A — "However, we did NOT test batch inference under memory contention on the actual IADS hardware — on an embedded system this could be 3–5× slower." R — "RF inference is embarrassingly parallel: 200 tracks can be distributed across [N] cores simultaneously. The bottleneck is not algorithm throughput but data ingestion from the radar processor." E — "We would benchmark on the target fire control computer with a synthetic 200-track injection to get measured latency under load before operational clearance."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="cat">ROBUSTNESS</span>What happens to your model when the adversary uses a stealth aircraft with a radar cross-section 100× smaller than anything in your training data?</div>
+    <div class="qa-model">
+      <div class="key-sentence">Out-of-distribution inputs are the single most important deployment risk — and acknowledging this directly impresses panels.</div>
+      <p>S — "Our training distribution has RCS values ranging from [min] to [max] m². An RCS 100× smaller would be [value] m² — well below our training minimum." A — "This is a genuine vulnerability: a discriminative classifier (RF, SVM, DNN) will extrapolate outside training distribution in unpredictable ways. It may classify the stealth aircraft as whichever training class has the nearest feature vector — likely a bird or weather return." R — "The principled detection approach for novel signatures is Isolation Forest (L5): a track with RCS 100× smaller would be an extreme outlier in the training distribution, producing high anomaly score regardless of class. We would recommend: classifier handles known threats → IF flags novel signatures → analyst escalates." E — "Ideally, we would include simulated low-observable signatures (via RCS modelling tools) in training data, even without class labels, to improve the classifier's coverage of the stealth regime."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="cat">RL</span>Your DQN agent achieved 93% win rate against random OPFOR. What happens in exercise 3, when OPFOR has watched your agent play twice and starts exploiting its patterns?</div>
+    <div class="qa-model">
+      <div class="key-sentence">Fixed trained policies are the Achilles heel of RL deployment — any strong answer acknowledges this directly.</div>
+      <p>S — "A trained DQN policy is a fixed function π(a|s;θ) — the weights θ do not update during deployment." A — "An experienced OPFOR who has observed the agent across two exercises will identify its tactical patterns — e.g., the agent always flanks left when OPFOR holds the northern objective. This is exploitable." R — "The adversarial robustness problem in RL: fixed policies that are near-optimal against naive opponents may be brittle against adaptive ones. Published literature (self-play, PSRO — Policy Space Response Oracles) addresses this: train the agent against a diverse mixture of opponent strategies, including past versions of itself." E — "For our project, we would implement a periodic retraining cycle: after each exercise, analyse which OPFOR tactics achieved highest win rate against our agent → include those tactics in the OPFOR training pool → retrain. This never-ending arms race is the operational reality of AI in contested environments."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="cat">ETHICS</span>If your autonomous recommendation system recommends engaging a target that turns out to be a medical helicopter, who is legally responsible?</div>
+    <div class="qa-model">
+      <div class="key-sentence">This question has one correct answer: the human decision-maker who authorised the engagement is responsible. The system is a tool, not an actor.</div>
+      <p>S — "Our system operates at Level 2 autonomy (human on the loop). A human operator reviewed and confirmed the engagement recommendation before execution." T — "Our system provides: the threat classification with SHAP explanation, the Q-value ranking of options, and an IFF status indicator. The operator is presented with all information the system has." R — "Under IHL: the combatant who executes an engagement is responsible for applying the principles of distinction, proportionality, and precaution. An AI system that presents a recommendation is analogous to a targeting radar — it is a tool, not an agent with legal personality. The commander who acts on the recommendation bears responsibility." A — "That said, there is a shared responsibility dimension: if the system's classifier had systematic false-positive errors for medical helicopters that were known to the developers but not disclosed, there may be institutional liability for the system developer (analogous to a defective weapon manufacturer's liability)." E — "The correct design response: add a positive IFF check as a mandatory pre-requisite for engagement recommendation output — the system should never recommend engaging an asset that has not failed IFF. This is a ROE-level constraint, not an algorithm-level one."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="cat">DEPLOYMENT</span>What is your estimate of the sim-to-real performance gap for your project, and how did you arrive at that estimate?</div>
+    <div class="qa-model">
+      <div class="key-sentence">Every project has a sim-to-real gap. A student who says "none" fails the panel; one who quantifies it with a principled estimate passes.</div>
+      <p>S — "Our simulation accuracy/success rate is [X%]. We estimated the real-world performance as approximately [X minus Y]% based on three gap factors." T/R — "Gap factor 1: SENSOR FIDELITY — our training radar data used a calibrated simulation; real radar has multi-path, clutter, and jamming that increases feature noise → estimated −3 to −5pp. Gap factor 2: OPFOR ADAPTATION — simulation OPFOR is scripted; real OPFOR adapts → estimated −5 to −8pp for RL/MARL projects. Gap factor 3: EDGE CASES — simulation cannot enumerate every operational scenario; tails of real operational distributions are underrepresented → estimated −3pp. Total estimated gap: −11 to −16 percentage points." "This is consistent with published evidence: L7 PPO drone achieved 94% simulation → 78% real (16pp gap); L8 MARL estimated ~65% real vs 82% simulation (17pp gap)." E — "Validation plan: staged testing — first in hardware-in-the-loop simulation with real sensor feeds, then restricted live field trial on a representative subset of scenarios before full operational clearance."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="cat">INTEGRATION</span>How would your project integrate with JANUS or existing C2 systems in the Indian military? What are the data format and latency requirements?</div>
+    <div class="qa-model">
+      <div class="key-sentence">System integration is where most academic projects fail — panels want to see you have thought beyond the algorithm.</div>
+      <p>S — "JANUS uses [Link-11/16 equivalent data format / scenario XML files / specific API]. Our system needs to ingest [feature list] at [frequency] and output [recommendation format]." T — "For our IADS classifier: input is radar track data (range, azimuth, elevation, RCS, velocity, Doppler) at 1-second update intervals. Output: 5-class probability vector + SHAP explanation. This maps directly to the JANUS track object format with an added AI-assessment field." R — "Integration layers required: (1) Data adapter: JANUS track format → normalised feature vector for our RF model. (2) Inference API: REST or gRPC endpoint on fire control computer. (3) Output injector: model output → JANUS AI-advisory field → operator display overlay." A — "We have not actually tested with live JANUS data — we used a [simulated/synthetic] representation. True integration would require a JANUS API access agreement and a dedicated integration sprint." E — "We estimate 2–3 months of integration engineering to move from trained model to JANUS-embedded advisory system, following the standard defence software integration V&V process."</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q"><span class="cat">CLUSTERING</span>Your OPFOR clustering produced 5 archetypes. A field commander asks: 'What do I actually DO with this?' Give a 60-second operational briefing.</div>
+    <div class="qa-model">
+      <div class="key-sentence">The answer to 'so what?' is the most important question any project must answer. Prepare this for every project.</div>
+      <p>"Commander, we analysed 8,000 historical OPFOR patrol trajectories and discovered 5 distinct operational archetypes. Here is what this means for your operations: [1-sentence description of each archetype and its tactical signature]. Archetype 3 — INFILTRATION — is the critical finding: it matches 12.4% of tracks and was previously unclassified. These are small units moving during low-visibility, exploiting border-gap corridors between 0200 and 0400 hours. We recommend: (1) Shift ISR surge to the 0200–0400 window in sectors matching Archetype 3 corridors. (2) Brief your [unit type] to specifically look for the small-unit, high-route-variation signature. (3) Any new patrol trajectory that does not match one of these 5 archetypes will be automatically flagged by our anomaly detection system as Priority Intelligence Requirement — these are the potential novel tactics or adversary adaptation events you most need to know about. The system runs continuously on incoming trajectory data and updates your intelligence picture every 6 hours."</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION C: PROJECT TOPIC GUIDES -->
+<div class="section-head"><div class="badge" style="background:var(--gold)">C</div><h2>Project Topic Guides — T1 through T8</h2></div>
+<div class="section-body">
+
+  <div class="project-card">
+    <div class="project-header" style="background:#E8F5EF;">
+      <div class="num" style="background:var(--l2)">T1</div>
+      <h3 style="color:var(--l2)">Threat Classification System (L2)</h3>
+      <span style="font-size:11px;color:var(--grey);">Supervised Classification</span>
+    </div>
+    <div class="project-body">
+      <div class="section-label">Problem Statement</div>
+      <p>Build a multi-class classifier for air/sea/ground threat identification from sensor data. Choose a specific sensor modality and operational context.</p>
+      <div class="section-label">Suggested Datasets</div>
+      <p>SRTM radar terrain dataset (public), synthetic radar track generator (JANUS outputs), NSL-KDD for cyber analogue, or design your own synthetic dataset using realistic IADS parameters from the course.</p>
+      <div class="section-label">Required Algorithms</div>
+      <p>Primary: Random Forest (mandatory — establishes course benchmark). Compare against: kNN, SVM (RBF kernel), XGBoost. Address class imbalance with at least one technique (SMOTE or class weighting).</p>
+      <div class="section-label">Key Metrics to Report</div>
+      <p><span class="metric-badge">Per-class Recall</span><span class="metric-badge">AUROC per class</span><span class="metric-badge">Confusion Matrix</span><span class="metric-badge">SHAP Feature Importance</span><span class="metric-badge">Inference Latency (ms)</span></p>
+      <div class="section-label">Benchmark to Beat</div>
+      <p>Course L2 IADS result: RF 97.5%, AUC=0.991 on 8,500 samples with 11 features.</p>
+      <details><summary>Panel Questions to Prepare For</summary><div class="inner">
+        <p>1. "What is your per-class recall for the rarest class? What is the operational consequence of missing it?"</p>
+        <p>2. "How would you retrain when the adversary fields a new threat type with only 20 labelled examples?"</p>
+        <p>3. "Your SHAP analysis shows feature X dominates classification. What if the adversary deliberately manipulates feature X?"</p>
+      </div></details>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header" style="background:#F0EAF7;">
+      <div class="num" style="background:var(--l3)">T2</div>
+      <h3 style="color:var(--l3)">Mission Planning Regression (L3)</h3>
+      <span style="font-size:11px;color:var(--grey);">Supervised Regression + Sensor Fusion</span>
+    </div>
+    <div class="project-body">
+      <div class="section-label">Problem Statement</div>
+      <p>Predict a continuous mission outcome: fuel consumption, mission duration, munitions required, or casualty estimate. Integrate at least two sensor/intelligence data streams via a fusion approach.</p>
+      <div class="section-label">Required Elements</div>
+      <p>Regression chain: OLS → Ridge/Lasso (compare L1 vs L2 penalty) → XGBoost. Kalman Filter for any sequential sensor fusion component. RMSE and R² as primary metrics. Residual analysis (are errors random or structured?).</p>
+      <div class="section-label">Key Metrics</div>
+      <p><span class="metric-badge">R² Score</span><span class="metric-badge">RMSE</span><span class="metric-badge">Residual Plot</span><span class="metric-badge">Feature Importance</span><span class="metric-badge">Kalman Gain Analysis</span></p>
+      <div class="section-label">Benchmark</div>
+      <p>Course L3 XGBoost: R²=0.912, RMSE=2.06 hours on mission duration. Kalman+RF fusion: 96.2% TPR.</p>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header" style="background:#E5F4F5;">
+      <div class="num" style="background:var(--l4)">T3</div>
+      <h3 style="color:var(--l4)">OPFOR Pattern Intelligence (L4)</h3>
+      <span style="font-size:11px;color:var(--grey);">Unsupervised Clustering + Visualisation</span>
+    </div>
+    <div class="project-body">
+      <div class="section-label">Problem Statement</div>
+      <p>Discover operational archetypes from movement, communications, or logistics data without prior labels. Identify novel or deceptive patterns.</p>
+      <div class="section-label">Required Algorithms</div>
+      <p>k-Means (with Elbow + Silhouette for k selection), DBSCAN (ε and MinPts calibrated via k-distance plot), at least one of: GMM or Ward hierarchical. PCA or UMAP for visualisation. ARI for cross-method validation.</p>
+      <div class="section-label">Key Metrics</div>
+      <p><span class="metric-badge">Silhouette Score (target >0.65)</span><span class="metric-badge">ARI (cross-method)</span><span class="metric-badge">DBSCAN Noise %</span><span class="metric-badge">PCA Explained Variance</span></p>
+      <div class="section-label">Unique Requirement</div>
+      <p>Must name each discovered cluster with an operational label and provide a 2-sentence operational briefing for each archetype (the "Commander, what do I DO with this?" slide).</p>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header" style="background:#FAEAEA;">
+      <div class="num" style="background:var(--l5)">T4</div>
+      <h3 style="color:var(--l5)">Cyber Defence Anomaly Detection (L5)</h3>
+      <span style="font-size:11px;color:var(--grey);">Unsupervised Anomaly Detection</span>
+    </div>
+    <div class="project-body">
+      <div class="section-label">Problem Statement</div>
+      <p>Build a tiered anomaly detection system for a military network or critical infrastructure. Detect known attacks AND novel zero-day signatures.</p>
+      <div class="section-label">Required Architecture</div>
+      <p>Tier-1: Isolation Forest (real-time, &lt;0.005ms). Tier-2: Autoencoder (deeper analysis, ~0.05ms). Optional Tier-3: LSTM Autoencoder for user behaviour sequences. Calculate daily compute load for a realistic packet volume. Test against at least one attack type NOT in training data.</p>
+      <div class="section-label">Key Metrics</div>
+      <p><span class="metric-badge">TPR (Recall)</span><span class="metric-badge">FPR</span><span class="metric-badge">AUROC</span><span class="metric-badge">Daily Compute (seconds)</span><span class="metric-badge">MTTD</span></p>
+      <div class="section-label">Dataset Options</div>
+      <p>KDD Cup 1999 (public), CICIDS 2017/2018 (public), NSL-KDD (public — recommended for class balance), or synthetic generation from the L5 case study parameters.</p>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header" style="background:#EAEEF8;">
+      <div class="num" style="background:var(--l6)">T5</div>
+      <h3 style="color:var(--l6)">Wargame Decision Support (L6)</h3>
+      <span style="font-size:11px;color:var(--grey);">Q-Learning / DQN</span>
+    </div>
+    <div class="project-body">
+      <div class="section-label">Required Algorithm</div>
+      <p>Dueling + Double DQN with experience replay. Compare against: vanilla DQN (baseline 1), Q-Table (baseline 2). Implement reward shaping AND curriculum learning. Output: top-3 actions with Q-values and at least one SHAP attribution.</p>
+      <div class="section-label">Environment Options</div>
+      <p>Custom Python gym environment (10×10 to 30×30 grid), OpenAI Gym MiniGrid (modified for military scenario), STARCRAFT II (advanced), or a custom JANUS-inspired hex grid.</p>
+      <div class="section-label">Key Metrics</div>
+      <p><span class="metric-badge">Win Rate vs Random</span><span class="metric-badge">Win Rate vs Scripted OPFOR</span><span class="metric-badge">Win Rate vs Human</span><span class="metric-badge">TD Error Curve</span><span class="metric-badge">Q-Value Convergence</span></p>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header" style="background:#E5F5EF;">
+      <div class="num" style="background:var(--l7)">T6</div>
+      <h3 style="color:var(--l7)">Autonomous Platform Control (L7)</h3>
+      <span style="font-size:11px;color:var(--grey);">Policy Gradient — PPO / SAC</span>
+    </div>
+    <div class="project-body">
+      <div class="section-label">Required Algorithm</div>
+      <p>Implement BOTH PPO AND SAC; compare on same environment. Document: episodes to 70% success, final success rate, and performance under domain randomisation (add 10–30% noise to simulate real conditions).</p>
+      <div class="section-label">Environment Options</div>
+      <p>PyBullet drone simulation (open source), OpenAI Gym LunarLander (modified), custom 6-DoF kinematics model, or a simplified missile intercept geometry environment.</p>
+      <div class="section-label">Key Metrics</div>
+      <p><span class="metric-badge">Waypoint Success Rate</span><span class="metric-badge">Episodes to 70%</span><span class="metric-badge">Performance Under Disturbance</span><span class="metric-badge">Entropy H(π)</span><span class="metric-badge">Sim-to-Real Estimate</span></p>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header" style="background:#F5EEE5;">
+      <div class="num" style="background:var(--l8)">T7</div>
+      <h3 style="color:var(--l8)">Multi-Agent Operations (L8)</h3>
+      <span style="font-size:11px;color:var(--grey);">MARL — QMIX / MAPPO</span>
+    </div>
+    <div class="project-body">
+      <div class="section-label">Required Algorithm</div>
+      <p>Implement BOTH QMIX AND MAPPO; compare on same cooperative environment with ≥3 agents. Document: emergent behaviours (requires replay analysis), credit assignment (report per-agent advantage estimates), communication channel (optional +10 marks on T7 variant).</p>
+      <div class="section-label">Environment Options</div>
+      <p>SMAC (StarCraft Multi-Agent Challenge — open source, recommended), MPE (Multi-Particle Environments — simpler), custom naval or combined arms Python environment, or the course case study reproduced in code.</p>
+      <div class="section-label">Key Metrics</div>
+      <p><span class="metric-badge">Mission Success Rate</span><span class="metric-badge">vs Human Team</span><span class="metric-badge">Emergent Behaviours Found</span><span class="metric-badge">CommsMAPPO vs MAPPO Gap</span><span class="metric-badge">Per-Agent Credit</span></p>
+    </div>
+  </div>
+
+  <div class="project-card">
+    <div class="project-header" style="background:var(--yellow);">
+      <div class="num" style="background:var(--gold)">T8</div>
+      <h3 style="color:var(--dark)">Original Proposal (Any Lecture)</h3>
+      <span style="font-size:11px;color:var(--grey);">Student-designed — approval required by Session 8</span>
+    </div>
+    <div class="project-body">
+      <div class="section-label">Requirements</div>
+      <p>Must integrate techniques from at least TWO different lectures. Must include a novel dataset or scenario not used in lectures 1–9. Must define a clear operational problem with measurable success criteria. Must include a benchmark comparison against at least one course case study result.</p>
+      <div class="section-label">Strong Original Proposals (Ideas)</div>
+      <p>Hyperspectral imagery + OPFOR clustering (T3+T1 fusion). Cyber threat classification with adversarial robustness testing (T1+T4). Logistics optimisation with RL for supply chain under contested conditions (T5+T2). Human-AI teaming: RL agent whose actions must satisfy operator-defined constraint satisfaction. Signal intelligence LSTM autoencoder for communications pattern anomalies. Counter-drone swarm coordination using MARL with jammers and interceptors (T7 variant).</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION D: FINAL NOTE -->
+<div style="background:var(--navy);border-radius:10px;padding:20px 24px;color:#fff;text-align:center;margin-bottom:8px;">
+  <div style="font-size:28px;font-weight:800;color:var(--gold2);margin-bottom:8px;">Course Complete</div>
+  <div style="font-size:14px;color:var(--lblue);margin-bottom:14px;">AI & Machine Learning in Warfare Postgraduate Programme — 10 Lectures</div>
+  <div style="font-size:13px;color:#D0E8F5;max-width:600px;margin:0 auto 16px;">"AI will not replace military commanders — but commanders who understand AI will replace those who do not."</div>
+  <div style="font-size:12px;color:var(--gold);">AK DHAMIJA, Researcher &amp; Instructor, AI &amp; Machine Learning</div>
+  <div style="margin-top:16px;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;">
+    <span style="display:inline-block;background:#E05218;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L1</span>
+    <span style="display:inline-block;background:#1E7A45;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L2</span>
+    <span style="display:inline-block;background:#6B2D8B;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L3</span>
+    <span style="display:inline-block;background:#0D5C6F;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L4</span>
+    <span style="display:inline-block;background:#A93226;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L5</span>
+    <span style="display:inline-block;background:#2C3E80;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L6</span>
+    <span style="display:inline-block;background:#1B7A5E;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L7</span>
+    <span style="display:inline-block;background:#9B5E1A;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L8</span>
+    <span style="display:inline-block;background:#5E1F6A;color:#fff;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">L9</span>
+    <span style="display:inline-block;background:#C9A227;color:#1B3A5E;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800">L10</span>
+  </div>
+  <div style="margin-top:16px;font-size:15px;font-weight:700;color:var(--gold2);">भारत माता की जय</div>
+</div>
+</div>
+
+<div class="bot-bar">
+  <strong>AK DHAMIJA</strong>, Researcher &amp; Instructor, AI &amp; Machine Learning &nbsp;|&nbsp;
+  Simulation Strategies in Warfare — Unit 4 &nbsp;|&nbsp;
+  Lecture 10, Part 3: Q&A Bank & Project Topic Guides
+</div>
+<script></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+});
+</script>
+</body>
+</html>
