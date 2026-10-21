@@ -1,0 +1,122 @@
+\ProvidesPackage{issa}
+\RequirePackage{amsmath,amssymb,mathtools,bm}
+\RequirePackage{tikz,pgfplots}
+\pgfplotsset{compat=1.16}
+\RequirePackage{colortbl}
+\RequirePackage{booktabs,array,multirow,tabularx,graphicx,adjustbox,etoolbox}
+\RequirePackage[expansion=false]{microtype}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.misc,fit,backgrounds,calc,decorations.pathmorphing,patterns,matrix,chains,decorations.markings}
+\usepgfplotslibrary{fillbetween}
+
+\definecolor{ISSAnavy}{HTML}{1B3A5E}\definecolor{ISSAblue}{HTML}{2869A0}
+\definecolor{ISSAlblue}{HTML}{BDD7EE}\definecolor{ISSAvlight}{HTML}{F2F7FB}
+\definecolor{ISSAdark}{HTML}{152744}\definecolor{ISSAgrey}{HTML}{6A7A8A}
+\definecolor{ISSAyell}{HTML}{FFF4B8}\definecolor{ISSAamb}{HTML}{C98A12}
+\definecolor{ISSAgrn}{HTML}{1E7A45}\definecolor{ISSAred}{HTML}{C0392B}
+\definecolor{AccentCol}{HTML}{1B3A5E}\definecolor{ISSAlgrey}{HTML}{E0EBF5}
+
+\mode<presentation>
+\usefonttheme[onlymath]{serif}
+\setbeamertemplate{navigation symbols}{}
+\setbeamersize{text margin left=0.35cm,text margin right=0.35cm}
+\setbeamercolor{normal text}{fg=ISSAdark}
+\setbeamercolor{structure}{fg=ISSAnavy}
+\setbeamerfont{frametitle}{size=\small,series=\bfseries}
+\newcommand{\lecnum}{}
+\newcommand{\sectitle}{}
+\setbeamertemplate{background canvas}{%
+ \begin{tikzpicture}[remember picture,overlay]
+  \fill[ISSAvlight] (current page.south west) rectangle (current page.north east);
+  \fill[ISSAnavy] (current page.north west) rectangle ([yshift=-0.92cm]current page.north east);
+  \fill[AccentCol] ([yshift=-0.92cm]current page.north west) rectangle ([yshift=-0.98cm]current page.north east);
+  \fill[ISSAnavy] (current page.south west) rectangle ([yshift=0.48cm]current page.south east);
+  \fill[AccentCol] ([yshift=0.48cm]current page.south west) rectangle ([yshift=0.52cm]current page.south east);
+ \end{tikzpicture}}
+\setbeamertemplate{frametitle}{%
+ \nointerlineskip
+ \vbox to 0.98cm{\vfil\hbox to \textwidth{\color{white}\usebeamerfont{frametitle}\insertframetitle\hfill{\fontsize{6}{7}\selectfont\color{ISSAlblue}\sectitle}}\vfil}%
+ \vspace{-0.40cm}}
+\setbeamertemplate{footline}{%
+ \vbox to 0.52cm{\vfil\hbox to \paperwidth{\hspace{0.35cm}\color{ISSAlblue}\fontsize{6}{7}\selectfont AK DHAMIJA, Researcher \& Instructor \textbullet\ AI \& Machine Learning \textbullet\ Lecture \lecnum\hfill\insertframenumber\,/\,\inserttotalframenumber\hspace{0.35cm}}\vfil}}
+\setbeamertemplate{itemize item}{\color{AccentCol}\rule[0.35ex]{3.5pt}{3.5pt}}
+\setbeamertemplate{itemize subitem}{\color{ISSAblue}\tiny$\blacktriangleright$}
+\setbeamertemplate{enumerate item}{\color{AccentCol}\bfseries\insertenumlabel.}
+\setbeamerfont{itemize/enumerate body}{size=\scriptsize}
+\setbeamerfont{itemize/enumerate subbody}{size=\tiny}
+\setlength\leftmargini{0.9em}
+\newenvironment{tl}{\begin{itemize}\setlength\itemsep{1pt}\setlength\parskip{0pt}\setlength\topsep{0pt}}{\end{itemize}}
+\newenvironment{te}{\begin{enumerate}\setlength\itemsep{1pt}\setlength\parskip{0pt}\setlength\topsep{0pt}}{\end{enumerate}}
+
+% ---- boxes (all environments) ----
+\tcbset{bxbase/.style={enhanced,boxrule=0.6pt,arc=1.5pt,left=3pt,right=3pt,top=2pt,bottom=2pt,before skip=2pt,after skip=2pt,fontupper=\scriptsize}}
+\newtcolorbox{cbox}[2][AccentCol]{bxbase,colback=white,colframe=#1,colbacktitle=#1,coltitle=white,fonttitle=\bfseries\scriptsize,title={#2},toptitle=0.5pt,bottomtitle=0.5pt}
+\newtcolorbox{ibox}{bxbase,colback=ISSAyell,colframe=ISSAamb}
+\newtcolorbox{rbox}{bxbase,colback=ISSAgrn!10,colframe=ISSAgrn}
+\newtcolorbox{wbox}{bxbase,colback=ISSAred!8,colframe=ISSAred}
+\newtcolorbox{fbx}[1]{bxbase,colback=ISSAvlight,colframe=AccentCol,colbacktitle=AccentCol,coltitle=white,fonttitle=\bfseries\tiny,title={\MakeUppercase{#1}},halign=center,fontupper=\footnotesize,toptitle=0pt,bottomtitle=0pt}
+\newcommand{\subhead}[1]{{\color{AccentCol}\bfseries\small #1}\par\vspace{-1pt}{\color{AccentCol!40}\rule{\linewidth}{0.4pt}}\par\vspace{2pt}}
+\newcommand{\hl}[1]{\textcolor{AccentCol}{\textbf{#1}}}
+\newcommand{\grn}[1]{\textcolor{ISSAgrn}{\textbf{#1}}}
+\newcommand{\red}[1]{\textcolor{ISSAred}{\textbf{#1}}}
+\newcommand{\figc}[2]{\adjustbox{max width=\linewidth,max height=#1,center}{#2}}
+\DeclareMathOperator*{\argmax}{arg\,max}\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\E}{\mathbb{E}}\newcommand{\R}{\mathbb{R}}\newcommand{\bx}{\mathbf{x}}\newcommand{\bw}{\mathbf{w}}
+
+\tikzset{
+ nd/.style={draw=ISSAnavy,fill=white,rounded corners=1.5pt,font=\fontsize{6.5}{7.5}\selectfont,align=center,inner sep=2.5pt,minimum height=0.5cm,line width=0.5pt,text=ISSAdark},
+ ndA/.style={nd,draw=AccentCol,fill=AccentCol!14},
+ ndN/.style={nd,fill=ISSAnavy,text=white},
+ ndC/.style={nd,fill=AccentCol,draw=AccentCol,text=white},
+ ndG/.style={nd,draw=ISSAgrn,fill=ISSAgrn!12},
+ ndR/.style={nd,draw=ISSAred,fill=ISSAred!10},
+ ndY/.style={nd,draw=ISSAamb,fill=ISSAyell},
+ arr/.style={-{Stealth[length=3.5pt]},line width=0.6pt,draw=ISSAnavy},
+ arrA/.style={-{Stealth[length=3.5pt]},line width=0.7pt,draw=AccentCol},
+ lab/.style={font=\fontsize{5.5}{6.5}\selectfont,text=ISSAgrey,align=center},
+ pt1/.style={circle,fill=ISSAblue,inner sep=1.2pt},
+ pt2/.style={circle,fill=ISSAred,inner sep=1.2pt},
+ pt3/.style={circle,fill=ISSAgrn,inner sep=1.2pt},
+ pt4/.style={circle,fill=ISSAamb,inner sep=1.2pt},
+ pt5/.style={circle,fill=violet,inner sep=1.2pt},
+}
+\pgfplotsset{every axis/.append style={font=\fontsize{6}{7}\selectfont,tick label style={font=\fontsize{5.5}{6.5}\selectfont},label style={font=\fontsize{6}{7}\selectfont},title style={font=\fontsize{6.5}{7.5}\selectfont\bfseries},legend style={font=\fontsize{5.5}{6.5}\selectfont,draw=none,fill=white},line width=0.7pt,axis line style={draw=ISSAdark!70}}}
+
+% title slide
+\newcommand{\titleslide}[3]{%
+ \begin{frame}[plain]
+ \begin{tikzpicture}[remember picture,overlay]
+  \fill[ISSAnavy] (current page.south west) rectangle (current page.north east);
+  \fill[AccentCol] ([yshift=2.5cm]current page.south west) rectangle ([yshift=2.62cm]current page.south east);
+  \foreach \x/\y in {11.8/7.3,13.1/7.9,14.5/7.1,12.4/5.9,13.9/5.6,15.2/6.4,11.0/6.2}{\fill[ISSAlblue!35] ([shift={(\x cm,\y cm)}]current page.south west) circle (0.09);}
+  \draw[ISSAlblue!30,line width=0.5pt] ([shift={(11.8cm,7.3cm)}]current page.south west)--([shift={(13.1cm,7.9cm)}]current page.south west)--([shift={(14.5cm,7.1cm)}]current page.south west)--([shift={(13.9cm,5.6cm)}]current page.south west)--([shift={(12.4cm,5.9cm)}]current page.south west)--([shift={(11.8cm,7.3cm)}]current page.south west)--([shift={(11.0cm,6.2cm)}]current page.south west)--([shift={(12.4cm,5.9cm)}]current page.south west)--([shift={(15.2cm,6.4cm)}]current page.south west)--([shift={(14.5cm,7.1cm)}]current page.south west);
+  \node[anchor=west,text width=10cm,text=ISSAlblue,font=\scriptsize] at ([shift={(0.9cm,-1.0cm)}]current page.north west) {UNIT 4: SIMULATION STRATEGIES IN WARFARE \ \textbullet\ \ AI \& MACHINE LEARNING IN WARFARE};
+  \node[anchor=west,text=AccentCol!70!white,font=\fontsize{9}{11}\selectfont\bfseries] at ([shift={(0.9cm,-1.95cm)}]current page.north west) {LECTURE #1};
+  \node[anchor=north west,text width=10.2cm,inner sep=0pt,align=left,text=white,font={\fontsize{16}{19}\selectfont\bfseries\hyphenpenalty=10000\exhyphenpenalty=10000}] (ttl) at ([shift={(0.9cm,-2.35cm)}]current page.north west) {#2};
+  \node[anchor=north west,text width=9.5cm,inner sep=0pt,align=left,text=ISSAlblue,font=\fontsize{9}{11}\selectfont] at ([yshift=-0.3cm]ttl.south west) {#3};
+  \node[anchor=west,text=white,font=\small\bfseries] at ([shift={(0.9cm,1.9cm)}]current page.south west) {AK DHAMIJA, Researcher \& Instructor};
+  \node[anchor=west,text=ISSAlblue,font=\scriptsize] at ([shift={(0.9cm,1.4cm)}]current page.south west) {AI \& Machine Learning};
+  \node[anchor=west,text=white,font=\scriptsize] at ([shift={(0.9cm,0.9cm)}]current page.south west) {\href{mailto:dhamija.ak@gmail.com}{dhamija.ak@gmail.com} \quad\textbullet\quad 9811453163};
+ \end{tikzpicture}
+ \end{frame}}
+
+\newcommand{\sm}[1]{{\fontsize{5.5}{6.5}\selectfont #1}}
+\newcommand{\tn}[1]{{\fontsize{6.5}{7.5}\selectfont #1}}
+\newcommand{\sect}[1]{\renewcommand{\sectitle}{#1}}
+\newcommand{\code}[1]{{\ttfamily\fontsize{6.5}{7.8}\selectfont #1}}
+\tikzset{
+ nds/.style={nd,font=\fontsize{5.8}{6.8}\selectfont,inner sep=2pt,minimum height=0.4cm},
+ bigarr/.style={-{Stealth[length=5pt,width=4pt]},line width=1.1pt,draw=AccentCol},
+}
+
+% \bars{ymax}{plot height cm}{slot width cm}{label/value/colour,...}
+\newcommand{\bars}[4]{\begin{tikzpicture}
+  \draw[ISSAdark!60,line width=0.6pt](0,0)--(0,#2);
+ \foreach \l/\v/\c [count=\i from 0] in {#4}{%
+  \foreach \gv in {0.25,0.5,0.75,1}{\draw[ISSAlgrey!80!black,line width=0.3pt]({\i*#3},{\gv*#2})--({(\i+1)*#3},{\gv*#2});}
+  \fill[\c!75!black!10!\c] ({\i*#3+0.12},0) rectangle ({(\i+1)*#3-0.12},{\v/#1*#2});
+  \node[font=\scriptsize\bfseries,anchor=south] at ({\i*#3+#3/2},{\v/#1*#2}){\v};
+  \node[font=\fontsize{5.6}{6.6}\selectfont,anchor=north,text width=\dimexpr#3cm-3pt\relax,align=center] at ({\i*#3+#3/2},-0.04){\l};}
+ \end{tikzpicture}}
+\endinput

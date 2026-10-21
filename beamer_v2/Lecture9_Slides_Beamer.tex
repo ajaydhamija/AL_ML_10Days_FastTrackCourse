@@ -1,0 +1,191 @@
+\documentclass[aspectratio=169,10pt,t]{beamer}
+\usepackage{issa}  % place issa.sty in the same folder
+\definecolor{AccentCol}{HTML}{5E1F6A}
+\renewcommand{\lecnum}{9}
+\begin{document}
+\titleslide{9}{Culmination \& Revision}{Integrating eight lectures into one coherent defence-AI framework\\Concept map \textbullet\ case-study threads \textbullet\ algorithm selection \textbullet\ key formulas \textbullet\ misconceptions \textbullet\ ethics}
+
+\sect{1. Concept Map}
+\begin{frame}{Course Concept Map --- One Decision Tree, One Toolkit}
+\figc{4.3cm}{\begin{tikzpicture}
+\tikzset{L/.style={nd,text width=2.6cm,minimum height=1.2cm,font=\fontsize{6.3}{7.5}\selectfont}}
+\node[ndC,text width=11.6cm,minimum height=0.6cm](l1)at(5.6,2.4){\textbf{L1 FOUNDATIONS:} AI vs ML vs DL $\bullet$ paradigms $\bullet$ data can lie (Simpson, $H_0$, correlation, base rates) $\bullet$ data pitfalls};
+\node[L,fill=ISSAgrn!12,draw=ISSAgrn](a)at(0,0.9){\textbf{L2 CLASSIFICATION}\\kNN, DT, RF, SVM, XGBoost --- IADS threat ID};
+\node[L,fill=violet!10,draw=violet](b)at(2.85,0.9){\textbf{L3 REGRESSION \& FUSION}\\OLS, Ridge, Lasso, SVR, Kalman};
+\node[L,fill=teal!12,draw=teal](c)at(5.7,0.9){\textbf{L4 CLUSTERING}\\$k$-Means, DBSCAN, GMM, Ward, PCA};
+\node[L,fill=ISSAred!10,draw=ISSAred](d)at(8.55,0.9){\textbf{L5 ANOMALY}\\IF, OCSVM, autoencoders};
+\node[L,fill=blue!8,draw=blue!60!black](e)at(0.9,-0.75){\textbf{L6 Q-LEARNING}\\MDP, Bellman, DQN, Double/Dueling};
+\node[L,fill=green!10,draw=teal!60!black](f)at(4.4,-0.75){\textbf{L7 POLICY GRADIENT}\\REINFORCE, PPO, SAC, drones};
+\node[L,fill=orange!12,draw=orange!70!black](g)at(7.9,-0.75){\textbf{L8 MARL}\\CTDE, QMIX, MAPPO, combined arms};
+\node[L,fill=AccentCol!15,draw=AccentCol,text width=2.8cm](h)at(11.4,0.0){\textbf{L9 SYNTHESIS}\\all paradigms $\bullet$ one defence pipeline};
+\foreach \u in {a,b,c,d}{\draw[arr](l1)--(\u);}\foreach \u in {d,g}{\draw[arr](\u)--(h);}\draw[arr](a)--(e);\draw[arr](e)--(f);\draw[arr](f)--(g);
+\node[lab]at(1.4,1.75){supervised: labels};\node[lab]at(7.1,1.75){unsupervised: no labels};\node[lab]at(4.4,-1.6){reinforcement: learn by interaction};
+\end{tikzpicture}}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{rbox}\scriptsize\textbf{Key thread:} raw sensor data (L1 quality) $\to$ threat classification (L2--3) $\to$ pattern discovery (L4--5) $\to$ decision optimisation (L6--8). No algorithm exists in isolation.\end{rbox}
+\column{0.48\textwidth}
+\begin{cbox}[AccentCol]{Three master questions}\scriptsize \textcircled{\tiny1} Do I have labels? (supervised vs unsupervised) \textcircled{\tiny2} Is the environment interactive? (static ML vs RL) \textcircled{\tiny3} Are there multiple agents? (single-agent RL vs MARL)\end{cbox}
+\end{columns}
+\end{frame}
+
+\sect{2. Case-Study Thread}
+\begin{frame}{Cross-Lecture Case-Study Thread --- One Battlefield, Eight Algorithms}
+\figc{4.0cm}{\scriptsize\renewcommand{\arraystretch}{1.12}\begin{tabular}{clll}\toprule\textbf{L}&\textbf{Case study}&\textbf{Key result}&\textbf{Operational value}\\\midrule 1&Data pitfalls (Afghan mine detector, Simpson, base rates)&94.1\% Afghan $\to$ 58.7\% Iraq&know when to trust your data\\2&IADS 5-class threat classification ($N$=8,500)&RF 97.5\%, AUC 0.998 (AB)&real-time threat ID for SAM crews\\3&Mission duration + 3-sensor fusion&XGBoost $R^2$=0.912; KF+RF 96.2\%&planning accuracy; robust fusion\\4&OPFOR archetypes ($N$=8,000 trajectories)&$k$=5, silhouette 0.712&INFILTRATION found without labels\\5&Network intrusion (500K) + insider threat&AE TPR 95.8\%, FPR 0.6\%; MTTD 31.4 h&zero-day detection; CERT ops\\6&Wargame DQN ($20\times20$ JANUS)&93\% vs random; 81\% vs novice&tactical advisory system\\7&4-drone swarm, continuous control&PPO 94.3\%; SAC 96.2\% (91\% real)&autonomous UAS coordination\\8&6-unit combined-arms MARL&MAPPO 82.4\% vs human 81.3\%&emergent SEAD-first doctrine\\\bottomrule\end{tabular}}
+\sm{L2: the PPTX revision table cites RF AUC 0.991; the L2 deck reports 0.998 for the AB one-vs-rest curve.}
+\begin{rbox}\scriptsize\textbf{Golden thread:} L4 discovered the INFILTRATION archetype $\to$ L5 flags such trajectories as anomalies $\to$ L6's wargame agent learns counter-infiltration positioning $\to$ L8's SEAD-first protocol denies infiltrators the SAM coverage gaps they exploit. The course is one ecosystem.\end{rbox}
+\end{frame}
+
+\sect{3. Algorithm Selection}
+\begin{frame}{Algorithm Selection Guide --- From Problem Statement to Method}
+\figc{4.6cm}{\begin{tikzpicture}[level distance=1.1cm]
+\tikzset{Q/.style={nd,fill=AccentCol!15,draw=AccentCol,font=\fontsize{6.4}{7.4}\selectfont\bfseries},A/.style={nd,text width=2.55cm,font=\fontsize{5.9}{7}\selectfont,align=left,minimum height=1.1cm}}
+\node[Q](q1)at(0,0){Labels available?};
+\node[Q](cl)at(-4.4,-1.1){discrete or continuous output?};\node[Q](un)at(4.4,-1.1){find groups or flag the unusual?};
+\node[A,fill=ISSAgrn!10](c1)at(-6.0,-2.6){\textbf{Classification:} RF best overall; DT for interpretability; SVM for clean high-dim; XGBoost for fast tabular};
+\node[A,fill=violet!10](c2)at(-2.9,-2.6){\textbf{Regression:} XGBoost non-linear; Ridge/Lasso sparse \& interpretable; SVR robust to outliers; Kalman+ML fusion};
+\node[A,fill=teal!10](u1)at(2.9,-2.6){\textbf{Clustering:} $k$-Means first pass; DBSCAN any shape + noise; GMM soft membership; Ward for visual hierarchy};
+\node[A,fill=ISSAred!8](u2)at(6.0,-2.6){\textbf{Anomaly:} Isolation Forest real-time tier 1; autoencoder tier 2; LSTM-AE sequences; graph AE networks};
+\node[Q](q2)at(0,-3.9){interactive environment?};
+\node[A,fill=blue!8](r1)at(-3.2,-5.1){\textbf{Single agent:} small discrete $\to$ Dueling + Double DQN; continuous $\to$ PPO (stable) or SAC (robust)};
+\node[A,fill=orange!10](r2)at(3.2,-5.1){\textbf{Multiple agents:} MAPPO default; QMIX cooperative / off-policy; MADDPG continuous mixed; add comms if allowed};
+\draw[arr](q1)--node[above,font=\tiny]{yes}(cl);\draw[arr](q1)--node[above,font=\tiny]{no}(un);\draw[arr](cl)--(c1);\draw[arr](cl)--(c2);\draw[arr](un)--(u1);\draw[arr](un)--(u2);\draw[arr](q1)--node[right,font=\tiny]{sequential decisions}(q2);\draw[arr](q2)--node[above,font=\tiny]{1 agent}(r1);\draw[arr](q2)--node[above,font=\tiny]{$N$ agents}(r2);
+\end{tikzpicture}}
+\begin{wbox}\scriptsize\textbf{Before any of these:} apply Lecture 1's checks --- collection bias, base rates, confounders, distribution shift. The best algorithm cannot rescue a biased dataset.\end{wbox}
+\end{frame}
+
+\begin{frame}{Best Performers by Task --- the Course Scoreboard}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\figc{3.0cm}{\scriptsize\renewcommand{\arraystretch}{1.13}\begin{tabular}{lll}\toprule\textbf{Task}&\textbf{Best method}&\textbf{Result}\\\midrule Classification&Random Forest&97.5\% (IADS)\\Regression&XGBoost&$R^2$ 0.912\\Sensor fusion&Kalman + RF&96.2\%\\Imbalance&RF/XGB + SMOTE + weights&AB recall 89--92\%\\Clustering&$k$-Means ($k$=5)&silhouette 0.712\\Anomaly (accuracy)&Autoencoder&TPR 95.8\%\\Anomaly (speed)&Isolation Forest&0.002 ms/packet\\\bottomrule\end{tabular}}
+\column{0.48\textwidth}
+\figc{3.0cm}{\scriptsize\renewcommand{\arraystretch}{1.13}\begin{tabular}{lll}\toprule\textbf{Task}&\textbf{Best method}&\textbf{Result}\\\midrule Discrete RL&Dueling + Double DQN&93\% vs random\\Continuous RL&SAC&96.2\% (91\% real)\\Stable RL&PPO&94.3\%, less tuning\\Training aid&Curriculum&+40 points\\Cooperative MARL&MAPPO&82.4\%\\MARL + comms&CommsMAPPO&88.1\%\\Comms-denied&MAPPO / QMIX&82.4\% / 74.1\%\\\bottomrule\end{tabular}}
+\end{columns}
+\begin{ibox}\scriptsize\textbf{Read every number with Lecture 1 in mind:} all are single-study simulation or benchmark results without reported confidence intervals. They rank methods \emph{for these case studies}; they are not guarantees for your data.\end{ibox}
+\end{frame}
+
+\sect{4. Formula Sheets}
+\begin{frame}{Key Formulas (I) --- Data, Supervised Learning \& Fusion (L1--L3)}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{fbx}{Data \& statistics (L1)}\[\text{Error}=\text{Bias}^2+\text{Variance}+\varepsilon,\quad P(\ge1\text{ FP})=1-(1-\alpha)^m\]\[\text{PPV}=\frac{\text{sens}\cdot p}{\text{sens}\cdot p+(1-\text{spec})(1-p)}\]\[D_{KS}=\max_x|F_1-F_2|\]\end{fbx}
+\begin{fbx}{Classification (L2)}\[P=\tfrac{TP}{TP+FP},\ R=\tfrac{TP}{TP+FN},\ F_\beta=(1+\beta^2)\tfrac{PR}{\beta^2P+R}\]\[G=1-\textstyle\sum p_k^2,\quad H=-\sum p_k\log_2p_k\]\[\text{margin}=2/\|w\|\]\[\min\tfrac12\|w\|^2+C\textstyle\sum\xi_i,\quad K=e^{-\gamma\|x-x'\|^2}\]\end{fbx}
+\column{0.48\textwidth}
+\begin{fbx}{Regression (L3)}\[\hat\beta=(X^{\top}X)^{-1}X^{\top}y,\quad\hat\beta_{\text{ridge}}=(X^{\top}X+\lambda I)^{-1}X^{\top}y\]\[\text{Lasso: }\min\|y-X\beta\|^2+\lambda\|\beta\|_1,\quad R^2=1-\tfrac{SS_{\text{res}}}{SS_{\text{tot}}}\]\end{fbx}
+\begin{fbx}{Kalman filter (L3)}\[\hat x^{-}=F\hat x+Bu,\quad P^{-}=FPF^{\top}+Q\]\[K=P^{-}H^{\top}(HP^{-}H^{\top}+R)^{-1}\]\[\hat x=\hat x^{-}+K(z-H\hat x^{-}),\quad P=(I-KH)P^{-}\]\end{fbx}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Key Formulas (II) --- Unsupervised Learning \& Anomaly Detection (L4--L5)}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{fbx}{Clustering (L4)}\[J=\sum_j\sum_{x\in C_j}\|x-\mu_j\|^2,\quad\mu_j=\tfrac{1}{|C_j|}\sum_{x\in C_j}x\]\[s(i)=\frac{b(i)-a(i)}{\max(a(i),b(i))}\in[-1,1]\]\[P(x)=\sum_k\pi_k\mathcal N(x;\mu_k,\Sigma_k),\quad r_{ik}=\tfrac{\pi_k\mathcal N_{ik}}{\sum_j\pi_j\mathcal N_{ij}}\]\[C=V\Lambda V^{\top},\quad Z=\bar XV_k,\quad\text{EVR}_j=\lambda_j/\textstyle\sum\lambda\]\end{fbx}
+\sm{DBSCAN: core if $|N_\varepsilon(p)|\ge$ MinPts; clusters are maximal density-connected sets; ARI measures agreement between two clusterings.}
+\column{0.48\textwidth}
+\begin{fbx}{Anomaly detection (L5)}\[D_M(x)=\sqrt{(x-\mu)^{\top}\Sigma^{-1}(x-\mu)}\]\[s(x,\psi)=2^{-E[h(x)]/c(\psi)},\ c(\psi)=2H(\psi{-}1)-\tfrac{2(\psi-1)}{\psi}\]\[\text{RE}(x)=\|x-f_{\text{dec}}(f_{\text{enc}}(x))\|^2\]\[f(x)=\text{sign}\Big(\sum\alpha_iK(x_i,x)-\rho\Big)\]\end{fbx}
+\begin{wbox}\scriptsize\textbf{Key pitfall:} the plain covariance $\Sigma$ in Mahalanobis is contaminated by the anomalies themselves --- use the MCD estimator (most central 50\%).\end{wbox}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Key Formulas (III) --- Reinforcement Learning \& MARL (L6--L8)}
+\begin{columns}[T]
+\column{0.33\textwidth}
+\begin{fbx}{Q-learning (L6)}\[Q^{*}=\sum_{s'}P\big[R+\gamma\max_{a'}Q^{*}\big]\]\[Q\leftarrow Q+\alpha\delta\]\[\delta=r+\gamma\max Q'-Q\]\[y=r+\gamma Q(s',a^{*};\theta^{-})\]\[Q=V+A-\bar A\]\end{fbx}
+\column{0.33\textwidth}
+\begin{fbx}{Policy gradient (L7)}\[\nabla J=\mathbb E[\nabla\log\pi\,G_t]\]\[\hat A=r+\gamma V(s')-V(s)\]\[r_t=\pi_{\text{new}}/\pi_{\text{old}}\]\[L^{\text{CLIP}}=\mathbb E[\min(r_t\hat A,\text{clip}\,\hat A)]\]\[J_{\text{SAC}}=\mathbb E[r+\alpha H(\pi)]\]\end{fbx}
+\column{0.32\textwidth}
+\begin{fbx}{MARL (L8)}\[\partial Q_{\text{tot}}/\partial Q_i>0\]\[L=\tfrac1N\sum_iL_i^{\text{CLIP}}\]\[A_i=Q(s,\mathbf a)-b_i(s,\mathbf a_{-i})\]\[b_i=\mathbb E_{a_i'\sim\pi_i}Q(s,(a_i',\mathbf a_{-i}))\]\end{fbx}
+\end{columns}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{fbx}{$\varepsilon$-greedy and annealing}\[P(\text{greedy})=1-\varepsilon+\tfrac{\varepsilon}{|A|},\quad\varepsilon_t=\varepsilon_{\min}+(\varepsilon_{\max}-\varepsilon_{\min})e^{-t/\tau}\]\end{fbx}
+\column{0.48\textwidth}
+\begin{fbx}{Shaping and discounting}\[F=\gamma\Phi(s')-\Phi(s),\qquad G_t=\sum_k\gamma^kr_{t+k+1}\]\end{fbx}
+\end{columns}
+\end{frame}
+
+\sect{5. Misconceptions}
+\begin{frame}{Common Misconceptions --- Exam Traps and Conceptual Errors (I)}
+\figc{5.0cm}{\begin{tikzpicture}
+\tikzset{M/.style={nd,text width=7.0cm,align=left,minimum height=1.15cm,font=\fontsize{6.5}{7.7}\selectfont,inner sep=3pt,draw=ISSAred,fill=ISSAred!4}}
+\node[M]at(-3.75,1.9){\textbf{``More data always helps.''} \red{False.} Biased data amplifies bias: more Afghan data would not fix Iraq (94.1\% $\to$ 58.7\%). Quality and domain match beat quantity.};
+\node[M]at(-3.75,0.6){\textbf{``High accuracy = good model.''} \red{False.} On the real IADS stream (78.4\% civilian) ``always civilian'' scores 78\%+. Check per-class recall, AUC, confusion matrix.};
+\node[M]at(-3.75,-0.7){\textbf{``Percentages can be added or averaged.''} \red{False.} Simpson: A wins both stone sizes yet loses 78\% vs 83\% overall --- totals come from counts.};
+\node[M]at(-3.75,-2.0){\textbf{``Not significant = no effect.''} \red{False.} The coating trial ($p=0.072$, 40 sorties) was under-powered; 93 per arm were needed.};
+\node[M]at(3.75,1.9){\textbf{``DBSCAN needs $k$.''} \red{False.} It discovers the number of clusters from density ($\varepsilon$, MinPts); $k$-Means and GMM need $k$.};
+\node[M]at(3.75,0.6){\textbf{``A baseline biases the gradient.''} \red{False.} $\mathbb E[b(s)\nabla\log\pi]=0$ for any $b$ not depending on $a$: less variance, zero bias.};
+\node[M]at(3.75,-0.7){\textbf{``Replay is only for efficiency.''} \red{Incomplete.} It also breaks temporal correlation --- without that, DQN often diverges.};
+\node[M]at(3.75,-2.0){\textbf{``t-SNE distances are meaningful.''} \red{False.} Only local neighbourhoods are preserved; never compare between-cluster distances.};
+\end{tikzpicture}}
+\end{frame}
+
+\begin{frame}{Common Misconceptions (II) --- More Traps}
+\figc{4.4cm}{\begin{tikzpicture}
+\tikzset{M/.style={nd,text width=7.0cm,align=left,minimum height=1.3cm,font=\fontsize{6.5}{7.7}\selectfont,inner sep=3pt,draw=ISSAred,fill=ISSAred!4}}
+\node[M]at(-3.75,1.4){\textbf{``QMIX just sums Q-values.''} \red{Misleading.} VDN sums; QMIX mixes non-linearly, conditioned on the global state through a hypernetwork, while keeping monotonicity.};
+\node[M]at(-3.75,0){\textbf{``SAC always needs more episodes than PPO.''} \red{Context-dependent.} SAC took more episodes to 70\% on the drone task (1,500 vs 800), but reuses data via replay; choose by whether compute or environment interaction is scarce.};
+\node[M]at(-3.75,-1.4){\textbf{``Q = 18.7 means 18.7\% chance to win.''} \red{False.} Q-values are expected discounted reward in reward units, not probabilities.};
+\node[M]at(3.75,1.4){\textbf{``A 99\%-accurate detector's alarms are 99\% reliable.''} \red{False.} At a 0.1\% base rate only $\approx$9\% of alarms are real threats.};
+\node[M]at(3.75,0){\textbf{``Strong correlation shows the cause.''} \red{False.} Catering vs wins $r=0.71$ fell to 0.09 after controlling for budget; maintenance hours vs breakdowns is reverse causation.};
+\node[M]at(3.75,-1.4){\textbf{``Simulation win rate = field performance.''} \red{False.} Drones 94\% $\to$ 78\% real without randomisation; a human OPFOR adapts.};
+\end{tikzpicture}}
+\begin{ibox}\scriptsize\textbf{Exam technique:} when a question offers a confident absolute (``always'', ``proves'', ``guarantees''), look for the hidden assumption --- base rate, sample size, confounder, distribution shift, or simulation.\end{ibox}
+\end{frame}
+
+\sect{6. Integrated Pipeline}
+\begin{frame}{Integrated AI/ML Pipeline for Defence --- End-to-End Architecture}
+\figc{3.3cm}{\begin{tikzpicture}
+\tikzset{S/.style={nd,text width=2.25cm,align=left,minimum height=2.9cm,font=\fontsize{5.9}{7}\selectfont,inner sep=3pt,anchor=north}}
+\node[S,draw=ISSAnavy,fill=ISSAnavy!6](a)at(0,0){\textbf{1 DATA INGESTION}\\radar, IR, ELINT, SIGINT, OSINT\\\textbf{L1:} quality checks, bias audit, distribution-shift detection, label-noise estimate, missing-data strategy};
+\node[S,draw=ISSAgrn,fill=ISSAgrn!7](b)at(2.65,0){\textbf{2 THREAT ID}\\\textbf{L2:} RF 5-class IADS, XGBoost, SVM\\\textbf{L3:} regression (duration, trajectory); Kalman + ML fusion};
+\node[S,draw=teal,fill=teal!7](c)at(5.3,0){\textbf{3 PATTERN DISCOVERY}\\\textbf{L4:} OPFOR archetypes, new tactics; PCA/UMAP\\\textbf{L5:} IF real-time screen; AE deep analysis; LSTM-AE insider};
+\node[S,draw=blue!60!black,fill=blue!5](d)at(7.95,0){\textbf{4 DECISION SUPPORT}\\\textbf{L6:} DQN wargame COA, advisory Q-values\\\textbf{L7:} PPO/SAC continuous UAS control\\\textbf{L8:} MARL swarm, CTDE};
+\node[S,draw=AccentCol,fill=AccentCol!8](e)at(10.6,0){\textbf{5 HUMAN--AI INTERFACE}\\SHAP explanations, calibrated confidence; Level-2 MUM-T: top-3 actions; ROE/IHL checks; accountability log; override};
+\foreach \u/\v in {a/b,b/c,c/d,d/e}{\draw[bigarr]([yshift=-1.45cm]\u.north east)--([yshift=-1.45cm]\v.north west);}
+\draw[arr,dashed,ISSAred](e.south)--++(0,-0.25)-|node[pos=0.25,below,font=\tiny,ISSAred]{feedback: anomalies update baselines; outcomes retrain classifiers; operator feedback updates all models}(a.south);
+\end{tikzpicture}}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{wbox}\scriptsize\textbf{Real-world caveat:} the pipeline is ITERATIVE, not linear --- every stage feeds back to earlier ones.\end{wbox}
+\column{0.48\textwidth}
+\begin{ibox}\scriptsize\textbf{Deployment stack:} stages 1--3 at the edge on FPGA/GPU (10--100 ms); stages 4--5 on servers with datalinks (100 ms--1 s); human decision 1--10 s. Total loop: \textbf{1.5--11 s} sensor-to-action.\end{ibox}
+\end{columns}
+\end{frame}
+
+\sect{7. Ethics}
+\begin{frame}{Ethical AI in Defence --- Eight Non-Negotiable Principles}
+\figc{4.6cm}{\begin{tikzpicture}
+\tikzset{E/.style={nd,text width=3.35cm,align=left,minimum height=2.0cm,font=\fontsize{6.1}{7.2}\selectfont,inner sep=3pt,draw=AccentCol,fill=AccentCol!5}}
+\node[E]at(-5.4,1.1){\textbf{1 Human control.} Level 3+ unresolved under IHL; this course: Level 2 advisory. Meaningful control = understanding + oversight + ability to intervene.};
+\node[E]at(-1.8,1.1){\textbf{2 Data integrity.} L1 pitfalls flow into every decision: bias audits, shift monitoring, adversarial data tests.};
+\node[E]at(1.8,1.1){\textbf{3 Explainability.} SHAP for classifiers, per-feature RE for anomalies, Q-value advisories --- targeting needs a rationale.};
+\node[E]at(5.4,1.1){\textbf{4 Proportionality.} IHL Art.\ 51(5)(b): no reward function can encode this legal, contextual judgement.};
+\node[E]at(-5.4,-1.1){\textbf{5 Distinction.} Combatant vs civilian: novel uniforms, dual-use sites, surrender --- no AI solves this reliably at tempo.};
+\node[E]at(-1.8,-1.1){\textbf{6 Adversarial robustness.} Fixed policies can be reverse-engineered; classifiers fooled; red-team before deployment.};
+\node[E]at(1.8,-1.1){\textbf{7 Accountability.} Chain of command remains; full audit log: input $\to$ AI advice $\to$ human decision $\to$ outcome.};
+\node[E]at(5.4,-1.1){\textbf{8 Sim-to-real honesty.} 82.4\% in simulation $\neq$ operational; drones 94\% $\to$ 78\%. Overstating AI is an ethical failure.};
+\end{tikzpicture}}
+\begin{wbox}\scriptsize\centering\textbf{Ethical bright line:} AI is a DECISION-SUPPORT tool. Human commanders retain authority for all lethal action.\end{wbox}
+\end{frame}
+
+\sect{8. Assessment}
+\begin{frame}{Assessment Preparation --- What Examiners Look For}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{cbox}{Typical integration questions}\scriptsize\begin{tl}\item \textbf{Pipeline design:} ``Design an AI cyber-defence pipeline for 10M packets/day'' --- expect L1 data audit + L5 3-tier + L2 classifier + L8 human control\item \textbf{Algorithm choice:} ``QMIX or MAPPO for a naval task force?'' --- compare on cooperation, comms, action type, data efficiency\item \textbf{Failure analysis:} ``DQN wins 93\% vs random but loses to an adaptive OPFOR --- why?'' --- fixed-policy exploitability; league self-play\item \textbf{Data interpretation:} ``AI units win less overall'' --- spot Simpson's paradox and compute from counts\item \textbf{Ethics:} justify Level 2 over Level 3 using sim-to-real gaps and IHL\end{tl}\end{cbox}
+\column{0.48\textwidth}
+\begin{cbox}[ISSAgrn]{What distinguishes a top answer}\scriptsize\begin{tl}\item \textbf{Numbers, not adjectives:} ``RF 97.5\%, AB recall 96.1\%, 2.8 ms'' beats ``RF is better''\item \textbf{Limitations stated:} sample size, confidence interval, simulation vs field, base rate\item \textbf{Cross-lecture links:} L4 $\to$ L5 $\to$ L6 $\to$ L8 thread\item \textbf{Human control:} autonomy level, accountability and IHL in every deployment answer\item \textbf{Worked arithmetic shown:} Kalman gain, silhouette, Q-update, PPV\end{tl}\end{cbox}
+\end{columns}
+\end{frame}
+
+\sect{9. Looking Forward}
+\begin{frame}{Looking Forward --- What This Course Equips You To Do}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\begin{cbox}[AccentCol]{The three ideas that matter most}\scriptsize\begin{te}\item \textbf{Data quality and honest interpretation beat algorithm sophistication.} Simpson, base rates, survivorship and shift break more systems than weak models do.\item \textbf{Method choice follows the problem:} labels? interaction? multiple agents? --- then validate with several metrics.\item \textbf{Simulation results need real-world caveats} and a human accountable for lethal decisions.\end{te}\end{cbox}
+\column{0.48\textwidth}
+\begin{cbox}[ISSAnavy]{You can now}\scriptsize\begin{tl}\item Direct AI development teams with technical credibility\item Evaluate vendor and research claims with numerical rigour\item Challenge AI recommendations constructively and safely\item Design human--machine teaming protocols compatible with IHL\end{tl}\end{cbox}
+\begin{rbox}\scriptsize\textbf{Next --- Lecture 10:} student project presentations and the final Q\&A panel.\end{rbox}
+\end{columns}
+\end{frame}
+\end{document}
